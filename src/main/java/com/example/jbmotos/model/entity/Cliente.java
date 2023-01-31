@@ -31,13 +31,12 @@ public class Cliente {
 
     @Column(name = "email", unique = true)
     @NotBlank(message = "O campo Email é obrigatório")
-    @Length(min =10, max = 50)
     @Email
     private String email;
 
     @Column(name = "telefone")
     @NotBlank(message = "O campo Telefone é obrigatório")
-    @Length(min =11, max = 15)
+    @Length(min =11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
     private String telefone;
 
     @NotBlank(message = "O campo Endereco é obrigatório")
