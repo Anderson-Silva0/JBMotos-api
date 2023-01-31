@@ -18,7 +18,7 @@ public class Estoque {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_estoque")
+    @Column(name = "id")
     private Integer id;
 
     @NotBlank(message = "O campo Produto é obrigatório")

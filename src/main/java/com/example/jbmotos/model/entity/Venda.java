@@ -1,7 +1,5 @@
 package com.example.jbmotos.model.entity;
 
-
-import com.example.jbmotos.model.repositories.VendaRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +10,8 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Date;
 
 @Table(name = "venda", schema = "jbmotos")
 @Data
@@ -26,12 +23,12 @@ public class Venda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_venda")
+    @Column(name = "id")
     private Integer id;
 
     @NotBlank(message = "O campo Cliente é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "cliente")
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
     @Column(name = "data_hora")
@@ -40,7 +37,7 @@ public class Venda {
 
     @NotBlank(message = "O campo Funcionário é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "funcionario")
+    @JoinColumn(name = "id_funcionario")
     private Funcionario funcionario;
 
     @Column(name = "observacao")

@@ -19,7 +19,7 @@ import javax.persistence.*;
 public class Funcionario {
 
     @Id
-    @Column(name = "cpf_funcionario", unique = true)
+    @Column(name = "cpf", unique = true)
     @CPF
     private String cpf;
 
