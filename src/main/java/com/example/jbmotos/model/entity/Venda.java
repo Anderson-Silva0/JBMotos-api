@@ -31,37 +31,25 @@ public class Venda {
 
     @NotBlank(message = "O campo Cliente é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "cpf_cliente")
+    @JoinColumn(name = "cliente")
     private Cliente cliente;
-
-    @ManyToMany
-    @JoinColumn(name = "id_produto")
-    private List<Produto> produtos;
 
     @Column(name = "data_hora")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime data_hora;
 
-    @Column(name = "quantidade")
-    @NotBlank(message = "O campo Quantidade é obrigatório")
-    private Integer quantidade;
-
     @NotBlank(message = "O campo Funcionário é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "cpf_funcionario")
+    @JoinColumn(name = "funcionario")
     private Funcionario funcionario;
 
     @Column(name = "observacao")
     @NotBlank(message = "O campo Observação é obrigatório")
-    @Length(max = 255)
+    @Length(max = 255, message = "O campo Observação tem no máximo 255 caracteres.")
     private String observacao;
 
     @Column(name = "forma_de_pagamento")
-    @NotBlank(message = "O campo Observação é obrigatório")
-    @Length(max = 50)
+    @NotBlank(message = "O campo Forma de Pagamento é obrigatório")
+    @Length(max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String forma_de_pagamento;
-
-    @Column(name = "valor")
-    @NotBlank(message = "O campo Valor é obrigatório")
-    private BigDecimal valor;
 }
