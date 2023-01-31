@@ -19,18 +19,18 @@ import javax.persistence.*;
 public class Fornecedor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_fornecedor")
-    private Integer id;
-
-    @Column(name = "nome")
-    @NotBlank(message = "O campo Nome é obrigatório")
-    private String nome;
-
-    @Column
+    @Column(name = "cnpj_fornecedor")
     @NotBlank(message = "O campo CNPJ é obrigatório")
-    @Length(min = 14, max = 18)
     @CNPJ
     private String cnpj;
 
+    @Column(name = "nome")
+    @NotBlank(message = "O campo Nome é obrigatório")
+    @Length(min = 3, max = 50, message = "O campo Nome deve ter entre 3 e 50 caracteres.")
+    private String nome;
+
+    @Column(name = "telefone")
+    @NotBlank(message = "O campo Telefone é obrigatório")
+    @Length(min =11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
+    private String telefone;
 }
