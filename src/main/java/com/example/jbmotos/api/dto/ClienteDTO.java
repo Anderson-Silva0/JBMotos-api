@@ -18,17 +18,13 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class ClienteDTO {
 
-    @Column(name = "CPF_cliente", unique = true)
-    @Length(min = 11, max = 14)
     @CPF
     private String cpf;
 
-    @Column(name = "nome")
     @NotBlank(message = "O campo Nome é obrigatório")
     @Length(min = 3,max = 50)
     private String nome;
 
-    @Column(name = "email", unique = true)
     @NotBlank(message = "O campo Email é obrigatório")
     @Length(min =10, max = 50)
     @Email
@@ -36,7 +32,7 @@ public class ClienteDTO {
 
     @Column(name = "telefone")
     @NotBlank(message = "O campo Telefone é obrigatório")
-    @Length(min =11, max = 15)
+    @Length(min =11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
     private String telefone;
 
     @NotBlank(message = "O campo Endereco é obrigatório")
