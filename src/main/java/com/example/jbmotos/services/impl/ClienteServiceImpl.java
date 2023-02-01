@@ -2,7 +2,6 @@ package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.entity.Venda;
 import com.example.jbmotos.model.repositories.ClienteRepository;
 import com.example.jbmotos.services.ClienteService;
 import org.modelmapper.ModelMapper;
