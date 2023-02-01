@@ -1,6 +1,5 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.enums.TipoUsuario;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
