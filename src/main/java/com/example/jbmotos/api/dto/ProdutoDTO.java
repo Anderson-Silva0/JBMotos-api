@@ -21,9 +21,9 @@ public class ProdutoDTO {
     @Length(min = 3, max = 50, message = "O campo Nome deve ter entre 3 e 50 caracteres.")
     private String nome;
 
-    @NotBlank(message = "O campo Valor é obrigatório")
-    private BigDecimal valor;
+    @NotBlank(message = "O campo Preço de Venda é obrigatório")
+    private BigDecimal preco_venda;
 
-    @NotBlank(message = "O campo Fornecedor é obrigatório")
-    private String fornecedor;
+    @NotBlank(message = "O campo Estoque Mínimo é obrigatório")
+    private Integer min_estoque;
 }
