@@ -27,7 +27,7 @@ public class Venda {
 
     @NotBlank(message = "O campo Cliente é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "id_cliente")
+    @JoinColumn(name = "cpf_cliente")
     private Cliente cliente;
 
     @Column(name = "data_hora")
@@ -36,7 +36,7 @@ public class Venda {
 
     @NotBlank(message = "O campo Funcionário é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "id_funcionario")
+    @JoinColumn(name = "cpf_funcionario")
     private Funcionario funcionario;
 
     @Column(name = "observacao")
