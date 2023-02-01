@@ -1,10 +1,13 @@
 package com.example.jbmotos.api.dto;
 
+import com.example.jbmotos.model.enums.TipoUsuario;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.br.CPF;
+
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -29,4 +32,11 @@ public class EnderecoDTO {
     @NotBlank(message = "O campo Cidade é obrigatório")
     @Length(max = 50, message = "O campo Cidade deve ter no máximo 50 caracteres.")
     private String cidade;
+
+    @NotBlank(message = "O campo Tipo do Usuário é obrigatório")
+    private String tipo_usuario;
+
+    @NotBlank(message = "O campo CPF do Usuário é obrigatório")
+    @CPF
+    private String cpf_usuario;
 }
