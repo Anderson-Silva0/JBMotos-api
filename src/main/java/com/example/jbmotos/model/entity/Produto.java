@@ -33,6 +33,6 @@ public class Produto {
 
     @NotBlank(message = "O campo Fornecedor é obrigatório")
     @ManyToOne
-    @JoinColumn(name = "id_fornecedor")
+    @JoinColumn(name = "cnpj_fornecedor")
     private Fornecedor fornecedor;
 }
