@@ -1,6 +1,5 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.entity.Endereco;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
-import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
@@ -30,11 +28,7 @@ public class ClienteDTO {
     @Email
     private String email;
 
-    @Column(name = "telefone")
     @NotBlank(message = "O campo Telefone é obrigatório")
     @Length(min =11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
     private String telefone;
-
-    @NotBlank(message = "O campo Endereco é obrigatório")
-    private Endereco endereco;
 }
