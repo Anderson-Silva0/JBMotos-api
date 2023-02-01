@@ -43,7 +43,7 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     @Transactional
     public Endereco atualizarEndereco(EnderecoDTO enderecoDTO) {
-        Objects.requireNonNull(enderecoDTO.getId());
+        Objects.requireNonNull(enderecoDTO.getId(), "Erro ao tentar atualizar o Endereço. Informe um Id.");
         return enderecoRepository.save(mapper.map(enderecoDTO, Endereco.class));
     }
 
