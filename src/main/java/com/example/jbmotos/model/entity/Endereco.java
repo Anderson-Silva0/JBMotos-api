@@ -11,6 +11,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Table(name = "endereco", schema = "jbmotos")
 @Data
@@ -36,7 +37,7 @@ public class Endereco {
     private String cep;
 
     @Column(name = "numero")
-    @NotBlank(message = "O campo Numero é obrigatório")
+    @NotNull(message = "O campo Numero é obrigatório")
     private Integer numero;
 
     @Column(name = "cidade")
@@ -44,13 +45,15 @@ public class Endereco {
     @Length(max = 50, message = "O campo Cidade deve ter no máximo 50 caracteres.")
     private String cidade;
 
-    @Column(name = "tipo_suario")
+    @Column(name = "tipo_usuario")
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "O campo Tipo do Usuário é obrigatório")
-    private TipoUsuario tipo_usuario;
+    @NotNull(message = "O campo Tipo do Usuário é obrigatório")
+    @Length(max = 14)
+    private TipoUsuario tipoUsuario;
 
     @Column(name = "cpf_usuario")
     @NotBlank(message = "O campo CPF do Usuário é obrigatório")
-    @CPF
-    private String cpf_usuario;
+    @Length(max = 14)
+    @CPF(message = "Número do CPF inválido")
+    private String cpfUsuario;
 }
