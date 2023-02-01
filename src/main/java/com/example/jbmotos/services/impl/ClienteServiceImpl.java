@@ -43,7 +43,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
-        Objects.requireNonNull(clienteDTO.getCpf());
+        Objects.requireNonNull(clienteDTO.getCpf(), "Erro ao tentar atualizar a Cliente. Informe um CPF.");
         return clienteRepository.save(mapper.map(clienteDTO, Cliente.class));
     }
 
