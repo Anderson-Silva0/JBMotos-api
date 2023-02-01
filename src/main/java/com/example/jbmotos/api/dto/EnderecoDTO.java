@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -25,17 +26,17 @@ public class EnderecoDTO {
     @Length(max = 10, message = "O campo CEP deve ter no máximo 10 caracteres.")
     private String cep;
 
-    @NotBlank(message = "O campo Numero é obrigatório")
+    @NotNull(message = "O campo Numero é obrigatório")
     private Integer numero;
 
     @NotBlank(message = "O campo Cidade é obrigatório")
-    @Length(max = 50, message = "O campo Cidade deve ter no máximo 50 caracteres.")
+    @Length(min =  4, max = 50, message = "O campo Cidade deve ter no mínimo 4 e no máximo 50 caracteres.")
     private String cidade;
 
-    @NotBlank(message = "O campo Tipo do Usuário é obrigatório")
-    private String tipo_usuario;
+    @NotNull(message = "O campo Tipo do Usuário é obrigatório")
+    private String tipoUsuario;
 
     @NotBlank(message = "O campo CPF do Usuário é obrigatório")
-    @CPF
-    private String cpf_usuario;
+    @CPF(message = "Número do CPF inválido")
+    private String cpfUsuario;
 }
