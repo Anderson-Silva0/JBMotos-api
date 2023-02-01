@@ -19,7 +19,7 @@ import javax.persistence.*;
 public class Fornecedor {
 
     @Id
-    @Column(name = "cnpj")
+    @Column(name = "cnpj", unique = true)
     @NotBlank(message = "O campo CNPJ é obrigatório")
     @CNPJ
     private String cnpj;
