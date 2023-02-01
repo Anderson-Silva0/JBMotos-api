@@ -8,13 +8,13 @@ import java.util.Optional;
 
 public interface VendaService {
     
-    Venda salvarVenda(VendaDTO VendaDTO);
+    Venda salvarVenda(VendaDTO vendaDTO);
 
     List<Venda> buscarTodasVendas();
 
     Optional<Venda> buscarVendaPorId(Integer id);
 
-    Venda atualizarVenda(VendaDTO VendaDTO);
+    Venda atualizarVenda(VendaDTO vendaDTO);
 
     void deletarVenda(Integer id);
 }
