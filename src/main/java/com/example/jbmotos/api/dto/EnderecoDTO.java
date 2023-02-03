@@ -32,11 +32,4 @@ public class EnderecoDTO {
     @NotBlank(message = "O campo Cidade é obrigatório")
     @Length(min =  4, max = 50, message = "O campo Cidade deve ter no mínimo 4 e no máximo 50 caracteres.")
     private String cidade;
-
-    @NotNull(message = "O campo Tipo do Usuário é obrigatório")
-    private String tipoUsuario;
-
-    @NotBlank(message = "O campo CPF do Usuário é obrigatório")
-    @CPF(message = "Número do CPF inválido")
-    private String cpfUsuario;
 }
