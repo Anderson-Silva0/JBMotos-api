@@ -1,6 +1,7 @@
 package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.EnderecoDTO;
+import com.example.jbmotos.model.entity.Endereco;
 import com.example.jbmotos.services.EnderecoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/endereco")
@@ -26,20 +28,34 @@ public class EnderecoController {
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<EnderecoDTO> salvarEndereco(@Valid @RequestBody EnderecoDTO enderecoDTO) {
+    public ResponseEntity<EnderecoDTO> salvar(@Valid @RequestBody EnderecoDTO enderecoDTO) {
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}").buildAndExpand( enderecoService.salvarEndereco(enderecoDTO) ).toUri();
+                .fromCurrentRequest().buildAndExpand( enderecoService.salvarEndereco(enderecoDTO) ).toUri();
         return ResponseEntity.created(uri).build();
     }
+    @GetMapping("/buscar-todos")
+    public ResponseEntity<List<EnderecoDTO>> buscarTodos() {
+        return ResponseEntity.ok().body(
+                enderecoService.buscarTodosEnderecos().stream()
+                .map(endereco ->
+                        mapper.map(endereco, EnderecoDTO.class)
+                ).collect(Collectors.toList()));
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<EnderecoDTO> buscarPorId(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok().body(mapper.map(enderecoService.buscarEnderecoPorId(id), EnderecoDTO.class));
+    }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public List<String> handleValidationException(MethodArgumentNotValidException ex) {
-        List<String> message = new ArrayList<>();
-        ex.getBindingResult().getAllErrors().stream().forEach( erro -> {
-            message.add(erro.getDefaultMessage());
-        });
-        return message;
+    @PostMapping("/atualizar/{id}")
+    public ResponseEntity<EnderecoDTO> atualizar(@PathVariable("id") Integer id, @RequestBody EnderecoDTO enderecoDTO) {
+        enderecoDTO.setId(id);
+        System.out.println("Teste>>>>>>>>>> "+enderecoDTO.getId());
+        return ResponseEntity.ok().body(mapper.map(enderecoService.atualizarEndereco(enderecoDTO), EnderecoDTO.class));
+    }
+
+    @DeleteMapping("/deletar/{id}")
+    public ResponseEntity deletarPorId(@PathVariable("id") Integer id) {
+        enderecoService.deletarEnderecoPorId(id);
+        return ResponseEntity.noContent().build();
     }
 }
