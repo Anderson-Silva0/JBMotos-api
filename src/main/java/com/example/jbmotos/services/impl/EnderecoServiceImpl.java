@@ -62,4 +62,9 @@ public class EnderecoServiceImpl implements EnderecoService {
         }
         enderecoRepository.deleteById(id);
     }
+
+    @Override
+    public boolean existeEnderecoPorId(Integer id) {
+        return enderecoRepository.existsById(id);
+    }
 }
