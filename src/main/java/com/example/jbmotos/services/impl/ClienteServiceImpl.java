@@ -4,13 +4,15 @@ import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.repositories.ClienteRepository;
 import com.example.jbmotos.services.ClienteService;
+import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -18,13 +20,18 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
     @Autowired
+    private EnderecoService enderecoService;
+    @Autowired
     private ModelMapper mapper;
 
     @Override
     @Transactional
     public Cliente salvarCliente(ClienteDTO clienteDTO) {
-        //lembrar que o email do cliente é único. unique = true.
-        return clienteRepository.save(mapper.map(clienteDTO, Cliente.class));
+        validaEmailCpfEEnderecoParaSalvarCliente(clienteDTO);
+        Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
+        System.out.println(cliente.getEndereco());
+        return clienteRepository.save(cliente);
     }
 
     @Override
@@ -36,19 +43,59 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Cliente> buscarClientePorCPF(String cpf) {
+        if (!clienteRepository.existsClienteByCpf(cpf)) {
+            throw new ObjetoNaoEncontradoException("Cliente não encontrado para o CPF informado.");
+        }
         return clienteRepository.findClienteByCpf(cpf);
     }
 
     @Override
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
-        Objects.requireNonNull(clienteDTO.getCpf(), "Erro ao tentar atualizar a Cliente. Informe um CPF.");
-        return clienteRepository.save(mapper.map(clienteDTO, Cliente.class));
+        validaCpfEEnderecoParaAtualizarCliente(clienteDTO);
+        Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
+        System.out.println("Cliente aqui no service>> "+cliente);
+        return clienteRepository.save(cliente);
     }
 
     @Override
     @Transactional
     public void deletarCliente(String cpf) {
+        if (!clienteRepository.existsClienteByCpf(cpf)) {
+            throw new ObjetoNaoEncontradoException("Cliente não encontrado para o CPF informado.");
+        }
         clienteRepository.deleteClienteByCpf(cpf);
+    }
+
+    @Override
+    public void validaCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO) {
+        Cliente cliente = buscarClientePorCPF(clienteDTO.getCpf()).get();
+        if (!clienteRepository.existsClienteByCpf(clienteDTO.getCpf())) {
+            throw new ObjetoNaoEncontradoException("Cliente não encontrado para o CPF informado.");
+        }
+        if (!enderecoService.existeEnderecoPorId(clienteDTO.getEndereco())) {
+            throw new ObjetoNaoEncontradoException("Erro ao tentar atualizar Cliente, " +
+                    "o Endereço não existe.");
+        }
+        if (cliente.getEndereco().getId() != clienteDTO.getEndereco()) {
+            throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente, " +
+                    "o Endereço pertence à outro Cliente.");
+        }
+
+    }
+    @Override
+    public void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO) {
+        if (clienteRepository.existsClienteByCpf(clienteDTO.getCpf())) {
+            throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, CPF já cadastrado.");
+        }
+        if(clienteRepository.existsClienteByEmail(clienteDTO.getEmail())){
+            throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, Email já cadastrado.");
+        }
+        buscarTodosClientes().stream().forEach(c -> {
+            if (clienteDTO.getEndereco() == c.getEndereco().getId()) {
+                throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, o Endereço já pertence a um Cliente.");
+            }
+        });
     }
 }
