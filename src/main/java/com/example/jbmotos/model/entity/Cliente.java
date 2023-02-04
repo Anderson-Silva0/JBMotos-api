@@ -1,13 +1,9 @@
 package com.example.jbmotos.model.entity;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CPF;
 
 import javax.persistence.*;
 
@@ -33,6 +29,6 @@ public class Cliente {
     private String telefone;
 
     @JoinColumn(name = "id_endereco")
-    @OneToOne(targetEntity = Endereco.class)
+    @OneToOne
     private Endereco endereco;
 }
