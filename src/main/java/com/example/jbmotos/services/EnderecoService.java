@@ -18,4 +18,6 @@ public interface EnderecoService {
 
     @Transactional
     void deletarEnderecoPorId(Integer id);
+
+    boolean existeEnderecoPorId(Integer id);
 }
