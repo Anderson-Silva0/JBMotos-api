@@ -17,4 +17,8 @@ public interface ClienteService {
     Cliente atualizarCliente(ClienteDTO clienteDTO);
 
     void deletarCliente(String cpf);
+
+    void validaCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO);
+
+    void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO);
 }
