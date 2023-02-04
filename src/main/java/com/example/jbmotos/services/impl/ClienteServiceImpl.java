@@ -55,7 +55,6 @@ public class ClienteServiceImpl implements ClienteService {
         validaCpfEEnderecoParaAtualizarCliente(clienteDTO);
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
-        System.out.println("Cliente aqui no service>> "+cliente);
         return clienteRepository.save(cliente);
     }
 
