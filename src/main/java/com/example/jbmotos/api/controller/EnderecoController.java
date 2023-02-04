@@ -41,15 +41,14 @@ public class EnderecoController {
                         mapper.map(endereco, EnderecoDTO.class)
                 ).collect(Collectors.toList()));
     }
-    @GetMapping("/{id}")
+    @GetMapping("buscar/{id}")
     public ResponseEntity<EnderecoDTO> buscarPorId(@PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(mapper.map(enderecoService.buscarEnderecoPorId(id), EnderecoDTO.class));
     }
 
     @PostMapping("/atualizar/{id}")
-    public ResponseEntity<EnderecoDTO> atualizar(@PathVariable("id") Integer id, @RequestBody EnderecoDTO enderecoDTO) {
+    public ResponseEntity<EnderecoDTO> atualizar(@Valid @PathVariable("id") Integer id, @RequestBody EnderecoDTO enderecoDTO) {
         enderecoDTO.setId(id);
-        System.out.println("Teste>>>>>>>>>> "+enderecoDTO.getId());
         return ResponseEntity.ok().body(mapper.map(enderecoService.atualizarEndereco(enderecoDTO), EnderecoDTO.class));
     }
 
