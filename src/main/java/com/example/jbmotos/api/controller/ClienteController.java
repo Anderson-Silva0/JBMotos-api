@@ -1,7 +1,6 @@
 package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
-import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.services.ClienteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,6 @@ public class ClienteController {
     @PostMapping("atualizar/{cpf}")
     public ResponseEntity<ClienteDTO> atualizar(@Valid @PathVariable("cpf") String cpf, @RequestBody ClienteDTO clienteDTO) {
         clienteDTO.setCpf(cpf);
-        System.out.println("testeeee no controler>>> DTO "+clienteDTO);
         return ResponseEntity.ok().body(mapper.map(clienteService.atualizarCliente(clienteDTO), ClienteDTO.class));
     }
 
