@@ -37,18 +37,16 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Endereco> buscarEnderecoPorId(Integer id) {
-        Optional<Endereco> endereco = enderecoRepository.findById(id);
-        if (endereco.isEmpty()){
+        if (!enderecoRepository.existsById(id)) {
             throw new ObjetoNaoEncontradoException("Endereço não encontrado para o Id informado.");
         }
-        return endereco;
+        return enderecoRepository.findById(id);
     }
 
     @Override
     @Transactional
     public Endereco atualizarEndereco(EnderecoDTO enderecoDTO) {
-        Optional<Endereco> endereco = enderecoRepository.findById(enderecoDTO.getId());
-        if (endereco.isEmpty()){
+        if (!enderecoRepository.existsById(enderecoDTO.getId())) {
             throw new ObjetoNaoEncontradoException("Erro ao tentar atualizar." +
                     " Endereço não encontrado para o Id informado.");
         }
@@ -58,8 +56,7 @@ public class EnderecoServiceImpl implements EnderecoService {
     @Override
     @Transactional
     public void deletarEnderecoPorId(Integer id) {
-        Optional<Endereco> endereco = enderecoRepository.findById(id);
-        if (endereco.isEmpty()){
+        if (!enderecoRepository.existsById(id)){
             throw new ObjetoNaoEncontradoException("Erro ao tentar deletar." +
                     " Endereço não encontrado para o Id informado.");
         }
