@@ -30,7 +30,6 @@ public class ClienteServiceImpl implements ClienteService {
         validaEmailCpfEEnderecoParaSalvarCliente(clienteDTO);
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
-        System.out.println(cliente.getEndereco());
         return clienteRepository.save(cliente);
     }
 
@@ -52,7 +51,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
-        validaCpfEEnderecoParaAtualizarCliente(clienteDTO);
+        validaEmailCpfEEnderecoParaAtualizarCliente(clienteDTO);
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
         return clienteRepository.save(cliente);
@@ -68,20 +67,24 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public void validaCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO) {
+    public void validaEmailCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO) {
         Cliente cliente = buscarClientePorCPF(clienteDTO.getCpf()).get();
         if (!clienteRepository.existsClienteByCpf(clienteDTO.getCpf())) {
             throw new ObjetoNaoEncontradoException("Cliente não encontrado para o CPF informado.");
         }
         if (!enderecoService.existeEnderecoPorId(clienteDTO.getEndereco())) {
-            throw new ObjetoNaoEncontradoException("Erro ao tentar atualizar Cliente, " +
-                    "o Endereço não existe.");
+            throw new ObjetoNaoEncontradoException("Erro ao tentar atualizar Cliente, o Endereço não existe.");
         }
         if (cliente.getEndereco().getId() != clienteDTO.getEndereco()) {
             throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente, " +
                     "o Endereço pertence à outro Cliente.");
         }
-
+        buscarTodosClientes().stream().filter(c -> cliente.getCpf() != c.getCpf() )
+                    .forEach(clienteFiltrado -> {
+                    if (clienteDTO.getEmail().equals( clienteFiltrado.getEmail() )) {
+                        throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente, Email já cadastrado.");
+                    }
+                });
     }
     @Override
     public void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO) {
