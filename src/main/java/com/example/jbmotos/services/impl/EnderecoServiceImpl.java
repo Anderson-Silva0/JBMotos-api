@@ -3,10 +3,14 @@ package com.example.jbmotos.services.impl;
 import com.example.jbmotos.api.dto.EnderecoDTO;
 import com.example.jbmotos.model.entity.Endereco;
 import com.example.jbmotos.model.repositories.EnderecoRepository;
+import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.FuncionarioService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +22,13 @@ public class EnderecoServiceImpl implements EnderecoService {
 
     @Autowired
     private EnderecoRepository enderecoRepository;
+
+    @Autowired
+    @Lazy
+    private ClienteService clienteService;
+
+    @Autowired
+    private FuncionarioService funcionarioService;
 
     @Autowired
     private ModelMapper mapper;
@@ -60,11 +71,26 @@ public class EnderecoServiceImpl implements EnderecoService {
             throw new ObjetoNaoEncontradoException("Erro ao tentar deletar." +
                     " Endereço não encontrado para o Id informado.");
         }
+        verificaSeEnderecoPertenceAAlgumClienteOuFuncionario(id);
         enderecoRepository.deleteById(id);
     }
 
     @Override
     public boolean existeEnderecoPorId(Integer id) {
         return enderecoRepository.existsById(id);
+    }
+
+    @Override
+    public void verificaSeEnderecoPertenceAAlgumClienteOuFuncionario(Integer id) {
+        clienteService.buscarTodosClientes().stream().forEach(cliente -> {
+            if (id == cliente.getEndereco().getId()) {
+                throw new RegraDeNegocioException("Erro ao tentar deletar, o Endereço pertence a um Cliente.");
+            }
+        });
+        funcionarioService.buscarTodosFuncionarios().stream().forEach(funcionario -> {
+            if (id == funcionario.getEndereco().getId()) {
+                throw new RegraDeNegocioException("Erro ao tentar deletar, o Endereço pertence a um Funcionário.");
+            }
+        });
     }
 }

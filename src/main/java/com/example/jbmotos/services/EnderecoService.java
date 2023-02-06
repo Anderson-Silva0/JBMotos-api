@@ -20,4 +20,6 @@ public interface EnderecoService {
     void deletarEnderecoPorId(Integer id);
 
     boolean existeEnderecoPorId(Integer id);
+
+    void verificaSeEnderecoPertenceAAlgumClienteOuFuncionario(Integer id);
 }
