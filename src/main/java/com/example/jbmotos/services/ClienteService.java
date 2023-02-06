@@ -21,4 +21,6 @@ public interface ClienteService {
     void validaEmailCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO);
 
     void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO);
+
+    void existeClientePorCpf(String cpf, String tipoOperacao);
 }
