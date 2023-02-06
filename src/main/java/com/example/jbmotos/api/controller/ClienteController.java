@@ -1,6 +1,7 @@
 package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
+import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.services.ClienteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +26,16 @@ public class ClienteController {
 
     @PostMapping
     public ResponseEntity<ClienteDTO> salvar(@Valid @RequestBody ClienteDTO clienteDTO) {
+        Cliente cliente = clienteService.salvarCliente(clienteDTO);
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().buildAndExpand( clienteService.salvarCliente(clienteDTO) ).toUri();
-        return ResponseEntity.created(uri).build();
+                .fromCurrentRequest().buildAndExpand( cliente ).toUri();
+        return ResponseEntity.created(uri).body(mapper.map(cliente, ClienteDTO.class));
     }
 
     @GetMapping("/buscar-todos")
     public ResponseEntity<List<ClienteDTO>> buscarTodos() {
         return ResponseEntity.ok().body(
-                clienteService.buscarTodosClientes()
-                        .stream()
-                        .map(cliente ->
+                clienteService.buscarTodosClientes().stream().map(cliente ->
                                 mapper.map(cliente, ClienteDTO.class)
                         ).collect(Collectors.toList()));
     }
