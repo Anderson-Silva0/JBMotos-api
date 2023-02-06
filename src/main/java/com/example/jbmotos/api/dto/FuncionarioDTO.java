@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -15,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class FuncionarioDTO {
 
-    @CPF
+    @CPF(message = "Número do CPF inválido")
     private String cpf;
 
     @NotBlank(message = "O campo Nome é obrigatório")
@@ -25,4 +26,7 @@ public class FuncionarioDTO {
     @NotBlank(message = "O campo Telefone é obrigatório")
     @Length(min = 11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
     private String telefone;
+
+    @NotNull(message = "O campo Endereço é obrigatório")
+    private Integer endereco;
 }
