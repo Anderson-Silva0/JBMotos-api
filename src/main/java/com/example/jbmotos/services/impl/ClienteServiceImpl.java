@@ -5,6 +5,7 @@ import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.repositories.ClienteRepository;
 import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.FuncionarioService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
@@ -17,10 +18,16 @@ import java.util.Optional;
 
 @Service
 public class ClienteServiceImpl implements ClienteService {
+
     @Autowired
     private ClienteRepository clienteRepository;
+
     @Autowired
     private EnderecoService enderecoService;
+
+    @Autowired
+    private FuncionarioService funcionarioService;
+
     @Autowired
     private ModelMapper mapper;
 
@@ -97,6 +104,12 @@ public class ClienteServiceImpl implements ClienteService {
         buscarTodosClientes().stream().forEach(c -> {
             if (clienteDTO.getEndereco() == c.getEndereco().getId()) {
                 throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, o Endereço já pertence a um Cliente.");
+            }
+        });
+        funcionarioService.buscarTodosFuncionarios().stream().forEach(funcionario -> {
+            if (clienteDTO.getEndereco() == funcionario.getEndereco().getId()) {
+                throw new RegraDeNegocioException("Erro ao tentar salvar Cliente," +
+                        " o Endereço já pertence a um Funcionário.");
             }
         });
     }
