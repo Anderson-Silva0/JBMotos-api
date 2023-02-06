@@ -17,4 +17,12 @@ public interface FuncionarioService {
     Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO);
 
     void deletarFuncionario(String cpf);
+
+    void validaEnderecoParaSalvar(FuncionarioDTO funcionarioDTO);
+
+    void validaEnderecoParaAtualizar(FuncionarioDTO funcionarioDTO);
+
+    void existeFuncionarioPorCpfParaSalvar(String cpf);
+
+    void verificaSeFuncionarioExiste(String cpf);
 }
