@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ObjetoNaoEncontradoException.class)
     public ResponseEntity<StandardError> ObjetoNaoEncontrado(
             ObjetoNaoEncontradoException ex, HttpServletRequest request) {
@@ -28,6 +30,7 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RegraDeNegocioException.class)
     public ResponseEntity<StandardError> RegraDeNegocio(
             RegraDeNegocioException ex, HttpServletRequest request) {
@@ -40,6 +43,7 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<String>> MethodArgumentNotValid(MethodArgumentNotValidException ex) {
         List<String> erros = ex.getBindingResult()
