@@ -34,6 +34,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente salvarCliente(ClienteDTO clienteDTO) {
+        existeClientePorCpfParaSalvar(clienteDTO.getCpf());
         validaEmailCpfEEnderecoParaSalvarCliente(clienteDTO);
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
@@ -49,7 +50,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Cliente> buscarClientePorCPF(String cpf) {
-        existeClientePorCpf(cpf, "buscar");
+        verificaSeClienteExiste(cpf);
         return clienteRepository.findClienteByCpf(cpf);
     }
 
@@ -65,59 +66,53 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public void deletarCliente(String cpf) {
-        existeClientePorCpf(cpf, "deletar");
+        verificaSeClienteExiste(cpf);
         clienteRepository.deleteClienteByCpf(cpf);
     }
 
     @Override
     public void validaEmailCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO) {
         Cliente cliente = buscarClientePorCPF(clienteDTO.getCpf()).get();
-        if (!enderecoService.existeEnderecoPorId(clienteDTO.getEndereco())) {
+        if (!enderecoService.existeEnderecoPorId(clienteDTO.getEndereco()))
             throw new ObjetoNaoEncontradoException("Erro ao tentar atualizar Cliente, o Endereço não existe.");
-        }
         buscarTodosClientes().stream().filter(c -> cliente.getCpf() != c.getCpf() )
                 .forEach(clienteFiltrado -> {
-                    if (clienteDTO.getEmail().equals( clienteFiltrado.getEmail())) {
+                    if (clienteDTO.getEmail().equals( clienteFiltrado.getEmail()))
                         throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente, Email já cadastrado.");
-                    }
-                    if (clienteDTO.getEndereco() == clienteFiltrado.getEndereco().getId()) {
+                    if (clienteDTO.getEndereco() == clienteFiltrado.getEndereco().getId())
                         throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente, " +
                                 "o Endereço já pertence a um Cliente.");
-                    }
                 });
         funcionarioService.buscarTodosFuncionarios().stream().forEach(funcionario -> {
-            if (clienteDTO.getEndereco() == funcionario.getEndereco().getId()) {
+            if (clienteDTO.getEndereco() == funcionario.getEndereco().getId())
                 throw new RegraDeNegocioException("Erro ao tentar atualizar Cliente," +
                         " o Endereço já pertence a um Funcionário.");
-            }
         });
     }
     @Override
     public void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO) {
-        existeClientePorCpf(clienteDTO.getCpf(), "salvar");
-        if (clienteRepository.existsClienteByEmail(clienteDTO.getEmail())) {
+        if (clienteRepository.existsClienteByEmail(clienteDTO.getEmail()))
             throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, Email já cadastrado.");
-        }
         buscarTodosClientes().stream().forEach(c -> {
-            if (clienteDTO.getEndereco() == c.getEndereco().getId()) {
+            if (clienteDTO.getEndereco() == c.getEndereco().getId())
                 throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, o Endereço já pertence a um Cliente.");
-            }
         });
         funcionarioService.buscarTodosFuncionarios().stream().forEach(funcionario -> {
-            if (clienteDTO.getEndereco() == funcionario.getEndereco().getId()) {
+            if (clienteDTO.getEndereco() == funcionario.getEndereco().getId())
                 throw new RegraDeNegocioException("Erro ao tentar salvar Cliente," +
                         " o Endereço já pertence a um Funcionário.");
-            }
         });
     }
+
     @Override
-    public void existeClientePorCpf(String cpf, String tipoOperacao) {
-        if (clienteRepository.existsClienteByCpf(cpf) && tipoOperacao.equals("salvar")) {
+    public void existeClientePorCpfParaSalvar(String cpf) {
+        if (clienteRepository.existsClienteByCpf(cpf))
             throw new RegraDeNegocioException("Erro ao tentar salvar Cliente, CPF já cadastrado.");
-        }else if (!clienteRepository.existsClienteByCpf(cpf) && tipoOperacao.equals("buscar")
-                || !clienteRepository.existsClienteByCpf(cpf) && tipoOperacao.equals("deletar")
-                || !clienteRepository.existsClienteByCpf(cpf) && tipoOperacao.equals("atualizar")) {
+    }
+
+    @Override
+    public void verificaSeClienteExiste(String cpf){
+        if (clienteRepository.existsClienteByCpf(cpf))
             throw new ObjetoNaoEncontradoException("Cliente não encrontrado para o CPF informado.");
-        }
     }
 }
