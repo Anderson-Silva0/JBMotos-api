@@ -1,6 +1,7 @@
 package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.EnderecoDTO;
+import com.example.jbmotos.model.entity.Endereco;
 import com.example.jbmotos.services.EnderecoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +26,15 @@ public class EnderecoController {
 
     @PostMapping
     public ResponseEntity<EnderecoDTO> salvar(@Valid @RequestBody EnderecoDTO enderecoDTO) {
+        Endereco endereco = enderecoService.salvarEndereco(enderecoDTO);
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().buildAndExpand( enderecoService.salvarEndereco(enderecoDTO) ).toUri();
-        return ResponseEntity.created(uri).build();
+                .fromCurrentRequest().buildAndExpand( endereco ).toUri();
+        return ResponseEntity.created(uri).body(mapper.map(endereco, EnderecoDTO.class));
     }
     @GetMapping("/buscar-todos")
     public ResponseEntity<List<EnderecoDTO>> buscarTodos() {
         return ResponseEntity.ok().body(
-                enderecoService.buscarTodosEnderecos().stream()
-                .map(endereco ->
+                enderecoService.buscarTodosEnderecos().stream().map(endereco ->
                         mapper.map(endereco, EnderecoDTO.class)
                 ).collect(Collectors.toList()));
     }
