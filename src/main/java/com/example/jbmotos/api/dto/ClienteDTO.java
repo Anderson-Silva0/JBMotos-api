@@ -29,7 +29,7 @@ public class ClienteDTO {
     private String email;
 
     @NotBlank(message = "O campo Telefone é obrigatório")
-    @Length(min = 9, max = 15, message = "O campo Telefone deve ter entre 9 e 15 caracteres.")
+    @Length(min = 15, max = 15, message = "O campo Telefone está incorreto.")
     private String telefone;
 
     @NotNull(message = "O campo Endereço é obrigatório")
