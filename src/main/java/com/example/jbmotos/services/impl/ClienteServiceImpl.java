@@ -112,7 +112,7 @@ public class ClienteServiceImpl implements ClienteService {
 
     @Override
     public void verificaSeClienteExiste(String cpf){
-        if (clienteRepository.existsClienteByCpf(cpf))
+        if (!clienteRepository.existsClienteByCpf(cpf))
             throw new ObjetoNaoEncontradoException("Cliente não encrontrado para o CPF informado.");
     }
 }
