@@ -46,7 +46,7 @@ public class FuncionarioController {
                 mapper.map(funcionarioService.buscarFuncionarioPorCPF(cpf), FuncionarioDTO.class));
     }
 
-    @PostMapping("/atualizar/{cpf}")
+    @PutMapping("/atualizar/{cpf}")
     public ResponseEntity<FuncionarioDTO> atualizar(@PathVariable("cpf") String cpf,
                                                    @Valid @RequestBody FuncionarioDTO funcionarioDTO) {
         funcionarioDTO.setCpf(cpf);

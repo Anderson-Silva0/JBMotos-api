@@ -43,7 +43,7 @@ public class EnderecoController {
         return ResponseEntity.ok().body(mapper.map(enderecoService.buscarEnderecoPorId(id), EnderecoDTO.class));
     }
 
-    @PostMapping("/atualizar/{id}")
+    @PutMapping("/atualizar/{id}")
     public ResponseEntity<EnderecoDTO> atualizar(@PathVariable("id") Integer id,
                                                  @Valid @RequestBody EnderecoDTO enderecoDTO) {
         enderecoDTO.setId(id);
