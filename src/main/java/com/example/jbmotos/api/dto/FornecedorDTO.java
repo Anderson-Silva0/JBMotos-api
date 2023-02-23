@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 public class FornecedorDTO {
 
     @NotBlank(message = "O campo CNPJ é obrigatório")
-    @CNPJ
+    @CNPJ(message = "Número do CNPJ inexistente.")
     private String cnpj;
 
     @NotBlank(message = "O campo Nome é obrigatório")
