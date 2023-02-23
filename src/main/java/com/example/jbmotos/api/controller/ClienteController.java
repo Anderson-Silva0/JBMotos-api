@@ -40,20 +40,20 @@ public class ClienteController {
                         ).collect(Collectors.toList()));
     }
 
-    @GetMapping("buscar/{cpf}")
+    @GetMapping("/buscar/{cpf}")
     public ResponseEntity<ClienteDTO> buscarPorCpf(@PathVariable("cpf") String cpf) {
         return ResponseEntity.ok().body(
                 mapper.map(clienteService.buscarClientePorCPF(cpf).get(), ClienteDTO.class));
     }
 
-    @PutMapping("atualizar/{cpf}")
+    @PutMapping("/atualizar/{cpf}")
     public ResponseEntity<ClienteDTO> atualizar(@Valid @PathVariable("cpf") String cpf,
                                                 @RequestBody ClienteDTO clienteDTO) {
         clienteDTO.setCpf(cpf);
         return ResponseEntity.ok().body(mapper.map(clienteService.atualizarCliente(clienteDTO), ClienteDTO.class));
     }
 
-    @DeleteMapping("deletar/{cpf}")
+    @DeleteMapping("/deletar/{cpf}")
     public ResponseEntity deletar(@PathVariable("cpf") String cpf) {
         clienteService.deletarCliente(cpf);
         return ResponseEntity.noContent().build();
