@@ -38,7 +38,7 @@ public class EnderecoController {
                         mapper.map(endereco, EnderecoDTO.class)
                 ).collect(Collectors.toList()));
     }
-    @GetMapping("buscar/{id}")
+    @GetMapping("/buscar/{id}")
     public ResponseEntity<EnderecoDTO> buscarPorId(@PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(mapper.map(enderecoService.buscarEnderecoPorId(id), EnderecoDTO.class));
     }
