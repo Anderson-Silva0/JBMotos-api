@@ -17,4 +17,6 @@ public interface ProdutoService {
     Produto atualizarProduto(ProdutoDTO produtoDTO);
 
     void deletarProduto(Integer id);
+
+    void verificaSeProdutoExiste(Integer id);
 }
