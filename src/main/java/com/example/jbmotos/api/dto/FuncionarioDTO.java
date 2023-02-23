@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class FuncionarioDTO {
 
-    @CPF(message = "Número do CPF inválido")
+    @CPF(message = "Número do CPF inexistente.")
     private String cpf;
 
     @NotBlank(message = "O campo Nome é obrigatório")
