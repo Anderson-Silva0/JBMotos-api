@@ -17,4 +17,6 @@ public interface VendaService {
     Venda atualizarVenda(VendaDTO vendaDTO);
 
     void deletarVenda(Integer id);
+
+    void verificaSeVendaExiste(Integer id);
 }
