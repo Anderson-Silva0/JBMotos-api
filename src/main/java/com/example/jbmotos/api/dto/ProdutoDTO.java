@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 @Data
@@ -17,13 +18,15 @@ public class ProdutoDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O campo Nome é obrigatório")
-    @Length(min = 3, max = 50, message = "O campo Nome deve ter entre 3 e 50 caracteres.")
+    @NotBlank(message = "O campo Nome é obrigatório.")
     private String nome;
 
-    @NotBlank(message = "O campo Preço de Venda é obrigatório")
+    @NotNull(message = "O campo Preço de Venda é obrigatório.")
     private BigDecimal preco_venda;
 
-    @NotBlank(message = "O campo Estoque Mínimo é obrigatório")
+    @NotNull(message = "O campo Estoque Mínimo é obrigatório.")
     private Integer min_estoque;
+
+    @NotBlank(message = "O campo Marca é obrigatório.")
+    private String marca;
 }
