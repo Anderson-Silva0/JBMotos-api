@@ -22,11 +22,15 @@ public class EnderecoDTO {
     private String rua;
 
     @NotBlank(message = "O campo CEP é obrigatório")
-    @Length(max = 10, message = "O campo CEP deve ter no máximo 10 caracteres.")
+    @Length(min = 9, max = 9, message = "O campo CEP deve ter no mínimo e no máximo 9 caracteres.")
     private String cep;
 
     @NotNull(message = "O campo Numero é obrigatório")
     private Integer numero;
+
+    @NotBlank(message = "O campo Bairro é obrigatório")
+    @Length(min =  4, max = 50, message = "O campo Bairro deve ter no mínimo 4 e no máximo 50 caracteres.")
+    private String bairro;
 
     @NotBlank(message = "O campo Cidade é obrigatório")
     @Length(min =  4, max = 50, message = "O campo Cidade deve ter no mínimo 4 e no máximo 50 caracteres.")
