@@ -6,9 +6,9 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
-@Table(name = "venda", schema = "jbmotos")
+@Table(name = "pedido", schema = "jbmotos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,11 +20,11 @@ public class Pedido {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "cpf_cliente", nullable = false)
     private Cliente cliente;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     @JoinColumn(name = "cpf_funcionario", nullable = false)
     private Funcionario funcionario;
 
@@ -38,6 +38,6 @@ public class Pedido {
     @Column(name = "forma_de_pagamento")
     private String formaDePagamento;
 
-//    @ManyToMany(mappedBy = "vendas", cascade = CascadeType.ALL)
-//    private Set<Produto> produtos;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+    private List<PedidoProduto> pedidoProduto;
 }
