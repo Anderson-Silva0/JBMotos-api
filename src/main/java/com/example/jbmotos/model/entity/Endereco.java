@@ -1,9 +1,7 @@
 package com.example.jbmotos.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -34,4 +32,19 @@ public class Endereco {
 
     @Column(name = "cidade")
     private String cidade;
+
+    @OneToOne(mappedBy = "endereco")
+    @ToString.Exclude
+    @JsonIgnore
+    private Cliente cliente;
+
+    @OneToOne(mappedBy = "endereco")
+    @ToString.Exclude
+    @JsonIgnore
+    private Funcionario funcionario;
+
+    @OneToOne(mappedBy = "endereco")
+    @ToString.Exclude
+    @JsonIgnore
+    private Fornecedor fornecedor;
 }
