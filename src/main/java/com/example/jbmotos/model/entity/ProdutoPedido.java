@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 @Entity
-public class PedidoProduto {
+public class ProdutoPedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
