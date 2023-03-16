@@ -1,15 +1,16 @@
 package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
-import com.example.jbmotos.model.entity.Pedido;
 import com.example.jbmotos.model.entity.ProdutoPedido;
 import com.example.jbmotos.model.repositories.ProdutoPedidoRepository;
 import com.example.jbmotos.services.PedidoService;
 import com.example.jbmotos.services.ProdutoPedidoService;
 import com.example.jbmotos.services.ProdutoService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,25 +33,46 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
     private ModelMapper mapper;
 
     @Override
+    @Transactional
     public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        ProdutoPedido produtoPedido = mapper.map(produtoPedidoDTO, ProdutoPedido.class);
-        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
-        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
-        produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
-        produtoPedido.setValorTotal(
-                produtoPedido.getValorUnidade().multiply(
-                        BigDecimal.valueOf( produtoPedido.getQuantidade() )
-                )
-        );
-        return produtoPedidoRepository.save(produtoPedido);
+        return produtoPedidoRepository.save(getProdutoPedido(produtoPedidoDTO));
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ProdutoPedido> buscarTodosProdutoPedido() {
+        return produtoPedidoRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id) {
+        validaProdutoPedido(id);
+        return produtoPedidoRepository.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
+        validaProdutoPedido(produtoPedidoDTO.getId());
+        return produtoPedidoRepository.save(getProdutoPedido(produtoPedidoDTO));
+    }
+
+    @Override
+    @Transactional
+    public void deletarProdutoPedidoPorId(Integer id) {
+        validaProdutoPedido(id);
+        produtoPedidoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<ProdutoPedido> buscarProdutosDoPedido(Integer idPedido) {
         return produtoPedidoRepository.findProdutoPedidoByPedidoId(idPedido);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BigDecimal valorTotalDoPedido(Integer idPedido) {
         pedidoService.validaPedido(idPedido);
         BigDecimal valorTotal = BigDecimal.ZERO;
@@ -64,22 +86,22 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
     }
 
     @Override
-    public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        return null;
-    }
-
-    @Override
-    public void deletarProdutoPedido(Integer id) {
-
-    }
-
-    @Override
     public void validaProdutoPedido(Integer id) {
+        if ( !produtoPedidoRepository.existsById(id) ) {
+            throw new ObjetoNaoEncontradoException("Produto do Pedido não encontrado para o Id informado.");
+        }
+    }
 
+    @Override
+    public ProdutoPedido getProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
+        ProdutoPedido produtoPedido = mapper.map(produtoPedidoDTO, ProdutoPedido.class);
+        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
+        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+        produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
+        produtoPedido.setValorTotal(
+                produtoPedido.getValorUnidade().multiply(
+                        BigDecimal.valueOf(produtoPedido.getQuantidade())
+                ));
+        return produtoPedido;
     }
 }
