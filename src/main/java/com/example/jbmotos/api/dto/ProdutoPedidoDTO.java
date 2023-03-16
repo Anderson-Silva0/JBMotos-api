@@ -20,14 +20,15 @@ public class ProdutoPedidoDTO {
     private Integer id;
 
     @NotNull(message = "Informe o Id do Pedido.")
-    private Pedido pedido;
+    private Integer idPedido;
 
     @NotNull(message = "Informe o Id do Produto.")
-    private Produto produto;
+    private Integer idProduto;
 
     @NotNull(message = "Informe a Quantidade do Produto.")
     private Integer quantidade;
 
-    @NotNull(message = "Informe o Valor do Produto.")
-    private BigDecimal valor;
+    private BigDecimal valorUnidade;
+
+    private BigDecimal valorTotal;
 }
