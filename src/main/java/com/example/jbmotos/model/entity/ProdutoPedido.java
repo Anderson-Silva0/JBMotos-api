@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-@Table(name = "pedido_produto", schema = "jbmotos")
+@Table(name = "produto_pedido", schema = "jbmotos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,16 +20,23 @@ public class ProdutoPedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @ManyToOne
     @JoinColumn(name = "id_pedido")
     @JsonIgnore
     private Pedido pedido;
+
     @ManyToOne
     @JoinColumn(name = "id_produto")
     @JsonIgnore
     private Produto produto;
 
+    @Column(name = "quantidade")
     private Integer quantidade;
 
-    private BigDecimal valor;
+    @Column(name = "valor_unidade")
+    private BigDecimal valorUnidade;
+
+    @Column(name = "valorTotal")
+    private BigDecimal valorTotal;
 }
