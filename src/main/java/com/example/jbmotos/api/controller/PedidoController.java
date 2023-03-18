@@ -25,11 +25,11 @@ public class PedidoController {
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<Pedido> salvar(@Valid @RequestBody PedidoDTO pedidoDTO) {
+    public ResponseEntity<PedidoDTO> salvar(@Valid @RequestBody PedidoDTO pedidoDTO) {
         Pedido pedido = pedidoService.salvarPedido(pedidoDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest().buildAndExpand( pedido ).toUri();
-        return ResponseEntity.created(uri).body(pedido);
+        return ResponseEntity.created(uri).body(mapper.map(pedido, PedidoDTO.class));
     }
 
     @GetMapping("/buscar-todos")
@@ -42,8 +42,7 @@ public class PedidoController {
 
     @GetMapping("/buscar/{id}")
     public ResponseEntity<PedidoDTO> buscarPorId(@PathVariable("id") Integer id) {
-        Pedido pedido = pedidoService.buscarPedidoPorId(id).get();
-        return ResponseEntity.ok().body(mapper.map(pedido, PedidoDTO.class));
+        return ResponseEntity.ok().body(mapper.map(pedidoService.buscarPedidoPorId(id).get(), PedidoDTO.class));
     }
 
     @PutMapping("/atualizar/{id}")
