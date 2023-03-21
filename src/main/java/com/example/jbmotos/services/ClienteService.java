@@ -18,11 +18,17 @@ public interface ClienteService {
 
     void deletarCliente(String cpf);
 
-    void validaEmailCpfEEnderecoParaAtualizarCliente(ClienteDTO clienteDTO);
+    void validarEmailParaSalvar(String email);
 
-    void validaEmailCpfEEnderecoParaSalvarCliente(ClienteDTO clienteDTO);
+    void validarEnderecoParaSalvar(Integer idEndereco);
 
-    void existeClientePorCpfParaSalvar(String cpf);
+    void validarCpfClienteParaSalvar(String cpf);
 
-    void verificaSeClienteExiste(String cpf);
+    void validarEmailParaAtualizar(ClienteDTO clienteDTO);
+
+    void validarEnderecoParaAtualizar(ClienteDTO clienteDTO);
+
+    void checarCpfClienteExistente(String cpf);
+
+    boolean existeClientePorIdEndereco(Integer idEndereco);
 }
