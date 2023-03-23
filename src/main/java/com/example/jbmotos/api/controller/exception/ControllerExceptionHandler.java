@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,5 +54,15 @@ public class ControllerExceptionHandler {
                     erro.getDefaultMessage()
                 ).collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<List<String>> handleConstraintViolationException(ConstraintViolationException ex) {
+        List<String> erros = ex.getConstraintViolations()
+                .stream()
+                .map(cv -> cv.getMessage())
+                .collect(Collectors.toList());
+        return ResponseEntity.badRequest().body(erros);
     }
 }
