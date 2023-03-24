@@ -2,11 +2,11 @@
 
 # JBMotos 🏍️ -  Gerenciamento de Oficina Mecânica de Motos  (Backend)
 
-O JBMotos é um projeto de gerenciamento de uma oficina mecânica de motos, desenvolvido em Java, utilizando o framework Spring Boot e banco de dados PostgreSQL. O objetivo do projeto é ajudar a oficina a gerenciar seus clientes, funcionários, estoque de peças, serviços prestados, motos, orçamentos, entre outras funcionalidades. Vale ressaltar que existe também um projeto Front-end para este sistema, no entanto, a implementação deste projeto será iniciada apenas após a conclusão do JBMotos (Backend).
+O JBMotos é um projeto de gerenciamento de uma oficina mecânica de motos, onde o Backend está sendo desenvolvido em Java, utilizando o framework Spring Boot e banco de dados PostgreSQL. O objetivo do projeto é ajudar a oficina a gerenciar seus clientes, funcionários, estoque de peças, serviços prestados, motos, orçamentos, entre outras funcionalidades. Vale ressaltar que existe também um projeto Front-end para este sistema, no entanto, a implementação deste projeto será iniciada apenas após a conclusão do JBMotos (Backend).
 
 ## ⚠️ Observação
 
-O projeto ainda está em andamento e algumas Tecnologias, funcionalidades e/ou informações ainda não foram criadas ou adicionadas. No entanto, estamos trabalhando constantemente para aprimorar e adicionar novas funcionalidades ao JBMotos (Backend). 🚀
+O projeto ainda está em andamento e algumas Tecnologias, funcionalidades e/ou informações ainda não foram criadas ou adicionadas. No entanto, estou trabalhando constantemente para aprimorar e adicionar novas funcionalidades ao JBMotos (Backend). 🚀
 
 ## ⚙️ Funcionalidades
 
