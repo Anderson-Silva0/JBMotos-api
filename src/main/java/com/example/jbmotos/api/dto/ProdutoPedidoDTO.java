@@ -1,13 +1,11 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.entity.Pedido;
-import com.example.jbmotos.model.entity.Produto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -26,6 +24,7 @@ public class ProdutoPedidoDTO {
     private Integer idProduto;
 
     @NotNull(message = "Informe a Quantidade do Produto.")
+    @Min(value = 1, message = "A Quantidade deve ser maior ou igual a 1.")
     private Integer quantidade;
 
     private BigDecimal valorUnidade;
