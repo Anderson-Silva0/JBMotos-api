@@ -2,10 +2,9 @@ package com.example.jbmotos.config;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.api.dto.FuncionarioDTO;
-import com.example.jbmotos.api.dto.VendaDTO;
-import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.entity.Funcionario;
-import com.example.jbmotos.model.entity.Venda;
+import com.example.jbmotos.api.dto.PedidoDTO;
+import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
+import com.example.jbmotos.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +22,13 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(Funcionario.class, FuncionarioDTO.class)
                 .<Integer>addMapping(src -> src.getEndereco().getId(), (dest, valor) -> dest.setEndereco(valor));
 
-        modelMapper.createTypeMap(Venda.class, VendaDTO.class)
-                .<String>addMapping(src -> src.getCliente().getCpf(), (dest, valor) -> dest.setCpf_cliente(valor))
-                .<String>addMapping(src -> src.getFuncionario().getCpf(), (dest, valor) -> dest.setCpf_funcionario(valor));
+        modelMapper.createTypeMap(Pedido.class, PedidoDTO.class)
+                .<String>addMapping(src -> src.getCliente().getCpf(), (dest, valor) -> dest.setCpfCliente(valor))
+                .<String>addMapping(src -> src.getFuncionario().getCpf(), (dest, valor) -> dest.setCpfFuncionario(valor));
+
+        modelMapper.createTypeMap(ProdutoPedido.class, ProdutoPedidoDTO.class)
+                .<Integer>addMapping(src -> src.getProduto().getId(), (dest, valor) -> dest.setIdProduto(valor))
+                .<Integer>addMapping(src -> src.getPedido().getId(), (dest, valor) -> dest.setIdPedido(valor));
 
         return modelMapper;
     }
