@@ -18,11 +18,15 @@ public interface FuncionarioService {
 
     void deletarFuncionario(String cpf);
 
-    void validaEnderecoParaSalvar(FuncionarioDTO funcionarioDTO);
+    void validarEnderecoParaSalvar(Integer idEndereco);
 
-    void validaEnderecoParaAtualizar(FuncionarioDTO funcionarioDTO);
+    void validarCpfFuncionarioParaSalvar(String cpf);
 
-    void existeFuncionarioPorCpfParaSalvar(String cpf);
+    void validarEnderecoParaAtualizar(FuncionarioDTO funcionarioDTO);
 
-    void verificaSeFuncionarioExiste(String cpf);
+    List<Funcionario> filtrarFuncionariosPorCpfDiferente(FuncionarioDTO funcionarioDTO);
+
+    void checarCpfFuncionarioExistente(String cpf);
+
+    boolean existeFuncionarioPorIdEndereco(Integer idEndereco);
 }
