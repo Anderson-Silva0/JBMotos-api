@@ -8,5 +8,8 @@ import java.util.List;
 
 @Repository
 public interface ProdutoPedidoRepository extends JpaRepository<ProdutoPedido, Integer> {
+
     List<ProdutoPedido> findProdutoPedidoByPedidoId(Integer id);
+
+    boolean existsProdutoPedidosByPedidoIdAndProdutoId(Integer idPedido, Integer idProduto);
 }
