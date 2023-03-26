@@ -1,14 +1,21 @@
 package com.example.jbmotos.services.impl;
 
+import com.example.jbmotos.api.dto.EstoqueDTO;
 import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
+import com.example.jbmotos.model.entity.Estoque;
+import com.example.jbmotos.model.entity.Pedido;
+import com.example.jbmotos.model.entity.Produto;
 import com.example.jbmotos.model.entity.ProdutoPedido;
 import com.example.jbmotos.model.repositories.ProdutoPedidoRepository;
+import com.example.jbmotos.services.EstoqueService;
 import com.example.jbmotos.services.PedidoService;
 import com.example.jbmotos.services.ProdutoPedidoService;
 import com.example.jbmotos.services.ProdutoService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +27,21 @@ import java.util.stream.Collectors;
 @Service
 public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
 
+    private final String MSG_ERRO_SALVAR_PRODUTO_PEDIDO = "Não é possível realizar o Pedido do Produto pois a " +
+            "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
+
+    private final String MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO = "Não é possível Atualizar o Pedido do Produto pois a " +
+            "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
+
     @Autowired
+    @Lazy
     private PedidoService pedidoService;
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private EstoqueService estoqueService;
 
     @Autowired
     private ProdutoPedidoRepository produtoPedidoRepository;
@@ -34,74 +51,156 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
 
     @Override
     @Transactional
-    public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        return produtoPedidoRepository.save(getProdutoPedido(produtoPedidoDTO));
+    public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO){
+        ProdutoPedido produtoPedido = obterProdutoPedidoParaSalvar(produtoPedidoDTO);
+        verificarSeProdutoJaExisteNoPedidoParaSalvar(produtoPedido);
+        atualizarQtdEstoqueParaSalvar(produtoPedido);
+        return produtoPedidoRepository.save(produtoPedido);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProdutoPedido> buscarTodosProdutoPedido() {
+    public List<ProdutoPedido> buscarTodosProdutoPedido(){
         return produtoPedidoRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id) {
-        validaProdutoPedido(id);
+    public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id){
+        validarProdutoPedido(id);
         return produtoPedidoRepository.findById(id);
     }
 
     @Override
     @Transactional
-    public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        validaProdutoPedido(produtoPedidoDTO.getId());
-        return produtoPedidoRepository.save(getProdutoPedido(produtoPedidoDTO));
+    public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO){
+        validarProdutoPedido(produtoPedidoDTO.getId());
+        ProdutoPedido produtoPedido = obterProdutoPedidoParaAtualizar(produtoPedidoDTO);
+        verificarSeProdutoJaExisteNoPedidoParaAtualizar(produtoPedido);
+        atualizarQtdEstoqueParaAtualizar(produtoPedido, produtoPedidoDTO);
+        return produtoPedidoRepository.save(produtoPedido);
     }
 
     @Override
     @Transactional
-    public void deletarProdutoPedidoPorId(Integer id) {
-        validaProdutoPedido(id);
+    public void deletarProdutoPedidoPorId(Integer id){
+        validarProdutoPedido(id);
+        atualizarQtdEstoqueParaDeletar(id);
         produtoPedidoRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProdutoPedido> buscarProdutosDoPedido(Integer idPedido) {
+    public List<ProdutoPedido> buscarProdutoPedidoPorIdPedido(Integer idPedido){
         return produtoPedidoRepository.findProdutoPedidoByPedidoId(idPedido);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal valorTotalDoPedido(Integer idPedido) {
-        pedidoService.validaPedido(idPedido);
-        BigDecimal valorTotal = BigDecimal.ZERO;
-        List<BigDecimal> valoresTotais = buscarProdutosDoPedido(idPedido).stream().map(p ->
-                p.getValorTotal()
-        ).collect(Collectors.toList());
-        for(BigDecimal valor : valoresTotais) {
-            valorTotal = valorTotal.add(valor);
-        }
-        return valorTotal;
-    }
-
-    @Override
-    public void validaProdutoPedido(Integer id) {
-        if ( !produtoPedidoRepository.existsById(id) ) {
+    public void validarProdutoPedido(Integer id){
+        if (!produtoPedidoRepository.existsById(id)) {
             throw new ObjetoNaoEncontradoException("Produto do Pedido não encontrado para o Id informado.");
         }
     }
 
-    @Override
-    public ProdutoPedido getProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
+    private ProdutoPedido obterProdutoPedidoParaSalvar(ProdutoPedidoDTO produtoPedidoDTO){
         ProdutoPedido produtoPedido = mapper.map(produtoPedidoDTO, ProdutoPedido.class);
         produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
         produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+
+        Estoque estoque = produtoPedido.getProduto().getEstoque();
+        validarEstoqueSalvar(produtoPedido.getQuantidade(), estoque.getQuantidade());
+
         produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
         produtoPedido.setValorTotal(
                 produtoPedido.getValorUnidade().multiply(
                         BigDecimal.valueOf(produtoPedido.getQuantidade())
-                ));
+                )
+        );
         return produtoPedido;
+    }
+
+    private ProdutoPedido obterProdutoPedidoParaAtualizar(ProdutoPedidoDTO produtoPedidoDTO){
+        ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(produtoPedidoDTO.getId()).get();
+        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
+        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+
+        Estoque estoque = produtoPedido.getProduto().getEstoque();
+        validarEstoqueAtualizar(
+                estoque.getQuantidade(),
+                produtoPedidoDTO.getQuantidade(),
+                produtoPedido.getQuantidade()
+        );
+
+        produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
+        produtoPedido.setValorTotal(
+                produtoPedido.getValorUnidade().multiply(
+                        BigDecimal.valueOf(produtoPedidoDTO.getQuantidade())
+                )
+        );
+        return produtoPedido;
+    }
+
+    private void atualizarQtdEstoqueParaSalvar(ProdutoPedido produtoPedido){
+        Estoque estoque = produtoPedido.getProduto().getEstoque();
+        estoque.setQuantidade(estoque.getQuantidade() - produtoPedido.getQuantidade());
+        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
+    }
+
+    private void atualizarQtdEstoqueParaAtualizar(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
+        Estoque estoque = produtoPedido.getProduto().getEstoque();
+
+        Integer qtdAtualEstoque = estoque.getQuantidade();
+        Integer qtdAnteriorProduto = produtoPedido.getQuantidade();
+        Integer qtdNovaProduto = produtoPedidoDTO.getQuantidade();
+
+        Integer novaQtdEstoque = qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto;
+        estoque.setQuantidade(novaQtdEstoque);
+
+        produtoPedido.setQuantidade(qtdNovaProduto);
+
+        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
+    }
+
+    private void atualizarQtdEstoqueParaDeletar(Integer id) {
+        ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(id).get();
+        estoqueService.adicionarQuantidadeAoEstoque(produtoPedido.getProduto().getId(), produtoPedido.getQuantidade());
+    }
+
+    private void validarEstoqueSalvar(Integer qtdProduto, Integer qtdEstoque){
+        if (qtdProduto > qtdEstoque) {
+            throw new RegraDeNegocioException(MSG_ERRO_SALVAR_PRODUTO_PEDIDO);
+        }
+    }
+
+    private void validarEstoqueAtualizar(Integer qtdAtualEstoque,
+                                         Integer qtdNovaProduto,
+                                         Integer qtdAnteriorProduto){
+        if ( qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto < 0 ) {
+            throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO);
+        }
+    }
+
+    private void verificarSeProdutoJaExisteNoPedidoParaSalvar(ProdutoPedido produtoPedido){
+        Pedido pedido = produtoPedido.getPedido();
+        Produto produto = produtoPedido.getProduto();
+        if (produtoPedidoRepository.existsProdutoPedidosByPedidoIdAndProdutoId(pedido.getId(),produto.getId())) {
+            throw new RegraDeNegocioException("Erro ao tentar Salvar, Produto já adicionado ao Pedido.");
+        }
+    }
+
+    private void verificarSeProdutoJaExisteNoPedidoParaAtualizar(ProdutoPedido produtoPedido){
+        filtrarProdutoPedidoPorIdDiferente(produtoPedido).stream().forEach(produtoPedidoFiltrado -> {
+            if (produtoPedido.getProduto().getId() == produtoPedidoFiltrado.getProduto().getId() &&
+                    produtoPedido.getPedido() == produtoPedidoFiltrado.getPedido()) {
+                throw new RegraDeNegocioException("Erro ao tentar Atualizar, Produto já adicionado ao Pedido.");
+            }
+        });
+    }
+
+    private List<ProdutoPedido> filtrarProdutoPedidoPorIdDiferente(ProdutoPedido produtoPedido){
+        return buscarTodosProdutoPedido().stream()
+                .filter(produtoPedidoFiltrado -> (produtoPedido.getId() != produtoPedidoFiltrado.getId()))
+                .collect(Collectors.toList());
     }
 }
