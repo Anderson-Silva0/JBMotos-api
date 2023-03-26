@@ -1,13 +1,12 @@
 package com.example.jbmotos.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
-@Table(name = "cliente", schema = "jbmotos", uniqueConstraints = {@UniqueConstraint(columnNames = {"cpf"})})
+@Table(name = "cliente", schema = "jbmotos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,7 +27,12 @@ public class Cliente {
     @Column(name = "telefone")
     private String telefone;
 
-    @JoinColumn(name = "id_endereco")
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_endereco", referencedColumnName = "id")
     private Endereco endereco;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @JsonIgnore
+    private List<Pedido> pedidos;
 }
