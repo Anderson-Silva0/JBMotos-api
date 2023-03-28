@@ -27,11 +27,14 @@ import java.util.stream.Collectors;
 @Service
 public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
 
-    private final String MSG_ERRO_SALVAR_PRODUTO_PEDIDO = "Não é possível realizar o Pedido do Produto pois a " +
+    private final String MSG_ERRO_SALVAR_PRODUTO_PEDIDO = "Não é possível realizar o Pedido pois a " +
             "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
 
-    private final String MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO = "Não é possível Atualizar o Pedido do Produto pois a " +
-            "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
+    private final String MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO = "Não é possível Atualizar o Pedido pois a " +
+            "quantidade solicitada do Produto é maior do que a quantidade disponível em estoque.";
+
+    private final String MSG_ERRO_ATUALIZAR_NOVO_PRODUTO = "Não é possível Atualizar o Pedido pois a quantidade " +
+            "solicitada do novo Produto é maior do que a quantidade disponível em estoque.";
 
     @Autowired
     @Lazy
@@ -54,7 +57,6 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
     public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO){
         ProdutoPedido produtoPedido = obterProdutoPedidoParaSalvar(produtoPedidoDTO);
         verificarSeProdutoJaExisteNoPedidoParaSalvar(produtoPedido);
-        atualizarQtdEstoqueParaSalvar(produtoPedido);
         return produtoPedidoRepository.save(produtoPedido);
     }
 
@@ -77,7 +79,6 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
         validarProdutoPedido(produtoPedidoDTO.getId());
         ProdutoPedido produtoPedido = obterProdutoPedidoParaAtualizar(produtoPedidoDTO);
         verificarSeProdutoJaExisteNoPedidoParaAtualizar(produtoPedido);
-        atualizarQtdEstoqueParaAtualizar(produtoPedido, produtoPedidoDTO);
         return produtoPedidoRepository.save(produtoPedido);
     }
 
@@ -117,20 +118,27 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
                         BigDecimal.valueOf(produtoPedido.getQuantidade())
                 )
         );
+        atualizarQtdEstoqueParaSalvar(produtoPedido);
         return produtoPedido;
     }
 
     private ProdutoPedido obterProdutoPedidoParaAtualizar(ProdutoPedidoDTO produtoPedidoDTO){
         ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(produtoPedidoDTO.getId()).get();
-        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
-        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
 
-        Estoque estoque = produtoPedido.getProduto().getEstoque();
-        validarEstoqueAtualizar(
-                estoque.getQuantidade(),
-                produtoPedidoDTO.getQuantidade(),
-                produtoPedido.getQuantidade()
-        );
+        if(produtoPedidoDTO.getIdProduto() != produtoPedido.getProduto().getId()) {
+            atualizarPedidoComNovoProduto(produtoPedido, produtoPedidoDTO);
+        } else {
+            produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
+            produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+
+            Estoque estoque = produtoPedido.getProduto().getEstoque();
+            validarEstoqueAtualizar(
+                    estoque.getQuantidade(),
+                    produtoPedidoDTO.getQuantidade(),
+                    produtoPedido.getQuantidade()
+            );
+            atualizarQtdEstoqueParaAtualizar(produtoPedido, produtoPedidoDTO);
+        }
 
         produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
         produtoPedido.setValorTotal(
@@ -139,6 +147,24 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
                 )
         );
         return produtoPedido;
+    }
+
+    private void atualizarPedidoComNovoProduto(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
+        Integer qtdProdutoPedidoAntigo = produtoPedido.getQuantidade();
+        Integer qtdEstoqueAntigo = produtoPedido.getProduto().getEstoque().getQuantidade();
+
+        //Devolver a quantidade de estoque do produto antigo, pois mudou de produto.
+        produtoPedido.getProduto().getEstoque().setQuantidade(qtdProdutoPedidoAntigo + qtdEstoqueAntigo);
+
+        //Abater a quantidade de estoque do novo produto.
+        Estoque estoque = produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get().getEstoque();
+        if (produtoPedidoDTO.getQuantidade() > estoque.getQuantidade()) {
+            throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_NOVO_PRODUTO);
+        }
+        estoque.setQuantidade(estoque.getQuantidade() - produtoPedidoDTO.getQuantidade());
+        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
+        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+        produtoPedido.setQuantidade(produtoPedidoDTO.getQuantidade());
     }
 
     private void atualizarQtdEstoqueParaSalvar(ProdutoPedido produtoPedido){
