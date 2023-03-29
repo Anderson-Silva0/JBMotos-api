@@ -79,6 +79,8 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
         validarProdutoPedido(produtoPedidoDTO.getId());
         ProdutoPedido produtoPedido = obterProdutoPedidoParaAtualizar(produtoPedidoDTO);
         verificarSeProdutoJaExisteNoPedidoParaAtualizar(produtoPedido);
+        Estoque estoque = produtoPedido.getProduto().getEstoque();
+        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
         return produtoPedidoRepository.save(produtoPedido);
     }
 
@@ -184,8 +186,6 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
         estoque.setQuantidade(novaQtdEstoque);
 
         produtoPedido.setQuantidade(qtdNovaProduto);
-
-        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
     }
 
     private void atualizarQtdEstoqueParaDeletar(Integer id) {
