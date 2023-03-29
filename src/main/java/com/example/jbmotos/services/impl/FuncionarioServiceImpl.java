@@ -123,9 +123,7 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 
     @Override
     public List<Funcionario> filtrarFuncionariosPorCpfDiferente(FuncionarioDTO funcionarioDTO) {
-        return buscarTodosFuncionarios().stream()
-                .filter(funcionario -> (!funcionarioDTO.getCpf().equals(funcionario.getCpf())))
-                .collect(Collectors.toList());
+        return funcionarioRepository.findByCpfNot(funcionarioDTO.getCpf());
     }
 
     @Override
