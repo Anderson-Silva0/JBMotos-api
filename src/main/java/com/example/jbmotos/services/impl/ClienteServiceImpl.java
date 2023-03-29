@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 public class ClienteServiceImpl implements ClienteService {
 
     private final String ERRO_SALVAR_CLIENTE = "Erro ao tentar salvar Cliente";
+
     private final String ERRO_ATUALIZAR_CLIENTE = "Erro ao tentar atualizar Cliente";
 
     @Autowired
@@ -135,9 +136,7 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     private List<Cliente> filtrarClientesPorCpfDiferente(ClienteDTO clienteDTO) {
-        return buscarTodosClientes().stream()
-                .filter(cliente -> (!clienteDTO.getCpf().equals(cliente.getCpf())))
-                .collect(Collectors.toList());
+        return clienteRepository.findByCpfNot(clienteDTO.getCpf());
     }
 
     @Override
