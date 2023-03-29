@@ -35,7 +35,7 @@ public class EstoqueServiceImpl implements EstoqueService {
     @Transactional
     public Estoque salvarEstoque(EstoqueDTO estoqueDTO) {
         Estoque estoque = mapper.map(estoqueDTO, Estoque.class);
-        estoque.setStatus(validarQuantidade(estoque));
+        estoque.setStatus(obterStatusEstoque(estoque));
         return estoqueRepository.save(estoque);
     }
 
@@ -57,7 +57,7 @@ public class EstoqueServiceImpl implements EstoqueService {
     public Estoque atualizarEstoque(EstoqueDTO estoqueDTO) {
         validarEstoque(estoqueDTO.getId());
         Estoque estoque = mapper.map(estoqueDTO, Estoque.class);
-        estoque.setStatus(validarQuantidade(estoque));
+        estoque.setStatus(obterStatusEstoque(estoque));
         return estoqueRepository.save(estoque);
     }
 
@@ -107,7 +107,7 @@ public class EstoqueServiceImpl implements EstoqueService {
         }
     }
 
-    private StatusEstoque validarQuantidade(Estoque estoque) {
+    private StatusEstoque obterStatusEstoque(Estoque estoque) {
         if (estoque.getQuantidade() > estoque.getEstoqueMaximo()) {
             return StatusEstoque.ESTOQUE_ALTO;
         } else if (estoque.getQuantidade() < estoque.getEstoqueMinimo() && estoque.getQuantidade() > 0) {
