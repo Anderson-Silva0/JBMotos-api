@@ -31,9 +31,11 @@ public class EnderecoServiceImpl implements EnderecoService {
     private ClienteService clienteService;
 
     @Autowired
+    @Lazy
     private FuncionarioService funcionarioService;
 
     @Autowired
+    @Lazy
     private FornecedorService fornecedorService;
 
     @Autowired
