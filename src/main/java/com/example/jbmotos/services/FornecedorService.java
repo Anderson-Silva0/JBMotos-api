@@ -17,4 +17,16 @@ public interface FornecedorService {
     Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO);
 
     void deletarFornecedor(String cnpj);
+
+    void validarEnderecoParaSalvar(Integer idEndereco);
+
+    void validarCnpjFornecedorParaSalvar(String cnpj);
+
+    void validarEnderecoParaAtualizar(FornecedorDTO fornecedorDTO);
+
+    List<Fornecedor> filtrarFornecedoresPorCnpjDiferente(FornecedorDTO fornecedorDTO);
+
+    void checarCnpjFornecedorExistente(String cnpj);
+
+    boolean existeFornecedorPorIdEndereco(Integer idEndereco);
 }
