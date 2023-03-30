@@ -1,9 +1,6 @@
 package com.example.jbmotos.config;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
-import com.example.jbmotos.api.dto.FuncionarioDTO;
-import com.example.jbmotos.api.dto.PedidoDTO;
-import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
+import com.example.jbmotos.api.dto.*;
 import com.example.jbmotos.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +18,9 @@ public class ModelMapperConfig {
 
         modelMapper.createTypeMap(Funcionario.class, FuncionarioDTO.class)
                 .<Integer>addMapping(src -> src.getEndereco().getId(), (dest, valor) -> dest.setEndereco(valor));
+
+        modelMapper.createTypeMap(Fornecedor.class, FornecedorDTO.class)
+                        .<Integer>addMapping(src -> src.getEndereco().getId(), (dest, valor) -> dest.setEndereco(valor));
 
         modelMapper.createTypeMap(Pedido.class, PedidoDTO.class)
                 .<String>addMapping(src -> src.getCliente().getCpf(), (dest, valor) -> dest.setCpfCliente(valor))
