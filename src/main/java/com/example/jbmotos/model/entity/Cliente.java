@@ -1,6 +1,5 @@
 package com.example.jbmotos.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +14,7 @@ import java.util.List;
 public class Cliente {
 
     @Id
-    @Column(name = "cpf")
+    @Column(name = "cpf", length = 14)
     private String cpf;
 
     @Column(name = "nome")
@@ -32,7 +31,8 @@ public class Cliente {
     private Endereco endereco;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @JsonIgnore
     private List<Pedido> pedidos;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<Moto> motos;
 }
