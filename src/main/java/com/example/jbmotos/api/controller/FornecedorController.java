@@ -2,17 +2,19 @@ package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.FornecedorDTO;
 import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.repositories.FornecedorRepository;
 import com.example.jbmotos.services.FornecedorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/fornecedor")
@@ -25,10 +27,38 @@ public class FornecedorController {
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<FornecedorDTO> salvar(@RequestBody FornecedorDTO fornecedorDTO) {
+    public ResponseEntity<FornecedorDTO> salvar(@Valid @RequestBody FornecedorDTO fornecedorDTO) {
         Fornecedor fornecedor = fornecedorService.salvarFornecedor(fornecedorDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest().buildAndExpand(fornecedor).toUri();
         return ResponseEntity.created(uri).body( mapper.map(fornecedor, FornecedorDTO.class) );
+    }
+
+    @GetMapping("/buscar-todos")
+    public ResponseEntity<List<FornecedorDTO>> buscarTodos() {
+        return ResponseEntity.ok().body(fornecedorService.buscarTodosFornecedores().stream().map(fornecedor ->
+                mapper.map(fornecedor, FornecedorDTO.class)
+        ).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/buscar")
+    public ResponseEntity<FornecedorDTO> buscarPorCnpj(@RequestParam("cnpj") String cnpj) {
+        return ResponseEntity.ok().body(
+                mapper.map(fornecedorService.buscarFornecedorPorCNPJ(cnpj), FornecedorDTO.class));
+    }
+
+    @PutMapping("/atualizar")
+    public ResponseEntity<FornecedorDTO> atualizar(@RequestParam("cnpj") String cnpj,
+                                                   @Validated(FornecedorRepository.class) @RequestBody FornecedorDTO fornecedorDTO) {
+
+        fornecedorDTO.setCnpj(cnpj);
+        return ResponseEntity.ok().body(
+                mapper.map(fornecedorService.atualizarFornecedor(fornecedorDTO), FornecedorDTO.class));
+    }
+
+    @DeleteMapping("/deletar")
+    public ResponseEntity deletar(@RequestParam("cnpj") String cnpj) {
+        fornecedorService.deletarFornecedor(cnpj);
+        return ResponseEntity.noContent().build();
     }
 }
