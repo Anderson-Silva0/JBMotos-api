@@ -10,6 +10,7 @@ import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +28,9 @@ public class MotoServiceImpl implements MotoService {
     private ModelMapper mapper;
 
     @Override
+    @Transactional
     public Moto salvarMoto(MotoDTO motoDTO) {
+        motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
         Moto moto = mapper.map(motoDTO, Moto.class);
         validarPlacaMotoParaSalvar(motoDTO.getPlaca());
         moto.setCliente(clienteService.buscarClientePorCPF(motoDTO.getCpfCliente()).get());
@@ -35,47 +38,58 @@ public class MotoServiceImpl implements MotoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Moto> buscarTodasMotos() {
         return motoRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Moto> buscarMotosPorCpfCliente(String cpfCliente) {
+        clienteService.checarCpfClienteExistente(cpfCliente);
         existeMotoPorCpfCliente(cpfCliente);
         return motoRepository.findMotosByClienteCpf(cpfCliente);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Moto> buscarMotoPorId(Integer idMoto) {
         validarExistenciaMotoPorId(idMoto);
         return motoRepository.findById(idMoto);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Moto> buscarMotoPorPlaca(String placa) {
-        validarExistenciaMotoPorPlaca(placa);
-        return motoRepository.findMotoByPlaca(placa);
+        String placaMaiuscula = placa.toUpperCase();
+        validarExistenciaMotoPorPlaca(placaMaiuscula);
+        return motoRepository.findMotoByPlaca(placaMaiuscula);
     }
 
     @Override
+    @Transactional
     public Moto atualizarMoto(MotoDTO motoDTO) {
+        motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
         validarExistenciaMotoPorId(motoDTO.getId());
         validarPlacaMotoParaAtualizar(motoDTO);
         Moto moto = mapper.map(motoDTO, Moto.class);
         moto.setCliente(clienteService.buscarClientePorCPF(motoDTO.getCpfCliente()).get());
-        return moto;
+        return motoRepository.save(moto);
     }
 
     @Override
+    @Transactional
     public void deletarMotoPorId(Integer idMoto) {
         validarExistenciaMotoPorId(idMoto);
         motoRepository.deleteById(idMoto);
     }
 
     @Override
+    @Transactional
     public void deletarMotoPorPlaca(String placa) {
-        validarExistenciaMotoPorPlaca(placa);
-        motoRepository.deleteByPlaca(placa);
+        String placaMaiuscula = placa.toUpperCase();
+        validarExistenciaMotoPorPlaca(placaMaiuscula);
+        motoRepository.deleteByPlaca(placaMaiuscula);
     }
 
     @Override
@@ -88,7 +102,7 @@ public class MotoServiceImpl implements MotoService {
     @Override
     public void validarPlacaMotoParaAtualizar(MotoDTO motoDTO) {
         filtrarMotosPorIdDiferente(motoDTO.getId()).stream().forEach(motoFiltrada -> {
-            if (motoDTO.getPlaca() == motoFiltrada.getPlaca()) {
+            if (motoDTO.getPlaca().equals(motoFiltrada.getPlaca())) {
                 throw new RegraDeNegocioException("Erro ao tentar atualizar Moto, Placa já cadastrada.");
             }
         });
