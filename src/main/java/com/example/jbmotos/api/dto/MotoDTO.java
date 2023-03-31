@@ -1,6 +1,5 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.entity.Cliente;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -29,7 +30,9 @@ public class MotoDTO {
     @NotBlank(message = "O campo Modelo é obrigatório.")
     private String modelo;
 
-    @NotNull(message = "O Ano é obrigatório.")
+    @NotNull(message = "O campo Ano é obrigatório.")
+    @Min(value = 1900, message = "Informe um ano maior ou igual à 1900.")
+    @Max(value = 9999, message = "O campo Ano tem no máximo 4 dígitos.")
     private Integer ano;
 
     @CPF(message = "Número do CPF inexistente.")
