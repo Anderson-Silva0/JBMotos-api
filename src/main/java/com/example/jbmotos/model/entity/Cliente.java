@@ -1,8 +1,10 @@
 package com.example.jbmotos.model.entity;
 
 import lombok.*;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Table(name = "cliente", schema = "jbmotos")
@@ -17,14 +19,18 @@ public class Cliente {
     @Column(name = "cpf", length = 14)
     private String cpf;
 
-    @Column(name = "nome")
+    @Column(name = "nome", length = 50)
     private String nome;
 
-    @Column(name = "email")
+    @Column(name = "email", length = 200)
     private String email;
 
-    @Column(name = "telefone")
+    @Column(name = "telefone", length = 15)
     private String telefone;
+
+    @Column(name = "data_hora_cadastro")
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    private LocalDateTime dataHoraCadastro;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id")

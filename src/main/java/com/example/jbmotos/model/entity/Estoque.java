@@ -1,9 +1,7 @@
 package com.example.jbmotos.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.jbmotos.model.enums.StatusEstoque;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -22,12 +20,16 @@ public class Estoque {
     @OneToOne(mappedBy = "estoque")
     private Produto produto;
 
-    @Column(name = "min_estoque")
+    @Column(name = "estoque_minimo")
     private Integer estoqueMinimo;
 
-    @Column(name = "max_estoque")
+    @Column(name = "estoque_maximo")
     private Integer estoqueMaximo;
 
     @Column(name="quantidade")
     private Integer quantidade;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private StatusEstoque status;
 }

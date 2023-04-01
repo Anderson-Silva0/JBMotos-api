@@ -1,6 +1,5 @@
 package com.example.jbmotos.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,12 +22,10 @@ public class ProdutoPedido {
 
     @ManyToOne
     @JoinColumn(name = "id_pedido")
-    @JsonIgnore
     private Pedido pedido;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")
-    @JsonIgnore
     private Produto produto;
 
     @Column(name = "quantidade")
@@ -37,6 +34,6 @@ public class ProdutoPedido {
     @Column(name = "valor_unidade")
     private BigDecimal valorUnidade;
 
-    @Column(name = "valorTotal")
+    @Column(name = "valor_total")
     private BigDecimal valorTotal;
 }

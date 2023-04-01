@@ -20,24 +20,24 @@ public class Pedido {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinColumn(name = "cpf_cliente", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "cpf_cliente")
     private Cliente cliente;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
-    @JoinColumn(name = "cpf_funcionario", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "cpf_funcionario")
     private Funcionario funcionario;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
-    private LocalDateTime dataHora;
+    private LocalDateTime dataHoraCadastro;
 
-    @Column(name = "observacao")
+    @Column(name = "observacao", length = 300)
     private String observacao;
 
-    @Column(name = "forma_de_pagamento")
+    @Column(name = "forma_de_pagamento", length = 50)
     private String formaDePagamento;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
-    private List<PedidoProduto> pedidoProduto;
+    private List<ProdutoPedido> produtosPedido;
 }

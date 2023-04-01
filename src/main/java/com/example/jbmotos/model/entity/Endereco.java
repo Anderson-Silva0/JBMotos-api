@@ -1,6 +1,5 @@
 package com.example.jbmotos.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,36 +14,30 @@ public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true)
+    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "rua")
+    @Column(name = "rua", length = 100)
     private String rua;
 
-    @Column(name = "cep")
+    @Column(name = "cep", length = 9)
     private String cep;
 
     @Column(name = "numero")
     private Integer numero;
 
-    @Column(name = "bairro")
+    @Column(name = "bairro", length = 50)
     private String bairro;
 
-    @Column(name = "cidade")
+    @Column(name = "cidade", length = 50)
     private String cidade;
 
     @OneToOne(mappedBy = "endereco")
-    @ToString.Exclude
-    @JsonIgnore
     private Cliente cliente;
 
     @OneToOne(mappedBy = "endereco")
-    @ToString.Exclude
-    @JsonIgnore
     private Funcionario funcionario;
 
     @OneToOne(mappedBy = "endereco")
-    @ToString.Exclude
-    @JsonIgnore
     private Fornecedor fornecedor;
 }
