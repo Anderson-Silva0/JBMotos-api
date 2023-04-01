@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +45,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     @Transactional
     public Fornecedor salvarFornecedor(FornecedorDTO fornecedorDTO) {
+        fornecedorDTO.setDataHoraCadastro(LocalDateTime.now());
         validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
         validarEnderecoParaSalvar(fornecedorDTO.getEndereco());
 
@@ -68,11 +70,13 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     @Transactional
     public Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO) {
+        LocalDateTime dateTime = buscarFornecedorPorCNPJ(fornecedorDTO.getCnpj()).get().getDataHoraCadastro();
         checarCnpjFornecedorExistente(fornecedorDTO.getCnpj());
         validarEnderecoParaAtualizar(fornecedorDTO);
 
         Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
         fornecedor.setEndereco(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco()).get());
+        fornecedor.setDataHoraCadastro(dateTime);
         return fornecedorRepository.save(fornecedor);
     }
 

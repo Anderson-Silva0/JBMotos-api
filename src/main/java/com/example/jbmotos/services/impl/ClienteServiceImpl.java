@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,6 +44,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente salvarCliente(ClienteDTO clienteDTO) {
+        clienteDTO.setDataHoraCadastro(LocalDateTime.now());
         validarCpfClienteParaSalvar(clienteDTO.getCpf());
         validarEmailParaSalvar(clienteDTO.getEmail());
         validarEnderecoParaSalvar(clienteDTO.getEndereco());
@@ -68,12 +70,15 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
+        LocalDateTime dateTime = buscarClientePorCPF(clienteDTO.getCpf()).get().getDataHoraCadastro();
+        clienteDTO.setDataHoraCadastro(LocalDateTime.now());
         checarCpfClienteExistente(clienteDTO.getCpf());
         validarEmailParaAtualizar(clienteDTO);
         validarEnderecoParaAtualizar(clienteDTO);
 
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
+        cliente.setDataHoraCadastro(dateTime);
         return clienteRepository.save(cliente);
     }
 

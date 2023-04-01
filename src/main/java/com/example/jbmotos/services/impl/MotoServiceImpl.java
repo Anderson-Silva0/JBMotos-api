@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ public class MotoServiceImpl implements MotoService {
     @Override
     @Transactional
     public Moto salvarMoto(MotoDTO motoDTO) {
+        motoDTO.setDataHoraCadastro(LocalDateTime.now());
         motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
         Moto moto = mapper.map(motoDTO, Moto.class);
         validarPlacaMotoParaSalvar(motoDTO.getPlaca());
@@ -69,11 +71,13 @@ public class MotoServiceImpl implements MotoService {
     @Override
     @Transactional
     public Moto atualizarMoto(MotoDTO motoDTO) {
+        LocalDateTime dateTime = buscarMotoPorId(motoDTO.getId()).get().getDataHoraCadastro();
         motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
         validarExistenciaMotoPorId(motoDTO.getId());
         validarPlacaMotoParaAtualizar(motoDTO);
         Moto moto = mapper.map(motoDTO, Moto.class);
         moto.setCliente(clienteService.buscarClientePorCPF(motoDTO.getCpfCliente()).get());
+        moto.setDataHoraCadastro(dateTime);
         return motoRepository.save(moto);
     }
 

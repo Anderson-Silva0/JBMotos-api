@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     @Override
     @Transactional
     public Funcionario salvarFuncionario(FuncionarioDTO funcionarioDTO){
+        funcionarioDTO.setDataHoraCadastro(LocalDateTime.now());
         validarCpfFuncionarioParaSalvar(funcionarioDTO.getCpf());
         validarEnderecoParaSalvar(funcionarioDTO.getEndereco());
 
@@ -69,11 +71,13 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     @Override
     @Transactional
     public Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO){
+        LocalDateTime dateTime = buscarFuncionarioPorCPF(funcionarioDTO.getCpf()).get().getDataHoraCadastro();
         checarCpfFuncionarioExistente(funcionarioDTO.getCpf());
         validarEnderecoParaAtualizar(funcionarioDTO);
 
         Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
         funcionario.setEndereco(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco()).get());
+        funcionario.setDataHoraCadastro(dateTime);
         return funcionarioRepository.save(funcionario);
     }
 
