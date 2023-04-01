@@ -1,5 +1,6 @@
 package com.example.jbmotos.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -7,10 +8,12 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -25,9 +28,11 @@ public class MotoDTO {
     private String placa;
 
     @NotBlank(message = "O campo Marca é obrigatório.")
+    @Length(min = 3, max = 30, message = "O campo Marca deve ter entre 3 e 30 caracteres.")
     private String marca;
 
     @NotBlank(message = "O campo Modelo é obrigatório.")
+    @Length(min = 3, max = 30, message = "O campo Modelo deve ter entre 3 e 30 caracteres.")
     private String modelo;
 
     @NotNull(message = "O campo Ano é obrigatório.")
@@ -35,7 +40,11 @@ public class MotoDTO {
     @Max(value = 9999, message = "O campo Ano tem no máximo 4 dígitos.")
     private Integer ano;
 
-    @CPF(message = "Número do CPF inexistente.")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    private LocalDateTime dataHoraCadastro;
+
+    @CPF(message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
     @NotBlank(message = "O campo CPF do Cliente é obrigatório.")
+    @Length(min = 14, max = 14, message = "O campo CPF do Cliente deve ter 14 caracteres.")
     private String cpfCliente;
 }

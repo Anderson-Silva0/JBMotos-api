@@ -1,15 +1,20 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.entity.Produto;
-import com.example.jbmotos.model.enums.StatusEstoque;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class EstoqueDTO {
 
     private Integer id;
-
-    private Produto produto;
 
     @NotNull(message = "O campo Estoque Mínimo é obrigatório.")
     private Integer estoqueMinimo;
@@ -18,8 +23,8 @@ public class EstoqueDTO {
     private Integer estoqueMaximo;
 
     @NotNull(message = "O campo Quantidade é obrigatório.")
+    @Min(value = 0, message = "A Quantidade deve ser maior ou igual a 0.")
     private Integer quantidade;
 
-    @NotNull(message = "O campo Status é obrigatório.")
-    private StatusEstoque status;
+    private String status;
 }

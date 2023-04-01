@@ -1,7 +1,9 @@
 package com.example.jbmotos.api.dto;
 
+import com.example.jbmotos.model.entity.ProdutoPedido;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,19 +23,20 @@ public class PedidoDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O campo Cliente é obrigatório.")
-    @CPF(message = "Número do CPF inexistente.")
+    @NotBlank(message = "O campo CPF do Cliente é obrigatório.")
+    @Length(min = 14, max = 14, message = "O campo CPF do Cliente deve ter 14 caracteres.")
+    @CPF(message = "CPF do Cliente inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfCliente;
 
-    @NotBlank(message = "O campo Funcionário é obrigatório.")
-    @CPF(message = "Número do CPF inexistente.")
+    @NotBlank(message = "O campo CPF do Funcionário é obrigatório.")
+    @Length(min = 14, max = 14, message = "O campo CPF do Funcionário deve ter 14 caracteres.")
+    @CPF(message = "CPF do Fucionário inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfFuncionario;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private LocalDateTime dataHora;
+    private LocalDateTime dataHoraCadastro;
 
-    @NotBlank(message = "O campo Observação é obrigatório.")
-    @Length(max = 255, message = "O campo Observação tem no máximo 255 caracteres.")
+    @Length(max = 300, message = "O campo Observação tem no máximo 300 caracteres.")
     private String observacao;
 
     @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
@@ -41,5 +44,5 @@ public class PedidoDTO {
     private String formaDePagamento;
 
     @JsonIgnore
-    private List<Integer> produtos;
+    private List<ProdutoPedido> produtosPedidos;
 }

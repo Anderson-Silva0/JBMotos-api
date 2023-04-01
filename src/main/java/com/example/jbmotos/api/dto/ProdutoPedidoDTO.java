@@ -17,10 +17,10 @@ public class ProdutoPedidoDTO {
 
     private Integer id;
 
-    @NotNull(message = "Informe o Id do Pedido.")
+    @NotNull(message = "O Id do Pedido não pode ser nulo.")
     private Integer idPedido;
 
-    @NotNull(message = "Informe o Id do Produto.")
+    @NotNull(message = "O Id do Produto não pode ser nulo.")
     private Integer idProduto;
 
     @NotNull(message = "Informe a Quantidade do Produto.")
