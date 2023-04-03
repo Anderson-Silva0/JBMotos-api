@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,5 +57,10 @@ public class ProdutoController {
     public ResponseEntity deletar(@PathVariable("id") Integer id) {
         produtoService.deletarProduto(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("lucro-produto/{idProduto}")
+    public ResponseEntity<BigDecimal> lucroProduto(@PathVariable("idProduto") Integer idProduto) {
+        return ResponseEntity.ok().body(produtoService.calcularLucroProduto(idProduto));
     }
 }
