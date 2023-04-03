@@ -1,21 +1,19 @@
 package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.PedidoDTO;
-import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.entity.Funcionario;
-import com.example.jbmotos.model.entity.Produto;
 import com.example.jbmotos.model.entity.Pedido;
+import com.example.jbmotos.model.entity.Produto;
+import com.example.jbmotos.model.entity.ProdutoPedido;
 import com.example.jbmotos.model.repositories.PedidoRepository;
-import com.example.jbmotos.services.ClienteService;
-import com.example.jbmotos.services.FuncionarioService;
-import com.example.jbmotos.services.ProdutoService;
-import com.example.jbmotos.services.PedidoService;
+
+import com.example.jbmotos.services.*;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +23,13 @@ import java.util.stream.Collectors;
 public class PedidoServiceImpl implements PedidoService {
 
     @Autowired
-    private PedidoRepository PedidoRepository;
+    private PedidoRepository pedidoRepository;
 
     @Autowired
     private ProdutoService produtoService;
+
+    @Autowired
+    private ProdutoPedidoService produtoPedidoService;
 
     @Autowired
     private ClienteService clienteService;
@@ -41,67 +42,79 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @Transactional
-    public Pedido salvarPedido(PedidoDTO PedidoDTO) {
-        PedidoDTO.setDataHora(LocalDateTime.now());
-
-        List<Produto> produtos = PedidoDTO.getProdutos().stream().map(idProduto ->
-                produtoService.buscarProdutoPorId(idProduto).get()
-        ).collect(Collectors.toList());
-
-        Pedido Pedido = mapper.map(PedidoDTO, Pedido.class);
-
-        Pedido.setProdutos(produtos);
-
-        Cliente cliente = clienteService.buscarClientePorCPF(PedidoDTO.getCpfCliente()).get();
-        Pedido.setCliente(cliente);
-
-        Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(PedidoDTO.getCpfFuncionario()).get();
-        Pedido.setFuncionario(funcionario);
-
-        System.out.println("Pedido pronto = " + Pedido);
-
-        return PedidoRepository.save(Pedido);
-    }
-
-    public Cliente buscarCliente(String cpf) {
-        return clienteService.buscarClientePorCPF(cpf).get();
+    public Pedido salvarPedido(PedidoDTO pedidoDTO) {
+        pedidoDTO.setDataHoraCadastro(LocalDateTime.now());
+        Pedido pedido = mapper.map(pedidoDTO, Pedido.class);
+        pedido.setCliente(clienteService.buscarClientePorCPF(pedidoDTO.getCpfCliente()).get());
+        pedido.setFuncionario(funcionarioService.buscarFuncionarioPorCPF(pedidoDTO.getCpfFuncionario()).get());
+        return pedidoRepository.save(pedido);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Pedido> buscarTodasPedidos() {
-        return PedidoRepository.findAll();
+    public List<Pedido> buscarTodosPedidos() {
+        return pedidoRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Pedido> buscarPedidoPorId(Integer id) {
-        verificaSePedidoExiste(id);
-        return PedidoRepository.findById(id);
+        validarPedido(id);
+        return pedidoRepository.findById(id);
     }
 
     @Override
     @Transactional
-    public Pedido atualizarPedido(pedidoDTO pedidoDTO) {
-        LocalDateTime dateTime = buscarpedidoPorId(pedidoDTO.getId()).get().getDataHora();
-        pedido pedido = mapper.map(pedidoDTO, pedido.class);
+    public Pedido atualizarPedido(PedidoDTO pedidoDTO) {
+        LocalDateTime dateTime = buscarPedidoPorId(pedidoDTO.getId()).get().getDataHoraCadastro();
+        Pedido pedido = mapper.map(pedidoDTO, Pedido.class);
         pedido.setCliente(clienteService.buscarClientePorCPF(pedidoDTO.getCpfCliente()).get());
         pedido.setFuncionario(funcionarioService.buscarFuncionarioPorCPF(pedidoDTO.getCpfFuncionario()).get());
-        pedido.setDataHora(dateTime);
+        pedido.setDataHoraCadastro(dateTime);
         return pedidoRepository.save(pedido);
     }
 
     @Override
     @Transactional
-    public void deletarpedido(Integer id) {
-        verificaSepedidoExiste(id);
+    public void deletarPedido(Integer id) {
+        validarPedido(id);
         pedidoRepository.deleteById(id);
     }
 
     @Override
-    public void verificaSepedidoExiste(Integer id) {
+    public BigDecimal calcularLucroDoPedido(Integer idPedido){
+        validarPedido(idPedido);
+        List<ProdutoPedido> produtosDoPedido = produtoPedidoService.buscarProdutoPedidoPorIdPedido(idPedido);
+        BigDecimal lucroTotalPedido = produtosDoPedido.stream()
+                .map(produtoPedido -> produtoService.calcularLucroProduto(produtoPedido.getProduto().getId())
+                        .multiply( BigDecimal.valueOf(produtoPedido.getQuantidade()) )
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return lucroTotalPedido;
+    }
+
+    @Override
+    public void validarPedido(Integer id) {
         if (!pedidoRepository.existsById(id)) {
-            throw new ObjetoNaoEncontradoException("pedido não encontrada para o Id informado.");
+            throw new ObjetoNaoEncontradoException("Pedido não encontrado para o Id informado.");
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal valorTotalDoPedido(Integer idPedido){
+        validarPedido(idPedido);
+        BigDecimal valorTotal = produtoPedidoService.buscarProdutoPedidoPorIdPedido(idPedido).stream()
+                .map(produtoPedido -> produtoPedido.getValorTotal())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return valorTotal;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Produto> buscarProdutosDoPedido(Integer idPedido){
+        return produtoPedidoService.buscarProdutoPedidoPorIdPedido(idPedido).stream().map(produtoPedido ->
+                produtoPedido.getProduto()
+        ).collect(Collectors.toList());
     }
 }
