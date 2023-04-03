@@ -2,21 +2,29 @@ package com.example.jbmotos.services;
 
 import com.example.jbmotos.api.dto.PedidoDTO;
 import com.example.jbmotos.model.entity.Pedido;
+import com.example.jbmotos.model.entity.Produto;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 public interface PedidoService {
     
-    Pedido salvarPedido(PedidoDTO PedidoDTO);
+    Pedido salvarPedido(PedidoDTO pedidoDTO);
 
     List<Pedido> buscarTodosPedidos();
 
-    Optional<Pedido> buscarpedidoPorId(Integer id);
+    Optional<Pedido> buscarPedidoPorId(Integer id);
 
-    pedido atualizarpedido(pedidoDTO pedidoDTO);
+    Pedido atualizarPedido(PedidoDTO pedidoDTO);
 
-    void deletarpedido(Integer id);
+    void deletarPedido(Integer id);
 
-    void verificaSepedidoExiste(Integer id);
+    BigDecimal calcularLucroDoPedido(Integer idPedido);
+
+    void validarPedido(Integer id);
+
+    BigDecimal valorTotalDoPedido(Integer idPedido);
+
+    List<Produto> buscarProdutosDoPedido(Integer idPedido);
 }
