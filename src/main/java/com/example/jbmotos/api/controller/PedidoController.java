@@ -1,6 +1,7 @@
 package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.PedidoDTO;
+import com.example.jbmotos.api.dto.ProdutoDTO;
 import com.example.jbmotos.model.entity.Pedido;
 import com.example.jbmotos.services.PedidoService;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +49,7 @@ public class PedidoController {
 
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<PedidoDTO> atualizar(@PathVariable("id") Integer id,
-                                              @Valid @RequestBody PedidoDTO pedidoDTO) {
+                                               @Valid @RequestBody PedidoDTO pedidoDTO) {
         pedidoDTO.setId(id);
         return ResponseEntity.ok().body(mapper.map(pedidoService.atualizarPedido(pedidoDTO), PedidoDTO.class));
     }
@@ -56,5 +58,23 @@ public class PedidoController {
     public ResponseEntity deletar(@PathVariable("id") Integer id) {
         pedidoService.deletarPedido(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/lucro-pedido/{idPedido}")
+    public ResponseEntity<BigDecimal> LucroDoPedido(@PathVariable("idPedido") Integer idPedido) {
+        return ResponseEntity.ok().body(pedidoService.calcularLucroDoPedido(idPedido));
+    }
+
+    @GetMapping("/valor-total-pedido/{id}")
+    public ResponseEntity<BigDecimal> valorTotalDoPedido(@PathVariable("id") Integer idPedido) {
+        return ResponseEntity.ok().body(pedidoService.valorTotalDoPedido(idPedido));
+    }
+
+    @GetMapping("/produtos-do-pedido/{idPedido}")
+    public ResponseEntity<List<ProdutoDTO>> buscarProdutosDoPedido(@PathVariable("idPedido") Integer idPedido) {
+        return ResponseEntity.ok().body(
+                pedidoService.buscarProdutosDoPedido(idPedido).stream().map(produto ->
+                        mapper.map(produto, ProdutoDTO.class)
+                ).collect(Collectors.toList()));
     }
 }
