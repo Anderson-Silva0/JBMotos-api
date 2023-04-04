@@ -8,6 +8,7 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Table(name = "moto", schema = "jbmotos")
 @Data
@@ -41,4 +42,7 @@ public class Moto {
     @ManyToOne
     @JoinColumn(name = "cpf_cliente", referencedColumnName = "cpf")
     private Cliente cliente;
-}
+
+    @OneToMany(mappedBy = "moto", cascade = CascadeType.ALL)
+    private List<Servico> servicos;
+ }

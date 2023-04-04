@@ -33,6 +33,9 @@ public class Funcionario {
     @JoinColumn(name = "id_endereco", referencedColumnName = "id")
     private Endereco endereco;
 
-    @OneToMany(mappedBy = "funcionario")
+    @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
     private List<Pedido> Pedidos;
+
+    @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
+    private List<Servico> servicos;
 }

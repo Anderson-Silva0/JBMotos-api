@@ -40,4 +40,7 @@ public class Pedido {
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<ProdutoPedido> produtosPedido;
+
+    @OneToOne(mappedBy = "pedido")
+    private Servico servico;
 }
