@@ -225,8 +225,6 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
     }
 
     private List<ProdutoPedido> filtrarProdutoPedidoPorIdDiferente(ProdutoPedido produtoPedido){
-        return buscarTodosProdutoPedido().stream()
-                .filter(produtoPedidoFiltrado -> (produtoPedido.getId() != produtoPedidoFiltrado.getId()))
-                .collect(Collectors.toList());
+        return produtoPedidoRepository.findByIdNot(produtoPedido.getId());
     }
 }
