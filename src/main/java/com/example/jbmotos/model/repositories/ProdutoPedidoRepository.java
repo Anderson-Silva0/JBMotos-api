@@ -12,4 +12,6 @@ public interface ProdutoPedidoRepository extends JpaRepository<ProdutoPedido, In
     List<ProdutoPedido> findProdutoPedidoByPedidoId(Integer id);
 
     boolean existsProdutoPedidosByPedidoIdAndProdutoId(Integer idPedido, Integer idProduto);
+
+    List<ProdutoPedido> findByIdNot(Integer id);
 }
