@@ -39,6 +39,9 @@ public class Servico {
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime dataHoraCadastro;
 
+    @Column(name = "servicos_realizados", length = 300)
+    private String servicosRealizados;
+
     @Column(name = "observacao", length = 300)
     private String observacao;
 
