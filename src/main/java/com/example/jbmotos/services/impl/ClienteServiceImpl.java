@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ClienteServiceImpl implements ClienteService {
@@ -44,12 +43,12 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public Cliente salvarCliente(ClienteDTO clienteDTO) {
-        clienteDTO.setDataHoraCadastro(LocalDateTime.now());
         validarCpfClienteParaSalvar(clienteDTO.getCpf());
         validarEmailParaSalvar(clienteDTO.getEmail());
         validarEnderecoParaSalvar(clienteDTO.getEndereco());
 
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+        cliente.setDataHoraCadastro(LocalDateTime.now());
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
         return clienteRepository.save(cliente);
     }
@@ -71,14 +70,13 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
         LocalDateTime dateTime = buscarClientePorCPF(clienteDTO.getCpf()).get().getDataHoraCadastro();
-        clienteDTO.setDataHoraCadastro(LocalDateTime.now());
         checarCpfClienteExistente(clienteDTO.getCpf());
         validarEmailParaAtualizar(clienteDTO);
         validarEnderecoParaAtualizar(clienteDTO);
 
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
-        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
         cliente.setDataHoraCadastro(dateTime);
+        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
         return clienteRepository.save(cliente);
     }
 
