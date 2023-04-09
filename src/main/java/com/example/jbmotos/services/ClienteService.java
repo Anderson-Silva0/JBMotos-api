@@ -20,13 +20,9 @@ public interface ClienteService {
 
     void validarEmailParaSalvar(String email);
 
-    void validarEnderecoParaSalvar(Integer idEndereco);
-
     void validarCpfClienteParaSalvar(String cpf);
 
     void validarEmailParaAtualizar(ClienteDTO clienteDTO);
-
-    void validarEnderecoParaAtualizar(ClienteDTO clienteDTO);
 
     void checarCpfClienteExistente(String cpf);
 

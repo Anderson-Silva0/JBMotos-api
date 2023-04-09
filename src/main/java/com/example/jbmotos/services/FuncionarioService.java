@@ -18,11 +18,7 @@ public interface FuncionarioService {
 
     void deletarFuncionario(String cpf);
 
-    void validarEnderecoParaSalvar(Integer idEndereco);
-
     void validarCpfFuncionarioParaSalvar(String cpf);
-
-    void validarEnderecoParaAtualizar(FuncionarioDTO funcionarioDTO);
 
     List<Funcionario> filtrarFuncionariosPorCpfDiferente(FuncionarioDTO funcionarioDTO);
 

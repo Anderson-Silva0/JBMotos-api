@@ -18,11 +18,7 @@ public interface FornecedorService {
 
     void deletarFornecedor(String cnpj);
 
-    void validarEnderecoParaSalvar(Integer idEndereco);
-
     void validarCnpjFornecedorParaSalvar(String cnpj);
-
-    void validarEnderecoParaAtualizar(FornecedorDTO fornecedorDTO);
 
     List<Fornecedor> filtrarFornecedoresPorCnpjDiferente(FornecedorDTO fornecedorDTO);
 

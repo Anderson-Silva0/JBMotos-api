@@ -5,8 +5,6 @@ import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.repositories.ClienteRepository;
 import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.EnderecoService;
-import com.example.jbmotos.services.FornecedorService;
-import com.example.jbmotos.services.FuncionarioService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
@@ -32,12 +30,6 @@ public class ClienteServiceImpl implements ClienteService {
     private EnderecoService enderecoService;
 
     @Autowired
-    private FuncionarioService funcionarioService;
-
-    @Autowired
-    private FornecedorService fornecedorService;
-
-    @Autowired
     private ModelMapper mapper;
 
     @Override
@@ -45,8 +37,6 @@ public class ClienteServiceImpl implements ClienteService {
     public Cliente salvarCliente(ClienteDTO clienteDTO) {
         validarCpfClienteParaSalvar(clienteDTO.getCpf());
         validarEmailParaSalvar(clienteDTO.getEmail());
-        validarEnderecoParaSalvar(clienteDTO.getEndereco());
-
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setDataHoraCadastro(LocalDateTime.now());
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
@@ -70,10 +60,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Transactional
     public Cliente atualizarCliente(ClienteDTO clienteDTO) {
         LocalDateTime dateTime = buscarClientePorCPF(clienteDTO.getCpf()).get().getDataHoraCadastro();
-        checarCpfClienteExistente(clienteDTO.getCpf());
         validarEmailParaAtualizar(clienteDTO);
-        validarEnderecoParaAtualizar(clienteDTO);
-
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setDataHoraCadastro(dateTime);
         cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
@@ -95,19 +82,6 @@ public class ClienteServiceImpl implements ClienteService {
     }
 
     @Override
-    public void validarEnderecoParaSalvar(Integer idEndereco) {
-        if (existeClientePorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_SALVAR_CLIENTE+", o Endereço já pertence a um Cliente.");
-        }
-        if (funcionarioService.existeFuncionarioPorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_SALVAR_CLIENTE+", o Endereço já pertence a um Funcionário.");
-        }
-        if (fornecedorService.existeFornecedorPorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_SALVAR_CLIENTE+", o Endereço já pertence a um Fornecedor.");
-        }
-    }
-
-    @Override
     public void validarCpfClienteParaSalvar(String cpf) {
         if (clienteRepository.existsClienteByCpf(cpf)) {
             throw new RegraDeNegocioException(ERRO_SALVAR_CLIENTE+", CPF já cadastrado.");
@@ -119,21 +93,6 @@ public class ClienteServiceImpl implements ClienteService {
         filtrarClientesPorCpfDiferente(clienteDTO).stream().forEach(clienteFiltrado -> {
             if (clienteDTO.getEmail().equals( clienteFiltrado.getEmail())) {
                 throw new RegraDeNegocioException(ERRO_ATUALIZAR_CLIENTE+", Email já cadastrado.");
-            }
-        });
-    }
-
-    @Override
-    public void validarEnderecoParaAtualizar(ClienteDTO clienteDTO) {
-        filtrarClientesPorCpfDiferente(clienteDTO).stream().forEach(clienteFiltrado -> {
-            if (clienteDTO.getEndereco() == clienteFiltrado.getEndereco().getId()) {
-                throw new RegraDeNegocioException(ERRO_ATUALIZAR_CLIENTE+", o Endereço já pertence a um Cliente.");
-            }
-            if (funcionarioService.existeFuncionarioPorIdEndereco(clienteDTO.getEndereco())) {
-                throw new RegraDeNegocioException(ERRO_ATUALIZAR_CLIENTE+", o Endereço já pertence a um Funcionário.");
-            }
-            if (fornecedorService.existeFornecedorPorIdEndereco(clienteDTO.getEndereco())) {
-                throw new RegraDeNegocioException(ERRO_ATUALIZAR_CLIENTE+", o Endereço já pertence a um Fornecedor.");
             }
         });
     }
