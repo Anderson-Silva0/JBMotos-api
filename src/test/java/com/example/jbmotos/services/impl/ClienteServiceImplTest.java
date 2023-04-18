@@ -69,6 +69,8 @@ class ClienteServiceImplTest {
         assertEquals(clienteDTO.getEmail(), clienteSalvo.getEmail());
         assertEquals(clienteDTO.getTelefone(), clienteSalvo.getTelefone());
         assertNotNull(clienteSalvo.getDataHoraCadastro());
+        assertEquals(cliente.getDataHoraCadastro(), clienteSalvo.getDataHoraCadastro());
+        assertNotNull(clienteSalvo.getEndereco());
         assertEquals(getEndereco(), clienteSalvo.getEndereco());
 
         verify(clienteRepository, times(1)).existsClienteByCpf(anyString());

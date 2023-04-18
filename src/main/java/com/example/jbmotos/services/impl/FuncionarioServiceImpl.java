@@ -33,9 +33,9 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     @Override
     @Transactional
     public Funcionario salvarFuncionario(FuncionarioDTO funcionarioDTO){
-        funcionarioDTO.setDataHoraCadastro(LocalDateTime.now());
         validarCpfFuncionarioParaSalvar(funcionarioDTO.getCpf());
         Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
+        funcionario.setDataHoraCadastro(LocalDateTime.now());
         funcionario.setEndereco(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco()).get());
         return funcionarioRepository.save(funcionario);
     }
