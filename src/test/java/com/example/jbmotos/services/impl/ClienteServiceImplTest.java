@@ -4,7 +4,6 @@ import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.entity.Endereco;
 import com.example.jbmotos.model.repositories.ClienteRepository;
-import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.EnderecoService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
@@ -31,7 +30,7 @@ import static org.mockito.Mockito.*;
 class ClienteServiceImplTest {
 
     @Autowired
-    private ClienteService clienteService;
+    private ClienteServiceImpl clienteService;
 
     @MockBean
     private ClienteRepository clienteRepository;
