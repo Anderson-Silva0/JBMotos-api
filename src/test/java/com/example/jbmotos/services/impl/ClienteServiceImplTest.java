@@ -49,7 +49,7 @@ class ClienteServiceImplTest {
     public void setUp() {
         clienteDTO = getClienteDTO();
         cliente = getCliente();
-        endereco = getEndereco();
+        endereco = EnderecoServiceImplTest.getEndereco();
     }
 
     @Test
@@ -58,7 +58,7 @@ class ClienteServiceImplTest {
         when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(false);
         when(clienteRepository.existsClienteByEmail(clienteDTO.getEmail())).thenReturn(false);
         when(mapper.map(clienteDTO, Cliente.class)).thenReturn(cliente);
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(getEndereco()));
+        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(endereco));
         when(clienteRepository.save(cliente)).thenReturn(cliente);
 
         Cliente clienteSalvo = clienteService.salvarCliente(clienteDTO);
@@ -71,7 +71,7 @@ class ClienteServiceImplTest {
         assertNotNull(clienteSalvo.getDataHoraCadastro());
         assertEquals(cliente.getDataHoraCadastro(), clienteSalvo.getDataHoraCadastro());
         assertNotNull(clienteSalvo.getEndereco());
-        assertEquals(getEndereco(), clienteSalvo.getEndereco());
+        assertEquals(endereco, clienteSalvo.getEndereco());
 
         verify(clienteRepository, times(1)).existsClienteByCpf(anyString());
         verify(clienteRepository, times(1)).existsClienteByEmail(anyString());
@@ -143,7 +143,7 @@ class ClienteServiceImplTest {
                 .email("anderson@gmail.com")
                 .telefone("(81) 91234-5678")
                 .dataHoraCadastro(LocalDateTime.now())
-                .endereco(getEndereco())
+                .endereco(endereco)
                 .build();
         Cliente novoCliente;
 
@@ -161,7 +161,7 @@ class ClienteServiceImplTest {
                         .build()
         );
 
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(getEndereco()));
+        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(endereco));
         when(clienteRepository.save(novoCliente)).thenReturn(novoCliente);
 
         Cliente clienteAtualizado = clienteService.atualizarCliente(clienteDTO);
@@ -174,7 +174,7 @@ class ClienteServiceImplTest {
         assertNotNull(clienteAtualizado.getDataHoraCadastro());
         assertEquals(clienteAntigo.getDataHoraCadastro(), clienteAtualizado.getDataHoraCadastro());
         assertNotNull(clienteAtualizado.getEndereco());
-        assertEquals(getEndereco(), clienteAtualizado.getEndereco());
+        assertEquals(endereco, clienteAtualizado.getEndereco());
         assertEquals(Cliente.class, clienteAtualizado.getClass());
     }
 
@@ -359,17 +359,6 @@ class ClienteServiceImplTest {
         assertFalse( clienteService.existeClientePorIdEndereco(idEndereco) );
     }
 
-    public static ClienteDTO getClienteDTO() {
-        return ClienteDTO.builder()
-                .cpf("710.606.394-08")
-                .nome("Anderson")
-                .email("anderson@gmail.com")
-                .telefone("(81) 992389161")
-                .dataHoraCadastro(null)
-                .endereco(123)
-                .build();
-    }
-
     public static Cliente getCliente() {
         return Cliente.builder()
                 .cpf("710.606.394-08")
@@ -381,14 +370,14 @@ class ClienteServiceImplTest {
                 .build();
     }
 
-    public static Endereco getEndereco() {
-        return Endereco.builder()
-                .id(1)
-                .rua("Rua flores do oriente")
-                .cep("51250-545")
-                .numero(100)
-                .bairro("Jordão Baixo")
-                .cidade("Recife")
+    public static ClienteDTO getClienteDTO() {
+        return ClienteDTO.builder()
+                .cpf("710.606.394-08")
+                .nome("Anderson")
+                .email("anderson@gmail.com")
+                .telefone("(81) 992389161")
+                .dataHoraCadastro(null)
+                .endereco(123)
                 .build();
     }
 }

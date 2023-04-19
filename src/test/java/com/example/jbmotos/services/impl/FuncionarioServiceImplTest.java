@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.jbmotos.services.impl.ClienteServiceImplTest.getEndereco;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -50,7 +49,7 @@ class FuncionarioServiceImplTest {
     void setUp() {
         funcionario = getFuncionario();
         funcionarioDTO = getFuncionarioDTO();
-        endereco = getEndereco();
+        endereco = EnderecoServiceImplTest.getEndereco();
     }
 
     @Test
