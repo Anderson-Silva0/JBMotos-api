@@ -248,6 +248,29 @@ class ProdutoPedidoServiceImplTest {
     }
 
     @Test
+    @DisplayName("Deve lancar erro ao tentar atualizar ProdutoPedido com estoque indisponivel, com o mesmo produto")
+    void atualizarProdutoPedidoComErroNaValidacaoDoEstoque() {
+        //Cenário
+        estoque.setQuantidade(10);
+        produtoPedidoDTO.setQuantidade(15);
+        produto.setEstoque(estoque);
+        produtoPedido.setProduto(produto);
+
+        when(produtoPedidoRepository.existsById(produtoPedidoDTO.getId())).thenReturn(true);
+        when(produtoPedidoService.buscarProdutoPedidoPorId(produtoPedidoDTO.getId()))
+                .thenReturn(Optional.of(produtoPedido));
+        when(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido())).thenReturn(Optional.of(pedido));
+        when(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto())).thenReturn(Optional.of(produto));
+
+        //Execução e verificação
+        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () -> {
+            produtoPedidoService.atualizarProdutoPedido(produtoPedidoDTO);
+        });
+        assertEquals("Não é possível Atualizar o Pedido pois a quantidade solicitada do Produto" +
+                " é maior do que a quantidade disponível em estoque.", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("Deve atualizar um ProdutoPedido com sucesso, com produto diferente do anterior")
     void atualizarProdutoPedidoComOutroProduto() {
         //Cenário
