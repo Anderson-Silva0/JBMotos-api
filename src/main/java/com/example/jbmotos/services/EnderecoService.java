@@ -18,6 +18,4 @@ public interface EnderecoService {
     void deletarEnderecoPorId(Integer id);
 
     void validarEndereco(Integer id);
-
-    void verificarUsoEndereco(Integer idEndereco);
 }

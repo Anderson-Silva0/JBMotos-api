@@ -82,8 +82,7 @@ public class EnderecoServiceImpl implements EnderecoService {
         }
     }
 
-    @Override
-    public void verificarUsoEndereco(Integer idEndereco) {
+    private void verificarUsoEndereco(Integer idEndereco) {
         if (clienteService.existeClientePorIdEndereco(idEndereco)) {
             throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO+" Cliente.");
         }
