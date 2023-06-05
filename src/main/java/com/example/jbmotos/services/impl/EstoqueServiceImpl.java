@@ -77,26 +77,24 @@ public class EstoqueServiceImpl implements EstoqueService {
     @Override
     public void adicionarQuantidadeAoEstoque(Integer idProduto, Integer quantidade) {
         Estoque estoque = produtoService.buscarProdutoPorId(idProduto).get().getEstoque();
-        estoque.setQuantidade( estoque.getQuantidade() + quantidade );
+        estoque.setQuantidade(estoque.getQuantidade() + quantidade);
         atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal calcularValorTotalEstoque() {
-        BigDecimal valorTotal = BigDecimal.ZERO;
-        for (Estoque estoque : buscarTodosEstoques()) {
-            valorTotal = valorTotal.add(
-                    estoque.getProduto().getPrecoVenda().multiply( BigDecimal.valueOf(estoque.getQuantidade()) )
-            );
-        }
-        return valorTotal;
+        return buscarTodosEstoques().stream()
+                .map(estoque -> estoque.getProduto().getPrecoVenda()
+                        .multiply(BigDecimal.valueOf(estoque.getQuantidade()))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
     public void validarEstoque(Integer id) {
         if (!estoqueRepository.existsById(id)) {
-            throw new ObjetoNaoEncontradoException("Estoque não encontrado para o Id Informado.");
+            throw new ObjetoNaoEncontradoException("Estoque não encontrado para o Id informado.");
         }
     }
 
