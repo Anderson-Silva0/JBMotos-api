@@ -47,6 +47,23 @@ public class FornecedorController {
                 mapper.map(fornecedorService.buscarFornecedorPorCNPJ(cnpj), FornecedorDTO.class));
     }
 
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<FornecedorDTO>> filtrar(
+            @RequestParam(value = "cnpj", required = false) String cnpj,
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "telefone", required = false) String telefone
+    ) {
+        FornecedorDTO fornecedorDTO = FornecedorDTO.builder()
+                .cnpj(cnpj)
+                .nome(nome)
+                .telefone(telefone)
+                .build();
+        return ResponseEntity.ok().body(
+                fornecedorService.filtrarFornecedor(fornecedorDTO).stream().map(fornecedor ->
+                        mapper.map(fornecedor, FornecedorDTO.class)
+                ).collect(Collectors.toList()));
+    }
+
     @PutMapping("/atualizar")
     public ResponseEntity<FornecedorDTO> atualizar(@RequestParam("cnpj") String cnpj,
                                                    @Validated(FornecedorRepository.class) @RequestBody FornecedorDTO fornecedorDTO) {

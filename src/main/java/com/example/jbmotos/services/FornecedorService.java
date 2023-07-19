@@ -14,6 +14,8 @@ public interface FornecedorService {
 
     Optional<Fornecedor> buscarFornecedorPorCNPJ(String cnpj);
 
+    List<Fornecedor> filtrarFornecedor(FornecedorDTO fornecedorDTO);
+
     Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO);
 
     void deletarFornecedor(String cnpj);

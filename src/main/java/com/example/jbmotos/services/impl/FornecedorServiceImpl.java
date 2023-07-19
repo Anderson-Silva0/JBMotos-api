@@ -9,6 +9,8 @@ import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +53,16 @@ public class FornecedorServiceImpl implements FornecedorService {
     public Optional<Fornecedor> buscarFornecedorPorCNPJ(String cnpj) {
         checarCnpjFornecedorExistente(cnpj);
         return fornecedorRepository.findFornecedorByCnpj(cnpj);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Fornecedor> filtrarFornecedor(FornecedorDTO fornecedorDTO) {
+        Example<Fornecedor> example = Example.of(mapper.map(fornecedorDTO, Fornecedor.class),
+                ExampleMatcher.matching()
+                        .withIgnoreCase()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        return fornecedorRepository.findAll(example);
     }
 
     @Override
