@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,9 +47,28 @@ public class ClienteController {
                 mapper.map(clienteService.buscarClientePorCPF(cpf).get(), ClienteDTO.class));
     }
 
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<ClienteDTO>> filtrar(
+            @RequestParam(value = "cpf", required = false) String cpf,
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "telefone", required = false) String telefone
+    ) {
+        ClienteDTO clienteDTO = ClienteDTO.builder()
+                .cpf(cpf)
+                .nome(nome)
+                .email(email)
+                .telefone(telefone)
+                .build();
+        return ResponseEntity.ok().body(
+                clienteService.filtrarCliente(clienteDTO).stream().map(cliente ->
+                        mapper.map(cliente, ClienteDTO.class)
+                ).collect(Collectors.toList()));
+    }
+
     @PutMapping("/atualizar/{cpf}")
-    public ResponseEntity<ClienteDTO> atualizar(@Valid @PathVariable("cpf") String cpf,
-                                                @RequestBody ClienteDTO clienteDTO) {
+    public ResponseEntity<ClienteDTO> atualizar(@PathVariable("cpf") String cpf,
+                                                @Valid @RequestBody ClienteDTO clienteDTO) {
         clienteDTO.setCpf(cpf);
         return ResponseEntity.ok().body(mapper.map(clienteService.atualizarCliente(clienteDTO), ClienteDTO.class));
     }

@@ -9,6 +9,8 @@ import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +56,15 @@ public class ClienteServiceImpl implements ClienteService {
     public Optional<Cliente> buscarClientePorCPF(String cpf) {
         checarCpfClienteExistente(cpf);
         return clienteRepository.findClienteByCpf(cpf);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<Cliente> filtrarCliente(ClienteDTO clienteDTO) {
+        Example<Cliente> example = Example.of(mapper.map(clienteDTO, Cliente.class),
+                ExampleMatcher.matching()
+                        .withIgnoreCase()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        return clienteRepository.findAll(example);
     }
 
     @Override

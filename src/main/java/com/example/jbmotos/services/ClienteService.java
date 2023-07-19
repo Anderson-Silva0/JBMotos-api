@@ -14,6 +14,8 @@ public interface ClienteService {
 
     Optional<Cliente> buscarClientePorCPF(String cpf);
 
+    List<Cliente> filtrarCliente(ClienteDTO clienteDTO);
+
     Cliente atualizarCliente(ClienteDTO clienteDTO);
 
     void deletarCliente(String cpf);
