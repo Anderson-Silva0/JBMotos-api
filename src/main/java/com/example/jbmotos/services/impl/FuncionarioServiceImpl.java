@@ -1,6 +1,8 @@
 package com.example.jbmotos.services.impl;
 
+import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.api.dto.FuncionarioDTO;
+import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.entity.Funcionario;
 import com.example.jbmotos.model.repositories.FuncionarioRepository;
 import com.example.jbmotos.services.EnderecoService;
@@ -9,6 +11,8 @@ import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +55,16 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     public Optional<Funcionario> buscarFuncionarioPorCPF(String cpf){
         checarCpfFuncionarioExistente(cpf);
         return funcionarioRepository.findFuncionarioByCpf(cpf);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Funcionario> filtrarFuncionario(FuncionarioDTO funcionarioDTO) {
+        Example<Funcionario> example = Example.of(mapper.map(funcionarioDTO, Funcionario.class),
+                ExampleMatcher.matching()
+                        .withIgnoreCase()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        return funcionarioRepository.findAll(example);
     }
 
     @Override

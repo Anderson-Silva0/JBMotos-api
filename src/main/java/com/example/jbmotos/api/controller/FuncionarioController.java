@@ -1,5 +1,6 @@
 package com.example.jbmotos.api.controller;
 
+import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.api.dto.FuncionarioDTO;
 import com.example.jbmotos.model.entity.Funcionario;
 import com.example.jbmotos.services.FuncionarioService;
@@ -44,6 +45,23 @@ public class FuncionarioController {
     public ResponseEntity<FuncionarioDTO> buscarPorCpf(@PathVariable("cpf") String cpf) {
         return ResponseEntity.ok().body(
                 mapper.map(funcionarioService.buscarFuncionarioPorCPF(cpf), FuncionarioDTO.class));
+    }
+
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<FuncionarioDTO>> filtrar(
+            @RequestParam(value = "cpf", required = false) String cpf,
+            @RequestParam(value = "nome", required = false) String nome,
+            @RequestParam(value = "telefone", required = false) String telefone
+    ) {
+        FuncionarioDTO funcionarioDTO = FuncionarioDTO.builder()
+                .cpf(cpf)
+                .nome(nome)
+                .telefone(telefone)
+                .build();
+        return ResponseEntity.ok().body(
+                funcionarioService.filtrarFuncionario(funcionarioDTO).stream().map(funcionario ->
+                        mapper.map(funcionario, FuncionarioDTO.class)
+                ).collect(Collectors.toList()));
     }
 
     @PutMapping("/atualizar/{cpf}")

@@ -14,6 +14,8 @@ public interface FuncionarioService {
 
     Optional<Funcionario> buscarFuncionarioPorCPF(String cpf);
 
+    List<Funcionario> filtrarFuncionario(FuncionarioDTO funcionarioDTO);
+
     Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO);
 
     void deletarFuncionario(String cpf);
