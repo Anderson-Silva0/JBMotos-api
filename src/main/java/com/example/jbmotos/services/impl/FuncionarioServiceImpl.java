@@ -1,8 +1,6 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.api.dto.FuncionarioDTO;
-import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.entity.Funcionario;
 import com.example.jbmotos.model.repositories.FuncionarioRepository;
 import com.example.jbmotos.services.EnderecoService;

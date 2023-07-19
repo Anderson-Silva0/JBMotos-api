@@ -1,6 +1,5 @@
 package com.example.jbmotos.api.controller;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.api.dto.FuncionarioDTO;
 import com.example.jbmotos.model.entity.Funcionario;
 import com.example.jbmotos.services.FuncionarioService;
