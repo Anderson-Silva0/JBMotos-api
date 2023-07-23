@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CNPJ;
 
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -28,9 +29,11 @@ public class ProdutoDTO {
     private String nome;
 
     @NotNull(message = "O campo Preço de Custo é obrigatório.")
+    @DecimalMin(value = "0.01", inclusive = false, message = "O campo Preço de Custo deve ser maior que zero.")
     private BigDecimal precoCusto;
 
     @NotNull(message = "O campo Preço de Venda é obrigatório.")
+    @DecimalMin(value = "0.01", inclusive = false, message = "O campo Preço de Venda deve ser maior que zero.")
     private BigDecimal precoVenda;
 
     @NotBlank(message = "O campo Marca é obrigatório.")
@@ -41,8 +44,6 @@ public class ProdutoDTO {
     private Integer idEstoque;
 
     @NotBlank(message = "O campo CNPJ é obrigatório.")
-    @Length(min = 18, max = 18, message = "O campo CNPJ deve ter 18 caracteres.")
-    @CNPJ(message = "O CNPJ informado é inválido. Certifique-se de que está digitando corretamente e tente novamente.")
     private String cnpjFornecedor;
 
     @JsonIgnore

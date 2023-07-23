@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.br.CPF;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 @Data
@@ -35,7 +36,7 @@ public class ClienteDTO {
     private String email;
 
     @NotBlank(message = "O campo Telefone é obrigatório.")
-    @Length(min = 11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
+    @Length(min = 15, max = 15, message = "O campo Celular deve ter no mínimo 15 caracteres.")
     private String telefone;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")

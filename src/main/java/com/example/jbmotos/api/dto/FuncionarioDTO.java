@@ -28,8 +28,10 @@ public class FuncionarioDTO {
     private String nome;
 
     @NotBlank(message = "O campo Telefone é obrigatório.")
-    @Length(min = 11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
+    @Length(min = 15, max = 15, message = "O campo Celular deve ter no mínimo 15 caracteres.")
     private String telefone;
+
+    private String statusFuncionario;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;

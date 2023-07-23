@@ -34,8 +34,10 @@ public class FornecedorDTO {
 
     @NotBlank(groups = {FornecedorRepository.class}, message = "O campo Telefone é obrigatório.")
     @NotBlank(message = "O campo Telefone é obrigatório.")
-    @Length(min = 11, max = 15, message = "O campo Telefone deve ter entre 11 e 15 caracteres.")
+    @Length(min = 15, max = 15, message = "O campo Celular deve ter no mínimo 15 caracteres.")
     private String telefone;
+
+    private String statusFornecedor;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
