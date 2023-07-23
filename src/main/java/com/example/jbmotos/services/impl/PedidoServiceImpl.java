@@ -78,6 +78,10 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional
     public void deletarPedido(Integer id) {
         validarPedido(id);
+        Pedido pedido = buscarPedidoPorId(id).get();
+        pedido.getProdutosPedido().stream().forEach(produto -> {
+            produtoPedidoService.atualizarQtdEstoqueParaDeletar(produto.getId());
+        });
         pedidoRepository.deleteById(id);
     }
 
