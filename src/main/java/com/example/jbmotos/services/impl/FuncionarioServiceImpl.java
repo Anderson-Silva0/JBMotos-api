@@ -2,6 +2,7 @@ package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.FuncionarioDTO;
 import com.example.jbmotos.model.entity.Funcionario;
+import com.example.jbmotos.model.enums.StatusFuncionario;
 import com.example.jbmotos.model.repositories.FuncionarioRepository;
 import com.example.jbmotos.services.EnderecoService;
 import com.example.jbmotos.services.FuncionarioService;
@@ -34,9 +35,10 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 
     @Override
     @Transactional
-    public Funcionario salvarFuncionario(FuncionarioDTO funcionarioDTO){
+    public Funcionario salvarFuncionario(FuncionarioDTO funcionarioDTO) {
         validarCpfFuncionarioParaSalvar(funcionarioDTO.getCpf());
         Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
+        funcionario.setStatusFuncionario(StatusFuncionario.ATIVO);
         funcionario.setDataHoraCadastro(LocalDateTime.now());
         funcionario.setEndereco(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco()).get());
         return funcionarioRepository.save(funcionario);
@@ -44,13 +46,13 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Funcionario> buscarTodosFuncionarios(){
+    public List<Funcionario> buscarTodosFuncionarios() {
         return funcionarioRepository.findAll();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Funcionario> buscarFuncionarioPorCPF(String cpf){
+    public Optional<Funcionario> buscarFuncionarioPorCPF(String cpf) {
         checarCpfFuncionarioExistente(cpf);
         return funcionarioRepository.findFuncionarioByCpf(cpf);
     }
@@ -67,7 +69,20 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 
     @Override
     @Transactional
-    public Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO){
+    public StatusFuncionario alternarStatusFuncionario(String cpf) {
+        Funcionario funcionario = buscarFuncionarioPorCPF(cpf).get();
+        if (funcionario.getStatusFuncionario().equals(StatusFuncionario.ATIVO)) {
+            funcionario.setStatusFuncionario(StatusFuncionario.INATIVO);
+        } else if (funcionario.getStatusFuncionario().equals(StatusFuncionario.INATIVO)) {
+            funcionario.setStatusFuncionario(StatusFuncionario.ATIVO);
+        }
+        funcionarioRepository.save(funcionario);
+        return funcionario.getStatusFuncionario();
+    }
+
+    @Override
+    @Transactional
+    public Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO) {
         LocalDateTime dateTime = buscarFuncionarioPorCPF(funcionarioDTO.getCpf()).get().getDataHoraCadastro();
         Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
         funcionario.setDataHoraCadastro(dateTime);
@@ -77,15 +92,15 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 
     @Override
     @Transactional
-    public void deletarFuncionario(String cpf){
+    public void deletarFuncionario(String cpf) {
         checarCpfFuncionarioExistente(cpf);
         funcionarioRepository.deleteFuncionarioByCpf(cpf);
     }
 
     @Override
-    public void validarCpfFuncionarioParaSalvar(String cpf){
+    public void validarCpfFuncionarioParaSalvar(String cpf) {
         if (funcionarioRepository.existsFuncionarioByCpf(cpf)) {
-            throw new RegraDeNegocioException(ERRO_SALVAR_FUNCIONARIO+", CPF já cadastrado.");
+            throw new RegraDeNegocioException(ERRO_SALVAR_FUNCIONARIO + ", CPF já cadastrado.");
         }
     }
 
@@ -95,14 +110,14 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     }
 
     @Override
-    public void checarCpfFuncionarioExistente(String cpf){
+    public void checarCpfFuncionarioExistente(String cpf) {
         if (!funcionarioRepository.existsFuncionarioByCpf(cpf)) {
             throw new ObjetoNaoEncontradoException("Funcionário não encrontrado para o CPF informado.");
         }
     }
 
     @Override
-    public boolean existeFuncionarioPorIdEndereco(Integer idEndereco){
+    public boolean existeFuncionarioPorIdEndereco(Integer idEndereco) {
         return funcionarioRepository.existsFuncionarioByEnderecoId(idEndereco);
     }
 }
