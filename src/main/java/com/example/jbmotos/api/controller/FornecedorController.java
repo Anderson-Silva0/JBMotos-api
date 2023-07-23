@@ -2,6 +2,7 @@ package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.FornecedorDTO;
 import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.enums.StatusFornecedor;
 import com.example.jbmotos.model.repositories.FornecedorRepository;
 import com.example.jbmotos.services.FornecedorService;
 import org.modelmapper.ModelMapper;
@@ -62,6 +63,12 @@ public class FornecedorController {
                 fornecedorService.filtrarFornecedor(fornecedorDTO).stream().map(fornecedor ->
                         mapper.map(fornecedor, FornecedorDTO.class)
                 ).collect(Collectors.toList()));
+    }
+
+    @PatchMapping("/alternar-status")
+    public ResponseEntity<StatusFornecedor> alternarStatus(@RequestParam("cnpj") String cnpj) {
+        StatusFornecedor statusFornecedor = fornecedorService.alternarStatusFornecedor(cnpj);
+        return ResponseEntity.ok().body(statusFornecedor);
     }
 
     @PutMapping("/atualizar")
