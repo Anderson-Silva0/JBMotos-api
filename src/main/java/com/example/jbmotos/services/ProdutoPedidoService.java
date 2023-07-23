@@ -23,4 +23,6 @@ public interface ProdutoPedidoService {
     List<ProdutoPedido> buscarProdutoPedidoPorIdPedido(Integer idPedido);
 
     void validarProdutoPedido(Integer id);
+
+    void atualizarQtdEstoqueParaDeletar(Integer id);
 }
