@@ -6,6 +6,7 @@ import com.example.jbmotos.model.entity.Estoque;
 import com.example.jbmotos.model.entity.Pedido;
 import com.example.jbmotos.model.entity.Produto;
 import com.example.jbmotos.model.entity.ProdutoPedido;
+import com.example.jbmotos.model.enums.StatusEstoque;
 import com.example.jbmotos.model.repositories.ProdutoPedidoRepository;
 import com.example.jbmotos.services.EstoqueService;
 import com.example.jbmotos.services.PedidoService;
@@ -108,7 +109,7 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
         verificarSeProdutoJaExisteNoPedidoParaSalvar(produtoPedido);
 
         Estoque estoque = produtoPedido.getProduto().getEstoque();
-        validarEstoqueSalvar(produtoPedido.getQuantidade(), estoque.getQuantidade());
+        validarEstoqueSalvar(produtoPedido.getQuantidade(), estoque.getQuantidade(), estoque.getStatus());
 
         produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
         produtoPedido.setValorTotal(
@@ -193,14 +194,16 @@ public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
 
         estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
     }
-
-    private void atualizarQtdEstoqueParaDeletar(Integer id) {
+    @Override
+    public void atualizarQtdEstoqueParaDeletar(Integer id) {
         ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(id).get();
         estoqueService.adicionarQuantidadeAoEstoque(produtoPedido.getProduto().getId(), produtoPedido.getQuantidade());
     }
 
-    private void validarEstoqueSalvar(Integer qtdProduto, Integer qtdEstoque) {
-        if (qtdProduto > qtdEstoque) {
+    private void validarEstoqueSalvar(Integer qtdProduto, Integer qtdEstoque, StatusEstoque status) {
+        if (status == StatusEstoque.INDISPONIVEL) {
+            throw new RegraDeNegocioException("Estoque indisponível.");
+        } else if (qtdProduto > qtdEstoque) {
             throw new RegraDeNegocioException(MSG_ERRO_SALVAR_PRODUTO_PEDIDO);
         }
     }
