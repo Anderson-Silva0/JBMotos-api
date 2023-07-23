@@ -2,6 +2,7 @@ package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.FornecedorDTO;
 import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.enums.StatusFornecedor;
 import com.example.jbmotos.model.repositories.FornecedorRepository;
 import com.example.jbmotos.services.EnderecoService;
 import com.example.jbmotos.services.FornecedorService;
@@ -37,6 +38,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     public Fornecedor salvarFornecedor(FornecedorDTO fornecedorDTO) {
         validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
         Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
+        fornecedor.setStatusFornecedor(StatusFornecedor.ATIVO);
         fornecedor.setDataHoraCadastro(LocalDateTime.now());
         fornecedor.setEndereco(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco()).get());
         return fornecedorRepository.save(fornecedor);
@@ -67,6 +69,19 @@ public class FornecedorServiceImpl implements FornecedorService {
 
     @Override
     @Transactional
+    public StatusFornecedor alternarStatusFornecedor(String cnpj) {
+        Fornecedor fornecedor = buscarFornecedorPorCNPJ(cnpj).get();
+        if (fornecedor.getStatusFornecedor().equals(StatusFornecedor.ATIVO)) {
+            fornecedor.setStatusFornecedor(StatusFornecedor.INATIVO);
+        } else if (fornecedor.getStatusFornecedor().equals(StatusFornecedor.INATIVO)) {
+            fornecedor.setStatusFornecedor(StatusFornecedor.ATIVO);
+        }
+        fornecedorRepository.save(fornecedor);
+        return fornecedor.getStatusFornecedor();
+    }
+
+    @Override
+    @Transactional
     public Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO) {
         LocalDateTime dateTime = buscarFornecedorPorCNPJ(fornecedorDTO.getCnpj()).get().getDataHoraCadastro();
         Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
@@ -83,9 +98,9 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
-    public void validarCnpjFornecedorParaSalvar(String cnpj){
+    public void validarCnpjFornecedorParaSalvar(String cnpj) {
         if (fornecedorRepository.existsFornecedorByCnpj(cnpj)) {
-            throw new RegraDeNegocioException(ERRO_SALVAR_FORNECEDOR+", CNPJ já cadastrado.");
+            throw new RegraDeNegocioException(ERRO_SALVAR_FORNECEDOR + ", CNPJ já cadastrado.");
         }
     }
 
@@ -95,7 +110,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     }
 
     @Override
-    public void checarCnpjFornecedorExistente(String cnpj){
+    public void checarCnpjFornecedorExistente(String cnpj) {
         if (!fornecedorRepository.existsFornecedorByCnpj(cnpj)) {
             throw new ObjetoNaoEncontradoException("Fornecedor não encrontrado para o CNPJ informado.");
         }
