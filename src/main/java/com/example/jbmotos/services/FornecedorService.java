@@ -2,6 +2,7 @@ package com.example.jbmotos.services;
 
 import com.example.jbmotos.api.dto.FornecedorDTO;
 import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.enums.StatusFornecedor;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,8 @@ public interface FornecedorService {
     Optional<Fornecedor> buscarFornecedorPorCNPJ(String cnpj);
 
     List<Fornecedor> filtrarFornecedor(FornecedorDTO fornecedorDTO);
+
+    StatusFornecedor alternarStatusFornecedor(String cnpj);
 
     Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO);
 
