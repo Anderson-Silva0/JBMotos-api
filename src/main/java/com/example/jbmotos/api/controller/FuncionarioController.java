@@ -2,6 +2,7 @@ package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.FuncionarioDTO;
 import com.example.jbmotos.model.entity.Funcionario;
+import com.example.jbmotos.model.enums.StatusFuncionario;
 import com.example.jbmotos.services.FuncionarioService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,12 @@ public class FuncionarioController {
                 funcionarioService.filtrarFuncionario(funcionarioDTO).stream().map(funcionario ->
                         mapper.map(funcionario, FuncionarioDTO.class)
                 ).collect(Collectors.toList()));
+    }
+
+    @PatchMapping("/alternar-status/{cpf}")
+    public ResponseEntity<StatusFuncionario> alternarStatus(@PathVariable("cpf") String cpf) {
+        StatusFuncionario statusFuncionario = funcionarioService.alternarStatusFuncionario(cpf);
+        return ResponseEntity.ok().body(statusFuncionario);
     }
 
     @PutMapping("/atualizar/{cpf}")
