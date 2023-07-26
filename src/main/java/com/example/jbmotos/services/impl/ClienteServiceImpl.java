@@ -2,6 +2,7 @@ package com.example.jbmotos.services.impl;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.model.entity.Cliente;
+import com.example.jbmotos.model.enums.StatusCliente;
 import com.example.jbmotos.model.repositories.ClienteRepository;
 import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.EnderecoService;
@@ -65,6 +66,19 @@ public class ClienteServiceImpl implements ClienteService {
                         .withIgnoreCase()
                         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
         return clienteRepository.findAll(example);
+    }
+
+    @Override
+    @Transactional
+    public StatusCliente alternarStatusCliente(String cpf) {
+        Cliente cliente = buscarClientePorCPF(cpf).get();
+        if (cliente.getStatusCliente().equals(StatusCliente.ATIVO)) {
+            cliente.setStatusCliente(StatusCliente.INATIVO);
+        } else if (cliente.getStatusCliente().equals(StatusCliente.INATIVO)) {
+            cliente.setStatusCliente(StatusCliente.ATIVO);
+        }
+        clienteRepository.save(cliente);
+        return cliente.getStatusCliente();
     }
 
     @Override
