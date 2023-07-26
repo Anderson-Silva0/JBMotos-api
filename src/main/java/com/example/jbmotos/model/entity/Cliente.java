@@ -1,5 +1,6 @@
 package com.example.jbmotos.model.entity;
 
+import com.example.jbmotos.model.enums.StatusCliente;
 import lombok.*;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
@@ -27,6 +28,10 @@ public class Cliente {
 
     @Column(name = "telefone", length = 15)
     private String telefone;
+
+    @Column(name = "statusCliente")
+    @Enumerated(EnumType.STRING)
+    private StatusCliente statusCliente;
 
     @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
