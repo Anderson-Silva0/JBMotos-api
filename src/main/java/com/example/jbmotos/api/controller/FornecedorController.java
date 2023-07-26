@@ -3,12 +3,10 @@ package com.example.jbmotos.api.controller;
 import com.example.jbmotos.api.dto.FornecedorDTO;
 import com.example.jbmotos.model.entity.Fornecedor;
 import com.example.jbmotos.model.enums.StatusFornecedor;
-import com.example.jbmotos.model.repositories.FornecedorRepository;
 import com.example.jbmotos.services.FornecedorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -73,8 +71,7 @@ public class FornecedorController {
 
     @PutMapping("/atualizar")
     public ResponseEntity<FornecedorDTO> atualizar(@RequestParam("cnpj") String cnpj,
-                                                   @Validated(FornecedorRepository.class) @RequestBody FornecedorDTO fornecedorDTO) {
-
+                                                   @Valid @RequestBody FornecedorDTO fornecedorDTO) {
         fornecedorDTO.setCnpj(cnpj);
         return ResponseEntity.ok().body(
                 mapper.map(fornecedorService.atualizarFornecedor(fornecedorDTO), FornecedorDTO.class));
