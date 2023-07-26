@@ -2,6 +2,7 @@ package com.example.jbmotos.api.controller;
 
 import com.example.jbmotos.api.dto.ClienteDTO;
 import com.example.jbmotos.model.entity.Cliente;
+import com.example.jbmotos.model.enums.StatusCliente;
 import com.example.jbmotos.services.ClienteService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +29,7 @@ public class ClienteController {
     public ResponseEntity<ClienteDTO> salvar(@Valid @RequestBody ClienteDTO clienteDTO) {
         Cliente cliente = clienteService.salvarCliente(clienteDTO);
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().buildAndExpand( cliente ).toUri();
+                .fromCurrentRequest().buildAndExpand(cliente).toUri();
         return ResponseEntity.created(uri).body(mapper.map(cliente, ClienteDTO.class));
     }
 
@@ -37,8 +37,8 @@ public class ClienteController {
     public ResponseEntity<List<ClienteDTO>> buscarTodos() {
         return ResponseEntity.ok().body(
                 clienteService.buscarTodosClientes().stream().map(cliente ->
-                                mapper.map(cliente, ClienteDTO.class)
-                        ).collect(Collectors.toList()));
+                        mapper.map(cliente, ClienteDTO.class)
+                ).collect(Collectors.toList()));
     }
 
     @GetMapping("/buscar/{cpf}")
@@ -64,6 +64,12 @@ public class ClienteController {
                 clienteService.filtrarCliente(clienteDTO).stream().map(cliente ->
                         mapper.map(cliente, ClienteDTO.class)
                 ).collect(Collectors.toList()));
+    }
+
+    @PatchMapping("/alternar-status/{cpf}")
+    public ResponseEntity<StatusCliente> alternarStatus(@PathVariable("cpf") String cpf) {
+        StatusCliente statusCliente = clienteService.alternarStatusCliente(cpf);
+        return ResponseEntity.ok().body(statusCliente);
     }
 
     @PutMapping("/atualizar/{cpf}")
