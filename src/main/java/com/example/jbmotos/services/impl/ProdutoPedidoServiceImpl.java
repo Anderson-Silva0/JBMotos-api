@@ -27,213 +27,241 @@ import java.util.Optional;
 @Service
 public class ProdutoPedidoServiceImpl implements ProdutoPedidoService {
 
-    private final String MSG_ERRO_SALVAR_PRODUTO_PEDIDO = "Não é possível realizar o Pedido pois a " +
-            "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
+	private final String MSG_ERRO_SALVAR_PRODUTO_PEDIDO = "Não é possível realizar o Pedido pois a "
+			+ "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
 
-    private final String MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO = "Não é possível Atualizar o Pedido pois a " +
-            "quantidade solicitada do Produto é maior do que a quantidade disponível em estoque.";
+	private final String MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO = "Não é possível Atualizar o Pedido pois a "
+			+ "quantidade solicitada do Produto é maior do que a quantidade disponível em estoque.";
 
-    private final String MSG_ERRO_ATUALIZAR_NOVO_PRODUTO = "Não é possível Atualizar o Pedido pois a quantidade " +
-            "solicitada do novo Produto é maior do que a quantidade disponível em estoque.";
+	private final String MSG_ERRO_ATUALIZAR_NOVO_PRODUTO = "Não é possível Atualizar o Pedido pois a quantidade "
+			+ "solicitada do novo Produto é maior do que a quantidade disponível em estoque.";
 
-    @Autowired
-    @Lazy
-    private PedidoService pedidoService;
+	@Autowired
+	@Lazy
+	private PedidoService pedidoService;
 
-    @Autowired
-    private ProdutoService produtoService;
+	@Autowired
+	private ProdutoService produtoService;
 
-    @Autowired
-    private EstoqueService estoqueService;
+	@Autowired
+	private EstoqueService estoqueService;
 
-    @Autowired
-    private ProdutoPedidoRepository produtoPedidoRepository;
+	@Autowired
+	private ProdutoPedidoRepository produtoPedidoRepository;
 
-    @Autowired
-    private ModelMapper mapper;
+	@Autowired
+	private ModelMapper mapper;
 
-    @Override
-    @Transactional
-    public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        ProdutoPedido produtoPedido = obterProdutoPedidoParaSalvar(produtoPedidoDTO);
-        return produtoPedidoRepository.save(produtoPedido);
-    }
+	@Override
+	@Transactional
+	public ProdutoPedido salvarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
+		ProdutoPedido produtoPedido = obterProdutoPedidoParaSalvar(produtoPedidoDTO);
+		return produtoPedidoRepository.save(produtoPedido);
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProdutoPedido> buscarTodosProdutoPedido() {
-        return produtoPedidoRepository.findAll();
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProdutoPedido> buscarTodosProdutoPedido() {
+		return produtoPedidoRepository.findAll();
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id) {
-        validarProdutoPedido(id);
-        return produtoPedidoRepository.findById(id);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Optional<ProdutoPedido> buscarProdutoPedidoPorId(Integer id) {
+		validarProdutoPedido(id);
+		return produtoPedidoRepository.findById(id);
+	}
 
-    @Override
-    @Transactional
-    public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
-        validarProdutoPedido(produtoPedidoDTO.getId());
-        ProdutoPedido produtoPedido = obterProdutoPedidoParaAtualizar(produtoPedidoDTO);
-        return produtoPedidoRepository.save(produtoPedido);
-    }
+	@Override
+	@Transactional
+	public ProdutoPedido atualizarProdutoPedido(ProdutoPedidoDTO produtoPedidoDTO) {
+		validarProdutoPedido(produtoPedidoDTO.getId());
+		ProdutoPedido produtoPedido = obterProdutoPedidoParaAtualizar(produtoPedidoDTO);
+		return produtoPedidoRepository.save(produtoPedido);
+	}
 
-    @Override
-    @Transactional
-    public void deletarProdutoPedidoPorId(Integer id) {
-        validarProdutoPedido(id);
-        atualizarQtdEstoqueParaDeletar(id);
-        produtoPedidoRepository.deleteById(id);
-    }
+	@Override
+	@Transactional
+	public void deletarProdutoPedidoPorId(Integer id) {
+		validarProdutoPedido(id);
+		atualizarQtdEstoqueParaDeletar(id);
+		produtoPedidoRepository.deleteById(id);
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProdutoPedido> buscarProdutoPedidoPorIdPedido(Integer idPedido) {
-        return produtoPedidoRepository.findProdutoPedidoByPedidoId(idPedido);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public List<ProdutoPedido> buscarProdutoPedidoPorIdPedido(Integer idPedido) {
+		return produtoPedidoRepository.findProdutoPedidoByPedidoId(idPedido);
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public void validarProdutoPedido(Integer id) {
-        if (!produtoPedidoRepository.existsById(id)) {
-            throw new ObjetoNaoEncontradoException("Produto do Pedido não encontrado para o Id informado.");
-        }
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public void validarProdutoPedido(Integer id) {
+		if (!produtoPedidoRepository.existsById(id)) {
+			throw new ObjetoNaoEncontradoException("Produto do Pedido não encontrado para o Id informado.");
+		}
+	}
 
-    private ProdutoPedido obterProdutoPedidoParaSalvar(ProdutoPedidoDTO produtoPedidoDTO) {
-        ProdutoPedido produtoPedido = mapper.map(produtoPedidoDTO, ProdutoPedido.class);
-        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
-        produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
-        verificarSeProdutoJaExisteNoPedidoParaSalvar(produtoPedido);
+	private ProdutoPedido obterProdutoPedidoParaSalvar(ProdutoPedidoDTO produtoPedidoDTO) {
+		ProdutoPedido produtoPedido = mapper.map(produtoPedidoDTO, ProdutoPedido.class);
 
-        Estoque estoque = produtoPedido.getProduto().getEstoque();
-        validarEstoqueSalvar(produtoPedido.getQuantidade(), estoque.getQuantidade(), estoque.getStatus());
+		Optional<Pedido> pedido = pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido());
+		if (pedido.isPresent()) {
+			produtoPedido.setPedido(pedido.get());
+		}
 
-        produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
-        produtoPedido.setValorTotal(
-                produtoPedido.getValorUnidade().multiply(
-                        BigDecimal.valueOf(produtoPedido.getQuantidade())
-                )
-        );
-        atualizarQtdEstoqueParaSalvar(produtoPedido);
-        return produtoPedido;
-    }
+		Optional<Produto> produto = produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto());
+		if (produto.isPresent()) {
+			produtoPedido.setProduto(produto.get());
+		}
 
-    private ProdutoPedido obterProdutoPedidoParaAtualizar(ProdutoPedidoDTO produtoPedidoDTO) {
-        ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(produtoPedidoDTO.getId()).get();
-        verificarSeProdutoJaExisteNoPedidoParaAtualizar(produtoPedido, produtoPedidoDTO);
+		verificarSeProdutoJaExisteNoPedidoParaSalvar(produtoPedido);
 
-        if (!produtoPedidoDTO.getIdProduto().equals(produtoPedido.getProduto().getId())) {
-            atualizarPedidoComNovoProduto(produtoPedido, produtoPedidoDTO);
-        } else {
-            produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
-            produtoPedido.setProduto(produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get());
+		Estoque estoque = produtoPedido.getProduto().getEstoque();
+		validarEstoqueSalvar(produtoPedido.getQuantidade(), estoque.getQuantidade(), estoque.getStatus());
 
-            Estoque estoque = produtoPedido.getProduto().getEstoque();
-            validarEstoqueAtualizar(
-                    estoque.getQuantidade(),
-                    produtoPedidoDTO.getQuantidade(),
-                    produtoPedido.getQuantidade()
-            );
-            atualizarQtdEstoqueParaAtualizar(produtoPedido, produtoPedidoDTO);
-        }
+		produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
+		produtoPedido.setValorTotal(
+				produtoPedido.getValorUnidade().multiply(BigDecimal.valueOf(produtoPedido.getQuantidade())));
+		atualizarQtdEstoqueParaSalvar(produtoPedido);
+		return produtoPedido;
+	}
 
-        produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
-        produtoPedido.setValorTotal(
-                produtoPedido.getValorUnidade().multiply(
-                        BigDecimal.valueOf(produtoPedidoDTO.getQuantidade())
-                )
-        );
-        return produtoPedido;
-    }
+	private ProdutoPedido obterProdutoPedidoParaAtualizar(ProdutoPedidoDTO produtoPedidoDTO) {
+		Optional<ProdutoPedido> produtoPedidoOptional = buscarProdutoPedidoPorId(produtoPedidoDTO.getId());
+		ProdutoPedido produtoPedido = null;
 
-    private void atualizarPedidoComNovoProduto(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
-        Integer qtdProdutoPedidoAntigo = produtoPedido.getQuantidade();
-        Integer qtdEstoqueAntigo = produtoPedido.getProduto().getEstoque().getQuantidade();
+		if (produtoPedidoOptional.isPresent()) {
+			produtoPedido = produtoPedidoOptional.get();
+			verificarSeProdutoJaExisteNoPedidoParaAtualizar(produtoPedido, produtoPedidoDTO);
 
-        //Devolver a quantidade de estoque do produto antigo, pois mudou de produto.
-        Estoque estoqueProdutoAntigo = produtoPedido.getProduto().getEstoque();
-        estoqueProdutoAntigo.setQuantidade(qtdProdutoPedidoAntigo + qtdEstoqueAntigo);
-        estoqueService.atualizarEstoque(mapper.map(estoqueProdutoAntigo, EstoqueDTO.class));
+			if (!produtoPedidoDTO.getIdProduto().equals(produtoPedido.getProduto().getId())) {
+				atualizarPedidoComNovoProduto(produtoPedido, produtoPedidoDTO);
+			} else {
+				Optional<Pedido> pedido = pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido());
+				if (pedido.isPresent()) {
+					produtoPedido.setPedido(pedido.get());
+				}
 
-        //Abater a quantidade de estoque do novo produto.
-        Produto novoProduto = produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto()).get();
-        Estoque estoqueNovoProduto = novoProduto.getEstoque();
+				Optional<Produto> produto = produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto());
+				if (produto.isPresent()) {
+					produtoPedido.setProduto(produto.get());
+				}
 
-        if (produtoPedidoDTO.getQuantidade() > novoProduto.getEstoque().getQuantidade()) {
-            throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_NOVO_PRODUTO);
-        }
+				Estoque estoque = produtoPedido.getProduto().getEstoque();
+				validarEstoqueAtualizar(estoque.getQuantidade(), produtoPedidoDTO.getQuantidade(),
+						produtoPedido.getQuantidade());
+				atualizarQtdEstoqueParaAtualizar(produtoPedido, produtoPedidoDTO);
+			}
 
-        estoqueNovoProduto.setQuantidade(estoqueNovoProduto.getQuantidade() - produtoPedidoDTO.getQuantidade());
-        produtoPedido.setPedido(pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido()).get());
-        produtoPedido.setProduto(novoProduto);
-        produtoPedido.setQuantidade(produtoPedidoDTO.getQuantidade());
+			produtoPedido.setValorUnidade(produtoPedido.getProduto().getPrecoVenda());
+			produtoPedido.setValorTotal(
+					produtoPedido.getValorUnidade().multiply(BigDecimal.valueOf(produtoPedidoDTO.getQuantidade())));
+		}
 
-        estoqueService.atualizarEstoque(mapper.map(estoqueNovoProduto, EstoqueDTO.class));
-    }
+		return produtoPedido;
+	}
 
-    private void atualizarQtdEstoqueParaSalvar(ProdutoPedido produtoPedido) {
-        Estoque estoque = produtoPedido.getProduto().getEstoque();
-        estoque.setQuantidade(estoque.getQuantidade() - produtoPedido.getQuantidade());
-        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
-    }
+	private void atualizarPedidoComNovoProduto(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
+		Integer qtdProdutoPedidoAntigo = produtoPedido.getQuantidade();
+		Integer qtdEstoqueAntigo = produtoPedido.getProduto().getEstoque().getQuantidade();
 
-    private void atualizarQtdEstoqueParaAtualizar(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
-        Estoque estoque = produtoPedido.getProduto().getEstoque();
+		// Devolver a quantidade de estoque do produto antigo, pois mudou de produto.
+		Estoque estoqueProdutoAntigo = produtoPedido.getProduto().getEstoque();
+		estoqueProdutoAntigo.setQuantidade(qtdProdutoPedidoAntigo + qtdEstoqueAntigo);
+		estoqueService.atualizarEstoque(mapper.map(estoqueProdutoAntigo, EstoqueDTO.class));
 
-        Integer qtdAtualEstoque = estoque.getQuantidade();
-        Integer qtdAnteriorProduto = produtoPedido.getQuantidade();
-        Integer qtdNovaProduto = produtoPedidoDTO.getQuantidade();
+		// Abater a quantidade de estoque do novo produto.
+		Optional<Produto> novoProdutoOptional = produtoService.buscarProdutoPorId(produtoPedidoDTO.getIdProduto());
+		if (novoProdutoOptional.isPresent()) {
+			Produto novoProduto = novoProdutoOptional.get();
 
-        Integer novaQtdEstoque = qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto;
-        estoque.setQuantidade(novaQtdEstoque);
+			Estoque estoqueNovoProduto = novoProduto.getEstoque();
 
-        produtoPedido.setQuantidade(qtdNovaProduto);
+			if (produtoPedidoDTO.getQuantidade() > novoProduto.getEstoque().getQuantidade()) {
+				throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_NOVO_PRODUTO);
+			}
 
-        estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
-    }
-    @Override
-    public void atualizarQtdEstoqueParaDeletar(Integer id) {
-        ProdutoPedido produtoPedido = buscarProdutoPedidoPorId(id).get();
-        estoqueService.adicionarQuantidadeAoEstoque(produtoPedido.getProduto().getId(), produtoPedido.getQuantidade());
-    }
+			estoqueNovoProduto.setQuantidade(estoqueNovoProduto.getQuantidade() - produtoPedidoDTO.getQuantidade());
 
-    private void validarEstoqueSalvar(Integer qtdProduto, Integer qtdEstoque, StatusEstoque status) {
-        if (status == StatusEstoque.INDISPONIVEL) {
-            throw new RegraDeNegocioException("Estoque indisponível.");
-        } else if (qtdProduto > qtdEstoque) {
-            throw new RegraDeNegocioException(MSG_ERRO_SALVAR_PRODUTO_PEDIDO);
-        }
-    }
+			Optional<Pedido> pedido = pedidoService.buscarPedidoPorId(produtoPedidoDTO.getIdPedido());
+			if (pedido.isPresent()) {
+				produtoPedido.setPedido(pedido.get());
+			}
 
-    private void validarEstoqueAtualizar(Integer qtdAtualEstoque,
-                                         Integer qtdNovaProduto,
-                                         Integer qtdAnteriorProduto) {
-        if (qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto < 0) {
-            throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO);
-        }
-    }
+			produtoPedido.setProduto(novoProduto);
+			produtoPedido.setQuantidade(produtoPedidoDTO.getQuantidade());
 
-    private void verificarSeProdutoJaExisteNoPedidoParaSalvar(ProdutoPedido produtoPedido) {
-        Pedido pedido = produtoPedido.getPedido();
-        Produto produto = produtoPedido.getProduto();
-        if (produtoPedidoRepository.existsProdutoPedidosByPedidoIdAndProdutoId(pedido.getId(), produto.getId())) {
-            throw new RegraDeNegocioException("Erro ao tentar Salvar, Produto já adicionado ao Pedido.");
-        }
-    }
+			estoqueService.atualizarEstoque(mapper.map(estoqueNovoProduto, EstoqueDTO.class));
+		}
+	}
 
-    private void verificarSeProdutoJaExisteNoPedidoParaAtualizar(ProdutoPedido produtoPedido, ProdutoPedidoDTO dto) {
-        filtrarProdutoPedidoPorIdDiferente(produtoPedido).stream().forEach(produtoPedidoFiltrado -> {
-            if (dto.getIdProduto().equals(produtoPedidoFiltrado.getProduto().getId()) &&
-                    dto.getIdPedido().equals(produtoPedidoFiltrado.getPedido().getId())) {
-                throw new RegraDeNegocioException("Erro ao tentar Atualizar, Produto já adicionado ao Pedido.");
-            }
-        });
-    }
+	private void atualizarQtdEstoqueParaSalvar(ProdutoPedido produtoPedido) {
+		Estoque estoque = produtoPedido.getProduto().getEstoque();
+		estoque.setQuantidade(estoque.getQuantidade() - produtoPedido.getQuantidade());
+		estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
+	}
 
-    private List<ProdutoPedido> filtrarProdutoPedidoPorIdDiferente(ProdutoPedido produtoPedido) {
-        return produtoPedidoRepository.findByIdNot(produtoPedido.getId());
-    }
+	private void atualizarQtdEstoqueParaAtualizar(ProdutoPedido produtoPedido, ProdutoPedidoDTO produtoPedidoDTO) {
+		Estoque estoque = produtoPedido.getProduto().getEstoque();
+
+		Integer qtdAtualEstoque = estoque.getQuantidade();
+		Integer qtdAnteriorProduto = produtoPedido.getQuantidade();
+		Integer qtdNovaProduto = produtoPedidoDTO.getQuantidade();
+
+		Integer novaQtdEstoque = qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto;
+		estoque.setQuantidade(novaQtdEstoque);
+
+		produtoPedido.setQuantidade(qtdNovaProduto);
+
+		estoqueService.atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
+	}
+
+	@Transactional(readOnly = true)
+	@Override
+	public void atualizarQtdEstoqueParaDeletar(Integer id) {
+		Optional<ProdutoPedido> produtoPedidoOptional = buscarProdutoPedidoPorId(id);
+
+		if (produtoPedidoOptional.isPresent()) {
+			ProdutoPedido produtoPedido = produtoPedidoOptional.get();
+
+			estoqueService.adicionarQuantidadeAoEstoque(produtoPedido.getProduto().getId(),
+					produtoPedido.getQuantidade());
+		}
+	}
+
+	private void validarEstoqueSalvar(Integer qtdProduto, Integer qtdEstoque, StatusEstoque status) {
+		if (status == StatusEstoque.INDISPONIVEL) {
+			throw new RegraDeNegocioException("Estoque indisponível.");
+		} else if (qtdProduto > qtdEstoque) {
+			throw new RegraDeNegocioException(MSG_ERRO_SALVAR_PRODUTO_PEDIDO);
+		}
+	}
+
+	private void validarEstoqueAtualizar(Integer qtdAtualEstoque, Integer qtdNovaProduto, Integer qtdAnteriorProduto) {
+		if (qtdAtualEstoque + qtdAnteriorProduto - qtdNovaProduto < 0) {
+			throw new RegraDeNegocioException(MSG_ERRO_ATUALIZAR_PRODUTO_PEDIDO);
+		}
+	}
+
+	private void verificarSeProdutoJaExisteNoPedidoParaSalvar(ProdutoPedido produtoPedido) {
+		Pedido pedido = produtoPedido.getPedido();
+		Produto produto = produtoPedido.getProduto();
+		if (produtoPedidoRepository.existsProdutoPedidosByPedidoIdAndProdutoId(pedido.getId(), produto.getId())) {
+			throw new RegraDeNegocioException("Erro ao tentar Salvar, Produto já adicionado ao Pedido.");
+		}
+	}
+
+	private void verificarSeProdutoJaExisteNoPedidoParaAtualizar(ProdutoPedido produtoPedido, ProdutoPedidoDTO dto) {
+		filtrarProdutoPedidoPorIdDiferente(produtoPedido).stream().forEach(produtoPedidoFiltrado -> {
+			if (dto.getIdProduto().equals(produtoPedidoFiltrado.getProduto().getId())
+					&& dto.getIdPedido().equals(produtoPedidoFiltrado.getPedido().getId())) {
+				throw new RegraDeNegocioException("Erro ao tentar Atualizar, Produto já adicionado ao Pedido.");
+			}
+		});
+	}
+
+	private List<ProdutoPedido> filtrarProdutoPedidoPorIdDiferente(ProdutoPedido produtoPedido) {
+		return produtoPedidoRepository.findByIdNot(produtoPedido.getId());
+	}
 }
