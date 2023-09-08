@@ -33,15 +33,15 @@ public class PedidoDTO {
     @CPF(message = "CPF do Fucionário inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfFuncionario;
 
-    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
-    private LocalDateTime dataHoraCadastro;
-
     @Length(max = 300, message = "O campo Observação tem no máximo 300 caracteres.")
     private String observacao;
 
     @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
     @Length(max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String formaDePagamento;
+    
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    private LocalDateTime dataHoraCadastro;
 
     @JsonIgnore
     private List<ProdutoPedido> produtosPedidos;
