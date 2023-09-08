@@ -1,20 +1,23 @@
 package com.example.jbmotos.api.dto;
 
-import com.example.jbmotos.model.entity.ProdutoPedido;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CNPJ;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.List;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.example.jbmotos.model.entity.ProdutoPedido;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
@@ -40,11 +43,16 @@ public class ProdutoDTO {
     @Length(min = 3, max = 30, message = "O campo Marca deve ter entre 3 e 30 caracteres.")
     private String marca;
 
+    private String statusProduto;
+
     @NotNull(message = "O Id do Estoque não pode ser nulo.")
     private Integer idEstoque;
 
     @NotBlank(message = "O campo CNPJ é obrigatório.")
     private String cnpjFornecedor;
+
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+    private LocalDateTime dataHoraCadastro;
 
     @JsonIgnore
     private List<ProdutoPedido> produtosPedido;
