@@ -1,11 +1,11 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
-import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.enums.StatusCliente;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.ClienteDTO;
+import com.example.jbmotos.model.entity.Cliente;
+import com.example.jbmotos.model.enums.Situacao;
 
 public interface ClienteService {
 
@@ -17,7 +17,7 @@ public interface ClienteService {
 
     List<Cliente> filtrarCliente(ClienteDTO clienteDTO);
 
-    StatusCliente alternarStatusCliente(String cpf);
+    Situacao alternarStatusCliente(String cpf);
 
     Cliente atualizarCliente(ClienteDTO clienteDTO);
 

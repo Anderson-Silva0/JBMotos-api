@@ -1,10 +1,11 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.MotoDTO;
-import com.example.jbmotos.model.entity.Moto;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.MotoDTO;
+import com.example.jbmotos.model.entity.Moto;
+import com.example.jbmotos.model.enums.Situacao;
 
 public interface MotoService {
 
@@ -17,6 +18,10 @@ public interface MotoService {
     Optional<Moto> buscarMotoPorId(Integer idMoto);
 
     Optional<Moto> buscarMotoPorPlaca(String placa);
+
+    List<Moto> filtrarMoto(MotoDTO motoDTO);
+
+    Situacao alternarStatusMoto(Integer idMoto);
 
     Moto atualizarMoto(MotoDTO motoDTO);
 

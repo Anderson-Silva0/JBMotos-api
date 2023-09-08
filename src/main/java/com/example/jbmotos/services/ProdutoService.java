@@ -1,11 +1,12 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.ProdutoDTO;
-import com.example.jbmotos.model.entity.Produto;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.ProdutoDTO;
+import com.example.jbmotos.model.entity.Produto;
+import com.example.jbmotos.model.enums.Situacao;
 
 public interface ProdutoService {
 
@@ -14,6 +15,10 @@ public interface ProdutoService {
     List<Produto> buscarTodosProdutos();
 
     Optional<Produto> buscarProdutoPorId(Integer id);
+
+    List<Produto> filtrarProduto(ProdutoDTO produtoDTO);
+
+    Situacao alternarStatusProduto(Integer idProduto);
 
     Produto atualizarProduto(ProdutoDTO produtoDTO);
 

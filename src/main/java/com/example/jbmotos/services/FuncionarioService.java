@@ -1,11 +1,11 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.FuncionarioDTO;
-import com.example.jbmotos.model.entity.Funcionario;
-import com.example.jbmotos.model.enums.StatusFuncionario;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.FuncionarioDTO;
+import com.example.jbmotos.model.entity.Funcionario;
+import com.example.jbmotos.model.enums.Situacao;
 
 public interface FuncionarioService {
 
@@ -17,7 +17,7 @@ public interface FuncionarioService {
 
     List<Funcionario> filtrarFuncionario(FuncionarioDTO funcionarioDTO);
 
-    StatusFuncionario alternarStatusFuncionario(String cpf);
+    Situacao alternarStatusFuncionario(String cpf);
 
     Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO);
 
