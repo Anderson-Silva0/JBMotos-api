@@ -1,19 +1,30 @@
 package com.example.jbmotos.api.controller;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
-import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.enums.StatusCliente;
-import com.example.jbmotos.services.ClienteService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.example.jbmotos.api.dto.ClienteDTO;
+import com.example.jbmotos.model.entity.Cliente;
+import com.example.jbmotos.model.enums.Situacao;
+import com.example.jbmotos.services.ClienteService;
 
 @RestController
 @RequestMapping("/api/cliente")
@@ -52,13 +63,15 @@ public class ClienteController {
             @RequestParam(value = "cpf", required = false) String cpf,
             @RequestParam(value = "nome", required = false) String nome,
             @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "telefone", required = false) String telefone
+            @RequestParam(value = "telefone", required = false) String telefone,
+            @RequestParam(value = "statusCliente", required = false) String statusCliente
     ) {
         ClienteDTO clienteDTO = ClienteDTO.builder()
                 .cpf(cpf)
                 .nome(nome)
                 .email(email)
                 .telefone(telefone)
+                .statusCliente(statusCliente)
                 .build();
         return ResponseEntity.ok().body(
                 clienteService.filtrarCliente(clienteDTO).stream().map(cliente ->
@@ -67,8 +80,8 @@ public class ClienteController {
     }
 
     @PatchMapping("/alternar-status/{cpf}")
-    public ResponseEntity<StatusCliente> alternarStatus(@PathVariable("cpf") String cpf) {
-        StatusCliente statusCliente = clienteService.alternarStatusCliente(cpf);
+    public ResponseEntity<Situacao> alternarStatus(@PathVariable("cpf") String cpf) {
+    	Situacao statusCliente = clienteService.alternarStatusCliente(cpf);
         return ResponseEntity.ok().body(statusCliente);
     }
 
@@ -80,7 +93,7 @@ public class ClienteController {
     }
 
     @DeleteMapping("/deletar/{cpf}")
-    public ResponseEntity deletar(@PathVariable("cpf") String cpf) {
+    public ResponseEntity<?> deletar(@PathVariable("cpf") String cpf) {
         clienteService.deletarCliente(cpf);
         return ResponseEntity.noContent().build();
     }
