@@ -1,19 +1,29 @@
 package com.example.jbmotos.api.controller;
 
-import com.example.jbmotos.api.dto.FornecedorDTO;
-import com.example.jbmotos.model.entity.Fornecedor;
-import com.example.jbmotos.model.enums.StatusFornecedor;
-import com.example.jbmotos.services.FornecedorService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.example.jbmotos.api.dto.FornecedorDTO;
+import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.enums.Situacao;
+import com.example.jbmotos.services.FornecedorService;
 
 @RestController
 @RequestMapping("/api/fornecedor")
@@ -50,12 +60,14 @@ public class FornecedorController {
     public ResponseEntity<List<FornecedorDTO>> filtrar(
             @RequestParam(value = "cnpj", required = false) String cnpj,
             @RequestParam(value = "nome", required = false) String nome,
-            @RequestParam(value = "telefone", required = false) String telefone
+            @RequestParam(value = "telefone", required = false) String telefone,
+            @RequestParam(value = "statusFornecedor", required = false) String statusFornecedor
     ) {
         FornecedorDTO fornecedorDTO = FornecedorDTO.builder()
                 .cnpj(cnpj)
                 .nome(nome)
                 .telefone(telefone)
+                .statusFornecedor(statusFornecedor)
                 .build();
         return ResponseEntity.ok().body(
                 fornecedorService.filtrarFornecedor(fornecedorDTO).stream().map(fornecedor ->
@@ -64,8 +76,8 @@ public class FornecedorController {
     }
 
     @PatchMapping("/alternar-status")
-    public ResponseEntity<StatusFornecedor> alternarStatus(@RequestParam("cnpj") String cnpj) {
-        StatusFornecedor statusFornecedor = fornecedorService.alternarStatusFornecedor(cnpj);
+    public ResponseEntity<Situacao> alternarStatus(@RequestParam("cnpj") String cnpj) {
+        Situacao statusFornecedor = fornecedorService.alternarStatusFornecedor(cnpj);
         return ResponseEntity.ok().body(statusFornecedor);
     }
 
@@ -78,7 +90,7 @@ public class FornecedorController {
     }
 
     @DeleteMapping("/deletar")
-    public ResponseEntity deletar(@RequestParam("cnpj") String cnpj) {
+    public ResponseEntity<?> deletar(@RequestParam("cnpj") String cnpj) {
         fornecedorService.deletarFornecedor(cnpj);
         return ResponseEntity.noContent().build();
     }
