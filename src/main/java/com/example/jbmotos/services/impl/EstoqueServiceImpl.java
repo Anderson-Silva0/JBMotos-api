@@ -1,22 +1,24 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.EstoqueDTO;
-import com.example.jbmotos.model.entity.Estoque;
-import com.example.jbmotos.model.enums.StatusEstoque;
-import com.example.jbmotos.model.repositories.EstoqueRepository;
-import com.example.jbmotos.services.EstoqueService;
-import com.example.jbmotos.services.ProdutoService;
-import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.example.jbmotos.services.exception.RegraDeNegocioException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import com.example.jbmotos.api.dto.EstoqueDTO;
+import com.example.jbmotos.model.entity.Estoque;
+import com.example.jbmotos.model.entity.Produto;
+import com.example.jbmotos.model.enums.StatusEstoque;
+import com.example.jbmotos.model.repositories.EstoqueRepository;
+import com.example.jbmotos.services.EstoqueService;
+import com.example.jbmotos.services.ProdutoService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 
 @Service
 public class EstoqueServiceImpl implements EstoqueService {
@@ -69,17 +71,22 @@ public class EstoqueServiceImpl implements EstoqueService {
         estoqueRepository.deleteById(id);
     }
 
-    @Override
-    public Integer obterQuantidadeDoProduto(Integer idProduto) {
-        return produtoService.buscarProdutoPorId(idProduto).get().getEstoque().getQuantidade();
-    }
+	@Override
+	public Integer obterQuantidadeDoProduto(Integer idProduto) {
+		Optional<Produto> produtoOptional = produtoService.buscarProdutoPorId(idProduto);
+		return produtoOptional.map(produto -> produto.getEstoque().getQuantidade()).orElse(null);
+	}
 
-    @Override
-    public void adicionarQuantidadeAoEstoque(Integer idProduto, Integer quantidade) {
-        Estoque estoque = produtoService.buscarProdutoPorId(idProduto).get().getEstoque();
-        estoque.setQuantidade(estoque.getQuantidade() + quantidade);
-        atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
-    }
+	@Override
+	@Transactional
+	public void adicionarQuantidadeAoEstoque(Integer idProduto, Integer quantidade) {
+		Optional<Produto> produtoOptional = produtoService.buscarProdutoPorId(idProduto);
+		if (produtoOptional.isPresent()) {
+			Estoque estoque = produtoOptional.get().getEstoque();
+			estoque.setQuantidade(estoque.getQuantidade() + quantidade);
+			atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
+		}
+	}
 
     @Override
     @Transactional(readOnly = true)

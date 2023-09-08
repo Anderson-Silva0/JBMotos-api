@@ -1,6 +1,17 @@
 package com.example.jbmotos.services.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.jbmotos.api.dto.ServicoDTO;
+import com.example.jbmotos.model.entity.Funcionario;
+import com.example.jbmotos.model.entity.Moto;
 import com.example.jbmotos.model.entity.Pedido;
 import com.example.jbmotos.model.entity.Servico;
 import com.example.jbmotos.model.repositories.ServicoRepository;
@@ -10,13 +21,6 @@ import com.example.jbmotos.services.PedidoService;
 import com.example.jbmotos.services.ServicoService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 @Service
 public class ServicoServiceImpl implements ServicoService {
@@ -36,17 +40,31 @@ public class ServicoServiceImpl implements ServicoService {
     @Autowired
     private ModelMapper mapper;
 
-    @Override
-    @Transactional
-    public Servico salvarServico(ServicoDTO servicoDTO) {
-        servicoDTO.setDataHoraCadastro(LocalDateTime.now());
-        validarPedidoParaSalvarServico(servicoDTO.getIdPedido());
-        Servico servico = mapper.map(servicoDTO, Servico.class);
-        servico.setFuncionario(funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario()).get());
-        servico.setMoto(motoService.buscarMotoPorId(servicoDTO.getIdMoto()).get());
-        servico.setPedido(pedidoService.buscarPedidoPorId(servicoDTO.getIdPedido()).get());
-        return servicoRepository.save(servico);
-    }
+	@Override
+	@Transactional
+	public Servico salvarServico(ServicoDTO servicoDTO) {
+		servicoDTO.setDataHoraCadastro(LocalDateTime.now());
+		validarPedidoParaSalvarServico(servicoDTO.getIdPedido());
+		Servico servico = mapper.map(servicoDTO, Servico.class);
+
+		Optional<Funcionario> funcionarioOptional = funcionarioService
+				.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
+		if (funcionarioOptional.isPresent()) {
+			servico.setFuncionario(funcionarioOptional.get());
+		}
+
+		Optional<Moto> motoOptional = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+		if (motoOptional.isPresent()) {
+			servico.setMoto(motoOptional.get());
+		}
+
+		Optional<Pedido> pedidoOptional = pedidoService.buscarPedidoPorId(servicoDTO.getIdPedido());
+		if (pedidoOptional.isPresent()) {
+			servico.setPedido(pedidoOptional.get());
+		}
+
+		return servicoRepository.save(servico);
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -76,18 +94,32 @@ public class ServicoServiceImpl implements ServicoService {
         return servicoRepository.findServicoByFuncionarioCpf(cpfFuncionario);
     }
 
-    @Override
-    @Transactional
-    public Servico atualizarServico(ServicoDTO servicoDTO) {
-        Servico servicoAntigo = buscarServicoPorId(servicoDTO.getId()).get();
-        Servico servicoNovo = mapper.map(servicoDTO, Servico.class);
-        servicoNovo.setDataHoraCadastro(servicoAntigo.getDataHoraCadastro());
-        validarPedidoParaAtualizarServico(servicoAntigo, servicoDTO);
-        servicoNovo.setFuncionario(funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario()).get());
-        servicoNovo.setMoto(motoService.buscarMotoPorId(servicoDTO.getIdMoto()).get());
-        servicoNovo.setPedido(servicoAntigo.getPedido());
-        return servicoRepository.save(servicoNovo);
-    }
+	@Override
+	@Transactional
+	public Servico atualizarServico(ServicoDTO servicoDTO) {
+		Optional<Servico> servicoOptional = buscarServicoPorId(servicoDTO.getId());
+		if (servicoOptional.isPresent()) {
+			Servico servicoAntigo = servicoOptional.get();
+			Servico servicoNovo = mapper.map(servicoDTO, Servico.class);
+			servicoNovo.setDataHoraCadastro(servicoAntigo.getDataHoraCadastro());
+			validarPedidoParaAtualizarServico(servicoAntigo, servicoDTO);
+
+			Optional<Funcionario> funcionarioOptional = funcionarioService
+					.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
+			if (funcionarioOptional.isPresent()) {
+				servicoNovo.setFuncionario(funcionarioOptional.get());
+			}
+
+			Optional<Moto> motoOptional = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+			if (motoOptional.isPresent()) {
+				servicoNovo.setMoto(motoOptional.get());
+			}
+
+			servicoNovo.setPedido(servicoAntigo.getPedido());
+			return servicoRepository.save(servicoNovo);
+		}
+		return null;
+	}
 
     @Override
     @Transactional
@@ -107,13 +139,14 @@ public class ServicoServiceImpl implements ServicoService {
             throw new RegraDeNegocioException("Erro ao tentar atualizar Serviço, o Pedido não pode ser alterado.");
         }
     }
-    @Override
-    public void verificarSePedidoPertenceAoServico(Integer idPedido) {
-        Pedido pedido = pedidoService.buscarPedidoPorId(idPedido).get();
-        if (pedido.getServico() == null) {
-            throw new RegraDeNegocioException("O Pedido informado não pertence a um Serviço.");
-        }
-    }
+
+	@Override
+	public void verificarSePedidoPertenceAoServico(Integer idPedido) {
+		Optional<Pedido> pedidoOptional = pedidoService.buscarPedidoPorId(idPedido);
+		if (pedidoOptional.isPresent() && (pedidoOptional.get().getServico() == null)) {
+			throw new RegraDeNegocioException("O Pedido informado não pertence a um Serviço.");
+		}
+	}
 
     @Override
     public void validarServico(Integer idServico) {

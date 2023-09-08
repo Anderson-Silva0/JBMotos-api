@@ -1,13 +1,9 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.ClienteDTO;
-import com.example.jbmotos.model.entity.Cliente;
-import com.example.jbmotos.model.enums.StatusCliente;
-import com.example.jbmotos.model.repositories.ClienteRepository;
-import com.example.jbmotos.services.ClienteService;
-import com.example.jbmotos.services.EnderecoService;
-import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.example.jbmotos.services.exception.RegraDeNegocioException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -15,9 +11,15 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.example.jbmotos.api.dto.ClienteDTO;
+import com.example.jbmotos.model.entity.Cliente;
+import com.example.jbmotos.model.entity.Endereco;
+import com.example.jbmotos.model.enums.Situacao;
+import com.example.jbmotos.model.repositories.ClienteRepository;
+import com.example.jbmotos.services.ClienteService;
+import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 
 @Service
 public class ClienteServiceImpl implements ClienteService {
@@ -42,7 +44,13 @@ public class ClienteServiceImpl implements ClienteService {
         validarEmailParaSalvar(clienteDTO.getEmail());
         Cliente cliente = mapper.map(clienteDTO, Cliente.class);
         cliente.setDataHoraCadastro(LocalDateTime.now());
-        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
+        cliente.setStatusCliente(Situacao.ATIVO);
+
+        Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
+        if (enderecoOptional.isPresent()) {
+            cliente.setEndereco(enderecoOptional.get());
+		}
+
         return clienteRepository.save(cliente);
     }
 
@@ -58,6 +66,7 @@ public class ClienteServiceImpl implements ClienteService {
         checarCpfClienteExistente(cpf);
         return clienteRepository.findClienteByCpf(cpf);
     }
+
     @Override
     @Transactional(readOnly = true)
     public List<Cliente> filtrarCliente(ClienteDTO clienteDTO) {
@@ -68,29 +77,42 @@ public class ClienteServiceImpl implements ClienteService {
         return clienteRepository.findAll(example);
     }
 
-    @Override
-    @Transactional
-    public StatusCliente alternarStatusCliente(String cpf) {
-        Cliente cliente = buscarClientePorCPF(cpf).get();
-        if (cliente.getStatusCliente().equals(StatusCliente.ATIVO)) {
-            cliente.setStatusCliente(StatusCliente.INATIVO);
-        } else if (cliente.getStatusCliente().equals(StatusCliente.INATIVO)) {
-            cliente.setStatusCliente(StatusCliente.ATIVO);
-        }
-        clienteRepository.save(cliente);
-        return cliente.getStatusCliente();
-    }
+	@Override
+	@Transactional
+	public Situacao alternarStatusCliente(String cpf) {
+		Optional<Cliente> clienteOptional = buscarClientePorCPF(cpf);
+		if (clienteOptional.isPresent()) {
+			if (clienteOptional.get().getStatusCliente().equals(Situacao.ATIVO)) {
+				clienteOptional.get().setStatusCliente(Situacao.INATIVO);
+			} else if (clienteOptional.get().getStatusCliente().equals(Situacao.INATIVO)) {
+				clienteOptional.get().setStatusCliente(Situacao.ATIVO);
+			}
+			clienteRepository.save(clienteOptional.get());
+			return clienteOptional.get().getStatusCliente();
+		}
+		return null;
+	}
 
     @Override
     @Transactional
-    public Cliente atualizarCliente(ClienteDTO clienteDTO) {
-        LocalDateTime dateTime = buscarClientePorCPF(clienteDTO.getCpf()).get().getDataHoraCadastro();
-        validarEmailParaAtualizar(clienteDTO);
-        Cliente cliente = mapper.map(clienteDTO, Cliente.class);
-        cliente.setDataHoraCadastro(dateTime);
-        cliente.setEndereco(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco()).get());
-        return clienteRepository.save(cliente);
-    }
+	public Cliente atualizarCliente(ClienteDTO clienteDTO) {
+		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+
+		Optional<Cliente> clienteOptional = buscarClientePorCPF(clienteDTO.getCpf());
+		if (clienteOptional.isPresent()) {
+			LocalDateTime dateTime = clienteOptional.get().getDataHoraCadastro();
+			cliente.setDataHoraCadastro(dateTime);
+		}
+
+		validarEmailParaAtualizar(clienteDTO);
+
+		Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
+		if (enderecoOptional.isPresent()) {
+			cliente.setEndereco(enderecoOptional.get());
+		}
+
+		return clienteRepository.save(cliente);
+	}
 
     @Override
     @Transactional
@@ -116,7 +138,7 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     public void validarEmailParaAtualizar(ClienteDTO clienteDTO) {
         filtrarClientesPorCpfDiferente(clienteDTO).stream().forEach(clienteFiltrado -> {
-            if (clienteDTO.getEmail().equals( clienteFiltrado.getEmail())) {
+            if (clienteDTO.getEmail().equals(clienteFiltrado.getEmail())) {
                 throw new RegraDeNegocioException(ERRO_ATUALIZAR_CLIENTE+", Email já cadastrado.");
             }
         });

@@ -1,13 +1,9 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.FornecedorDTO;
-import com.example.jbmotos.model.entity.Fornecedor;
-import com.example.jbmotos.model.enums.StatusFornecedor;
-import com.example.jbmotos.model.repositories.FornecedorRepository;
-import com.example.jbmotos.services.EnderecoService;
-import com.example.jbmotos.services.FornecedorService;
-import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.example.jbmotos.services.exception.RegraDeNegocioException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -15,9 +11,15 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.example.jbmotos.api.dto.FornecedorDTO;
+import com.example.jbmotos.model.entity.Endereco;
+import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.enums.Situacao;
+import com.example.jbmotos.model.repositories.FornecedorRepository;
+import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.FornecedorService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 
 @Service
 public class FornecedorServiceImpl implements FornecedorService {
@@ -33,16 +35,21 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Autowired
     private ModelMapper mapper;
 
-    @Override
-    @Transactional
-    public Fornecedor salvarFornecedor(FornecedorDTO fornecedorDTO) {
-        validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
-        Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
-        fornecedor.setStatusFornecedor(StatusFornecedor.ATIVO);
-        fornecedor.setDataHoraCadastro(LocalDateTime.now());
-        fornecedor.setEndereco(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco()).get());
-        return fornecedorRepository.save(fornecedor);
-    }
+	@Override
+	@Transactional
+	public Fornecedor salvarFornecedor(FornecedorDTO fornecedorDTO) {
+		validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
+		Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
+		fornecedor.setStatusFornecedor(Situacao.ATIVO);
+		fornecedor.setDataHoraCadastro(LocalDateTime.now());
+
+		Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco());
+		if (enderecoOptional.isPresent()) {
+			fornecedor.setEndereco(enderecoOptional.get());
+		}
+
+		return fornecedorRepository.save(fornecedor);
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -67,28 +74,39 @@ public class FornecedorServiceImpl implements FornecedorService {
         return fornecedorRepository.findAll(example);
     }
 
-    @Override
-    @Transactional
-    public StatusFornecedor alternarStatusFornecedor(String cnpj) {
-        Fornecedor fornecedor = buscarFornecedorPorCNPJ(cnpj).get();
-        if (fornecedor.getStatusFornecedor().equals(StatusFornecedor.ATIVO)) {
-            fornecedor.setStatusFornecedor(StatusFornecedor.INATIVO);
-        } else if (fornecedor.getStatusFornecedor().equals(StatusFornecedor.INATIVO)) {
-            fornecedor.setStatusFornecedor(StatusFornecedor.ATIVO);
-        }
-        fornecedorRepository.save(fornecedor);
-        return fornecedor.getStatusFornecedor();
-    }
+	@Override
+	@Transactional
+	public Situacao alternarStatusFornecedor(String cnpj) {
+		Optional<Fornecedor> fornecedorOptional = buscarFornecedorPorCNPJ(cnpj);
+		if (fornecedorOptional.isPresent()) {
+			if (fornecedorOptional.get().getStatusFornecedor().equals(Situacao.ATIVO)) {
+				fornecedorOptional.get().setStatusFornecedor(Situacao.INATIVO);
+			} else if (fornecedorOptional.get().getStatusFornecedor().equals(Situacao.INATIVO)) {
+				fornecedorOptional.get().setStatusFornecedor(Situacao.ATIVO);
+			}
+			fornecedorRepository.save(fornecedorOptional.get());
+			return fornecedorOptional.get().getStatusFornecedor();
+		}
+		return null;
+	}
 
-    @Override
-    @Transactional
-    public Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO) {
-        LocalDateTime dateTime = buscarFornecedorPorCNPJ(fornecedorDTO.getCnpj()).get().getDataHoraCadastro();
-        Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
-        fornecedor.setDataHoraCadastro(dateTime);
-        fornecedor.setEndereco(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco()).get());
-        return fornecedorRepository.save(fornecedor);
-    }
+	@Override
+	@Transactional
+	public Fornecedor atualizarFornecedor(FornecedorDTO fornecedorDTO) {
+		Optional<Fornecedor> fornecedorOptional = buscarFornecedorPorCNPJ(fornecedorDTO.getCnpj());
+		if (fornecedorOptional.isPresent()) {
+			LocalDateTime dateTime = fornecedorOptional.get().getDataHoraCadastro();
+			Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
+			fornecedor.setDataHoraCadastro(dateTime);
+
+			Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco());
+			if (enderecoOptional.isPresent()) {
+				fornecedor.setEndereco(enderecoOptional.get());
+			}
+			return fornecedorRepository.save(fornecedor);
+		}
+		return null;
+	}
 
     @Override
     @Transactional

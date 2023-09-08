@@ -1,20 +1,25 @@
 package com.example.jbmotos.services.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.jbmotos.api.dto.MotoDTO;
+import com.example.jbmotos.model.entity.Cliente;
 import com.example.jbmotos.model.entity.Moto;
+import com.example.jbmotos.model.enums.Situacao;
 import com.example.jbmotos.model.repositories.MotoRepository;
 import com.example.jbmotos.services.ClienteService;
 import com.example.jbmotos.services.MotoService;
 import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.example.jbmotos.services.exception.RegraDeNegocioException;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class MotoServiceImpl implements MotoService {
@@ -31,11 +36,17 @@ public class MotoServiceImpl implements MotoService {
     @Override
     @Transactional
     public Moto salvarMoto(MotoDTO motoDTO) {
-        motoDTO.setDataHoraCadastro(LocalDateTime.now());
-        motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
         Moto moto = mapper.map(motoDTO, Moto.class);
+        moto.setDataHoraCadastro(LocalDateTime.now());
+        moto.setPlaca(motoDTO.getPlaca().toUpperCase());
         validarPlacaMotoParaSalvar(motoDTO.getPlaca());
-        moto.setCliente(clienteService.buscarClientePorCPF(motoDTO.getCpfCliente()).get());
+        moto.setStatusMoto(Situacao.ATIVO);
+
+        Optional<Cliente> clienteOptional = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
+        if (clienteOptional.isPresent()) {
+        	moto.setCliente(clienteOptional.get());
+		}
+
         return motoRepository.save(moto);
     }
 
@@ -69,17 +80,52 @@ public class MotoServiceImpl implements MotoService {
     }
 
     @Override
-    @Transactional
-    public Moto atualizarMoto(MotoDTO motoDTO) {
-        LocalDateTime dateTime = buscarMotoPorId(motoDTO.getId()).get().getDataHoraCadastro();
-        motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
-        validarExistenciaMotoPorId(motoDTO.getId());
-        validarPlacaMotoParaAtualizar(motoDTO);
-        Moto moto = mapper.map(motoDTO, Moto.class);
-        moto.setCliente(clienteService.buscarClientePorCPF(motoDTO.getCpfCliente()).get());
-        moto.setDataHoraCadastro(dateTime);
-        return motoRepository.save(moto);
+    @Transactional(readOnly = true)
+    public List<Moto> filtrarMoto(MotoDTO motoDTO) {
+        Example<Moto> example = Example.of(mapper.map(motoDTO, Moto.class),
+                ExampleMatcher.matching()
+                        .withIgnoreCase()
+                        .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+        return motoRepository.findAll(example);
     }
+
+	@Override
+	@Transactional
+	public Situacao alternarStatusMoto(Integer idMoto) {
+		Optional<Moto> motoOptional = buscarMotoPorId(idMoto);
+		if (motoOptional.isPresent()) {
+			if (motoOptional.get().getStatusMoto().equals(Situacao.ATIVO)) {
+				motoOptional.get().setStatusMoto(Situacao.INATIVO);
+			} else if (motoOptional.get().getStatusMoto().equals(Situacao.INATIVO)) {
+				motoOptional.get().setStatusMoto(Situacao.ATIVO);
+			}
+			motoRepository.save(motoOptional.get());
+			return motoOptional.get().getStatusMoto();
+		}
+		return null;
+	}
+
+	@Override
+	@Transactional
+	public Moto atualizarMoto(MotoDTO motoDTO) {
+		Optional<Moto> motoOptional = buscarMotoPorId(motoDTO.getId());
+		if (motoOptional.isPresent()) {
+			LocalDateTime dateTime = motoOptional.get().getDataHoraCadastro();
+			motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
+			validarExistenciaMotoPorId(motoDTO.getId());
+			validarPlacaMotoParaAtualizar(motoDTO);
+			Moto moto = mapper.map(motoDTO, Moto.class);
+
+			Optional<Cliente> clienteOptional = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
+			if (clienteOptional.isPresent()) {
+				moto.setCliente(clienteOptional.get());
+			}
+
+			moto.setDataHoraCadastro(dateTime);
+			return motoRepository.save(moto);
+		}
+		return null;
+	}
 
     @Override
     @Transactional

@@ -192,6 +192,7 @@ class ClienteServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar atualizar cliente com email ja utilizado por outro cliente")
     void erroAtualizarClienteEmailJaUtilizado() {
+    	when(mapper.map(any(), any())).thenReturn(cliente);
         when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(true);
         when(clienteService.buscarClientePorCPF(clienteDTO.getCpf())).thenReturn(Optional.of(getCliente()));
         when(clienteRepository.findByCpfNot(clienteDTO.getCpf())).thenReturn(
