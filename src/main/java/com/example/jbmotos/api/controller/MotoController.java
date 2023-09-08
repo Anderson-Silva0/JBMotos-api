@@ -1,18 +1,30 @@
 package com.example.jbmotos.api.controller;
 
-import com.example.jbmotos.api.dto.MotoDTO;
-import com.example.jbmotos.model.entity.Moto;
-import com.example.jbmotos.services.MotoService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.example.jbmotos.api.dto.MotoDTO;
+import com.example.jbmotos.model.entity.Moto;
+import com.example.jbmotos.model.enums.Situacao;
+import com.example.jbmotos.services.MotoService;
 
 @RestController
 @RequestMapping("/api/moto")
@@ -58,6 +70,33 @@ public class MotoController {
         return ResponseEntity.ok().body(mapper.map(motoService.buscarMotoPorPlaca(placa), MotoDTO.class));
     }
 
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<MotoDTO>> filtrar(
+            @RequestParam(value = "placa", required = false) String placa,
+            @RequestParam(value = "marca", required = false) String marca,
+            @RequestParam(value = "modelo", required = false) String modelo,
+            @RequestParam(value = "cpfCliente", required = false) String cpfCliente,
+            @RequestParam(value = "statusMoto", required = false) String statusMoto
+    ) {
+        MotoDTO motoDTO = MotoDTO.builder()
+                .placa(placa)
+                .marca(marca)
+                .modelo(modelo)
+                .cpfCliente(cpfCliente)
+                .statusMoto(statusMoto)
+                .build();
+        return ResponseEntity.ok().body(
+                motoService.filtrarMoto(motoDTO).stream().map(moto ->
+                        mapper.map(moto, MotoDTO.class)
+                ).collect(Collectors.toList()));
+    }
+
+    @PatchMapping("/alternar-status/{id}")
+    public ResponseEntity<Situacao> alternarStatus(@PathVariable("id") Integer id) {
+    	Situacao statusMoto = motoService.alternarStatusMoto(id);
+        return ResponseEntity.ok().body(statusMoto);
+    }
+
     @PutMapping("/atualizar/{idMoto}")
     public ResponseEntity<MotoDTO> atualizar(@PathVariable("idMoto") Integer idMoto,
                                              @Valid @RequestBody MotoDTO motoDTO) {
@@ -66,13 +105,13 @@ public class MotoController {
     }
 
     @DeleteMapping("/deletar-por-id/{idMoto}")
-    public ResponseEntity deletarPorId(@PathVariable("idMoto") Integer idMoto) {
+    public ResponseEntity<?> deletarPorId(@PathVariable("idMoto") Integer idMoto) {
         motoService.deletarMotoPorId(idMoto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/deletar-por-placa/{placa}")
-    public ResponseEntity deletarPorPlaca(@PathVariable("placa") String placa) {
+    public ResponseEntity<?> deletarPorPlaca(@PathVariable("placa") String placa) {
         motoService.deletarMotoPorPlaca(placa);
         return ResponseEntity.noContent().build();
     }
