@@ -1,12 +1,28 @@
 package com.example.jbmotos.model.entity;
 
-import com.example.jbmotos.model.enums.StatusFornecedor;
-import lombok.*;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+
+import com.example.jbmotos.model.enums.Situacao;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Table(name = "fornecedor", schema = "jbmotos")
 @Data
@@ -28,7 +44,7 @@ public class Fornecedor {
 
     @Column(name = "statusFornecedor")
     @Enumerated(EnumType.STRING)
-    private StatusFornecedor statusFornecedor;
+    private Situacao statusFornecedor;
 
     @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
