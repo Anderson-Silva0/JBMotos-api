@@ -43,7 +43,7 @@ public class Pedido {
     @JoinColumn(name = "cpf_funcionario")
     private Funcionario funcionario;
 
-    @Column(name = "observacao", length = 300)
+    @Column(name = "observacao", length = 100)
     private String observacao;
 
     @Column(name = "forma_de_pagamento", length = 50)

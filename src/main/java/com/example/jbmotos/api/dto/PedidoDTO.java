@@ -33,7 +33,7 @@ public class PedidoDTO {
     @CPF(message = "CPF do Fucionário inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfFuncionario;
 
-    @Length(max = 300, message = "O campo Observação tem no máximo 300 caracteres.")
+    @Length(max = 100, message = "O campo Observação tem no máximo 100 caracteres.")
     private String observacao;
 
     @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
