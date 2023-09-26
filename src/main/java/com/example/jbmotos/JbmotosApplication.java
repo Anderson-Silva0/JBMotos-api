@@ -9,5 +9,4 @@ public class JbmotosApplication {
     public static void main(String[] args) {
         SpringApplication.run(JbmotosApplication.class, args);
     }
-
 }

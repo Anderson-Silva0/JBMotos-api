@@ -1,10 +1,10 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.ServicoDTO;
-import com.example.jbmotos.model.entity.Servico;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.ServicoDTO;
+import com.example.jbmotos.model.entity.Servico;
 
 public interface ServicoService {
 

@@ -1,11 +1,12 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
-import com.example.jbmotos.model.entity.ProdutoPedido;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.jbmotos.api.dto.ProdutoPedidoDTO;
+import com.example.jbmotos.model.entity.ProdutoPedido;
 
 public interface ProdutoPedidoService {
 

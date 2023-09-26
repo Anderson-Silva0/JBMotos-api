@@ -1,19 +1,29 @@
 package com.example.jbmotos.api.controller;
 
-import com.example.jbmotos.api.dto.EstoqueDTO;
-import com.example.jbmotos.model.entity.Estoque;
-import com.example.jbmotos.services.EstoqueService;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import com.example.jbmotos.api.dto.EstoqueDTO;
+import com.example.jbmotos.model.entity.Estoque;
+import com.example.jbmotos.services.EstoqueService;
 
 @RestController
 @RequestMapping("/api/estoque")
@@ -54,7 +64,7 @@ public class EstoqueController {
     }
 
     @DeleteMapping("/deletar/{id}")
-    public ResponseEntity deletar(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> deletar(@PathVariable("id") Integer id) {
         estoqueService.deletarEstoquePorId(id);
         return ResponseEntity.noContent().build();
     }

@@ -1,5 +1,13 @@
 package com.example.jbmotos.api.dto;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.br.CPF;
+
 import com.example.jbmotos.model.entity.ProdutoPedido;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,12 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CPF;
-
-import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -39,7 +41,7 @@ public class PedidoDTO {
     @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
     @Length(max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String formaDePagamento;
-    
+
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
 

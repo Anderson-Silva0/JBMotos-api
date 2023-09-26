@@ -1,12 +1,21 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.FuncionarioDTO;
-import com.example.jbmotos.model.entity.Endereco;
-import com.example.jbmotos.model.entity.Funcionario;
-import com.example.jbmotos.model.repositories.FuncionarioRepository;
-import com.example.jbmotos.services.EnderecoService;
-import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.example.jbmotos.services.exception.RegraDeNegocioException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +25,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.example.jbmotos.api.dto.FuncionarioDTO;
+import com.example.jbmotos.model.entity.Endereco;
+import com.example.jbmotos.model.entity.Funcionario;
+import com.example.jbmotos.model.repositories.FuncionarioRepository;
+import com.example.jbmotos.services.EnderecoService;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 
 @SpringBootTest
 @ActiveProfiles("test")

@@ -1,13 +1,12 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.PedidoDTO;
-import com.example.jbmotos.model.entity.Pedido;
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.example.jbmotos.api.dto.PedidoDTO;
+import com.example.jbmotos.model.entity.Pedido;
 
 class PedidoServiceImplTest {
 

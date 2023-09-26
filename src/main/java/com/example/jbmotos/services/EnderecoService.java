@@ -1,12 +1,13 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.EnderecoDTO;
-import com.example.jbmotos.model.entity.Endereco;
-
 import java.util.List;
 import java.util.Optional;
 
+import com.example.jbmotos.api.dto.EnderecoDTO;
+import com.example.jbmotos.model.entity.Endereco;
+
 public interface EnderecoService {
+	
     Endereco salvarEndereco(EnderecoDTO enderecoDTO);
 
     List<Endereco> buscarTodosEnderecos();

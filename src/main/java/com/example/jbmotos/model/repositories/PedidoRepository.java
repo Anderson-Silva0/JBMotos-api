@@ -1,10 +1,9 @@
 package com.example.jbmotos.model.repositories;
 
-import com.example.jbmotos.model.entity.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import com.example.jbmotos.model.entity.Pedido;
+
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
 }

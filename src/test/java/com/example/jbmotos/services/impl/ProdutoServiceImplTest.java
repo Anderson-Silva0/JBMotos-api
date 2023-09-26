@@ -1,13 +1,12 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.ProdutoDTO;
-import com.example.jbmotos.model.entity.Produto;
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.example.jbmotos.api.dto.ProdutoDTO;
+import com.example.jbmotos.model.entity.Produto;
 
 class ProdutoServiceImplTest {
 

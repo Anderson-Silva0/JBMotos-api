@@ -1,7 +1,12 @@
 package com.example.jbmotos.api.controller.exception;
 
-import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.example.jbmotos.services.exception.RegraDeNegocioException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,11 +15,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolationException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import com.example.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.example.jbmotos.services.exception.RegraDeNegocioException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -48,7 +50,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> MethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        Map<String, String> erros = new HashMap<String, String>();
+        Map<String, String> erros = new HashMap<>();
         ex.getBindingResult().getAllErrors()
                 .stream()
                 .forEach(erro -> {
@@ -62,7 +64,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
-        Map<String, String> erros = new HashMap<String, String>();
+        Map<String, String> erros = new HashMap<>();
         ex.getConstraintViolations()
                 .stream()
                 .forEach(erro -> {

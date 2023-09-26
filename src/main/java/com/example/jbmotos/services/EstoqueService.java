@@ -1,11 +1,11 @@
 package com.example.jbmotos.services;
 
-import com.example.jbmotos.api.dto.EstoqueDTO;
-import com.example.jbmotos.model.entity.Estoque;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import com.example.jbmotos.api.dto.EstoqueDTO;
+import com.example.jbmotos.model.entity.Estoque;
 
 public interface EstoqueService {
 

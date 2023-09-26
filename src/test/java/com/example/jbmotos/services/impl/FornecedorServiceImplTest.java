@@ -1,10 +1,14 @@
 package com.example.jbmotos.services.impl;
 
-import com.example.jbmotos.api.dto.FornecedorDTO;
-import com.example.jbmotos.model.entity.Endereco;
-import com.example.jbmotos.model.entity.Fornecedor;
-import com.example.jbmotos.model.repositories.FornecedorRepository;
-import com.example.jbmotos.services.EnderecoService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import com.example.jbmotos.api.dto.FornecedorDTO;
+import com.example.jbmotos.model.entity.Endereco;
+import com.example.jbmotos.model.entity.Fornecedor;
+import com.example.jbmotos.model.repositories.FornecedorRepository;
+import com.example.jbmotos.services.EnderecoService;
 
 @SpringBootTest
 @ActiveProfiles("test")

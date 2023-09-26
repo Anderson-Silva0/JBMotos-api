@@ -1,14 +1,14 @@
 package com.example.jbmotos.model.repositories;
 
-import com.example.jbmotos.model.entity.Funcionario;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.jbmotos.model.entity.Funcionario;
+
 public interface FuncionarioRepository extends JpaRepository<Funcionario, String> {
+	
     Optional<Funcionario> findFuncionarioByCpf(String cpf);
 
     boolean existsFuncionarioByCpf(String cpf);

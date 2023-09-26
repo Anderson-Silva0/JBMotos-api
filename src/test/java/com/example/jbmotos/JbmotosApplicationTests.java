@@ -8,6 +8,6 @@ class JbmotosApplicationTests {
 
     @Test
     void contextLoads() {
+    	
     }
-
 }
