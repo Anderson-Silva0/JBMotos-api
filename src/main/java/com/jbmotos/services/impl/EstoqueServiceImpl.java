@@ -87,10 +87,20 @@ public class EstoqueServiceImpl implements EstoqueService {
 			atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
 		}
 	}
+	
+	@Override
+    @Transactional(readOnly = true)
+    public BigDecimal calcularCustoTotalEstoque() {
+        return buscarTodosEstoques().stream()
+                .map(estoque -> estoque.getProduto().getPrecoCusto()
+                        .multiply(BigDecimal.valueOf(estoque.getQuantidade()))
+                )
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     @Override
     @Transactional(readOnly = true)
-    public BigDecimal calcularValorTotalEstoque() {
+    public BigDecimal calcularPotencialVendaEstoque() {
         return buscarTodosEstoques().stream()
                 .map(estoque -> estoque.getProduto().getPrecoVenda()
                         .multiply(BigDecimal.valueOf(estoque.getQuantidade()))
