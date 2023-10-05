@@ -22,8 +22,10 @@ public interface EstoqueService {
     Integer obterQuantidadeDoProduto(Integer idProduto);
 
     void adicionarQuantidadeAoEstoque(Integer idProduto, Integer quantidade);
+    
+    BigDecimal calcularCustoTotalEstoque();
 
-    BigDecimal calcularValorTotalEstoque();
+    BigDecimal calcularPotencialVendaEstoque();
 
     void validarEstoque(Integer id);
 
