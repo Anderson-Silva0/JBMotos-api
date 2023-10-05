@@ -247,10 +247,39 @@ class EstoqueServiceImplTest {
         verify(estoqueRepository, times(1)).save(estoque);
         verify(estoqueRepository, times(1)).existsById(estoque.getId());
     }
-
+    
     @Test
-    @DisplayName("Deve calcular o valor total do Estoque")
-    void calcularValorTotalEstoque() {
+    @DisplayName("Deve calcular o valor total de custo do Estoque")
+    void calcularCustoTotalEstoque() {
+        // Cenário
+        BigDecimal precoCusto = BigDecimal.valueOf(150.55);
+        estoque.setQuantidade(5);
+        produto.setPrecoCusto(precoCusto);
+        estoque.setProduto(produto);
+
+        List<Estoque> listaEstoque = new ArrayList<>();
+        listaEstoque.add(estoque);
+        listaEstoque.add(estoque);
+        listaEstoque.add(estoque);
+
+        when(estoqueRepository.findAll()).thenReturn(listaEstoque);
+
+        // Execução
+        BigDecimal valorCustoTotalEstoque = estoqueService.calcularCustoTotalEstoque();
+
+        // Verificação
+        BigDecimal valorTotalEsperado = listaEstoque.stream().map(estoqueTeste ->
+                estoqueTeste.getProduto().getPrecoCusto().multiply(
+                        BigDecimal.valueOf( estoqueTeste.getQuantidade() )
+                )).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        assertEquals(valorTotalEsperado, valorCustoTotalEstoque);
+        verify(estoqueRepository, times(1)).findAll();
+    }
+    
+    @Test
+    @DisplayName("Deve calcular o potencial de venda do Estoque")
+    void calcularPontecialVendaEstoque() {
         // Cenário
         BigDecimal precoVenda = BigDecimal.valueOf(150.55);
         estoque.setQuantidade(5);
@@ -265,7 +294,7 @@ class EstoqueServiceImplTest {
         when(estoqueRepository.findAll()).thenReturn(listaEstoque);
 
         // Execução
-        BigDecimal valorTotalEstoque = estoqueService.calcularValorTotalEstoque();
+        BigDecimal valorTotalEstoque = estoqueService.calcularPotencialVendaEstoque();
 
         // Verificação
         BigDecimal valorTotalEsperado = listaEstoque.stream().map(estoqueTeste ->
