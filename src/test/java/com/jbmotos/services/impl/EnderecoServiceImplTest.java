@@ -112,13 +112,12 @@ class EnderecoServiceImplTest {
         when(enderecoRepository.findById(endereco.getId())).thenReturn(Optional.of(endereco));
 
         //Execução
-        Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(endereco.getId());
+        Endereco enderecoBuscado = enderecoService.buscarEnderecoPorId(endereco.getId());
 
         //Verificação
-        assertNotNull(enderecoOptional);
-        assertEquals(true, enderecoOptional.isPresent());
-        assertEquals(endereco, enderecoOptional.get());
-        assertEquals(Optional.class, enderecoOptional.getClass());
+        assertNotNull(enderecoBuscado);
+        assertEquals(endereco, enderecoBuscado);
+        assertEquals(Endereco.class, enderecoBuscado.getClass());
     }
 
     @Test

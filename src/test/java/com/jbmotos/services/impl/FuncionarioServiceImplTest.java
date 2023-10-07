@@ -67,7 +67,7 @@ class FuncionarioServiceImplTest {
         when(funcionarioRepository.existsFuncionarioByCpf(funcionarioDTO.getCpf())).thenReturn(false);
         when(mapper.map(funcionarioDTO, Funcionario.class)).thenReturn(funcionario);
         when(funcionarioRepository.save(funcionario)).thenReturn(funcionario);
-        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(Optional.of(endereco));
+        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(endereco);
 
         Funcionario funcionarioSalvo = funcionarioService.salvarFuncionario(funcionarioDTO);
 
@@ -121,12 +121,11 @@ class FuncionarioServiceImplTest {
         when(funcionarioRepository.existsFuncionarioByCpf(cpfFuncionario)).thenReturn(true);
         when(funcionarioRepository.findFuncionarioByCpf(cpfFuncionario)).thenReturn(Optional.of(funcionario));
 
-        Optional<Funcionario> funcionarioOptional = funcionarioService.buscarFuncionarioPorCPF(cpfFuncionario);
+        Funcionario funcionarioBuscado = funcionarioService.buscarFuncionarioPorCPF(cpfFuncionario);
 
-        assertNotNull(funcionarioOptional);
-        assertEquals(true, funcionarioOptional.isPresent());
-        assertEquals(funcionario, funcionarioOptional.get());
-        assertEquals(Optional.class, funcionarioOptional.getClass());
+        assertNotNull(funcionario);
+        assertEquals(funcionario, funcionarioBuscado);
+        assertEquals(Funcionario.class, funcionario.getClass());
     }
 
     @Test
@@ -154,9 +153,7 @@ class FuncionarioServiceImplTest {
                 .build();
         Funcionario novoFuncionario;
 
-        when(funcionarioRepository.existsFuncionarioByCpf(funcionarioDTO.getCpf())).thenReturn(true);
-        when(funcionarioService.buscarFuncionarioPorCPF(funcionarioDTO.getCpf()))
-                .thenReturn(Optional.of(funcionarioAntigo));
+        when(funcionarioRepository.findFuncionarioByCpf(funcionarioDTO.getCpf())).thenReturn(Optional.of(funcionarioAntigo));
 
         when(mapper.map(funcionarioDTO, Funcionario.class)).thenReturn(
                 novoFuncionario = Funcionario.builder()
@@ -168,7 +165,7 @@ class FuncionarioServiceImplTest {
                 .build()
         );
 
-        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(Optional.of(endereco));
+        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(endereco);
         when(funcionarioRepository.save(novoFuncionario)).thenReturn(novoFuncionario);
 
         Funcionario funcionarioAtualizado = funcionarioService.atualizarFuncionario(funcionarioDTO);

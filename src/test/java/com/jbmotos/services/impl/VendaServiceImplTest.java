@@ -5,53 +5,53 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.jbmotos.api.dto.PedidoDTO;
-import com.jbmotos.model.entity.Pedido;
+import com.jbmotos.api.dto.VendaDTO;
+import com.jbmotos.model.entity.Venda;
 
-class PedidoServiceImplTest {
+class VendaServiceImplTest {
 
     @BeforeEach
     void setUp() {
     }
 
     @Test
-    void salvarPedido() {
+    void salvarVenda() {
     }
 
     @Test
-    void buscarTodosPedidos() {
+    void buscarTodasVendas() {
     }
 
     @Test
-    void buscarPedidoPorId() {
+    void buscarVendaPorId() {
     }
 
     @Test
-    void atualizarPedido() {
+    void atualizarVenda() {
     }
 
     @Test
-    void deletarPedido() {
+    void deletarVenda() {
     }
 
     @Test
-    void calcularLucroDoPedido() {
+    void calcularLucroDaVenda() {
     }
 
     @Test
-    void validarPedido() {
+    void validarVenda() {
     }
 
     @Test
-    void valorTotalDoPedido() {
+    void valorTotalDaVenda() {
     }
 
     @Test
-    void buscarProdutosDoPedido() {
+    void buscarProdutosDaVenda() {
     }
 
-    public static Pedido getPedido() {
-        return Pedido.builder()
+    public static Venda getVenda() {
+        return Venda.builder()
                 .id(1)
                 .cliente(null)
                 .funcionario(null)
@@ -61,8 +61,8 @@ class PedidoServiceImplTest {
                 .build();
     }
 
-    public static PedidoDTO getPedidoDTO() {
-        return PedidoDTO.builder()
+    public static VendaDTO getVendaDTO() {
+        return VendaDTO.builder()
                 .id(1)
                 .cpfCliente("123.456.789-10")
                 .cpfFuncionario("109.876.543-21")

@@ -7,8 +7,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +55,7 @@ class FornecedorServiceImplTest {
         // Cenário
         when(fornecedorRepository.existsFornecedorByCnpj(fornecedorDTO.getCnpj())).thenReturn(false);
         when(mapper.map(fornecedorDTO, Fornecedor.class)).thenReturn(fornecedor);
-        when(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco())).thenReturn(Optional.of(endereco));
+        when(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco())).thenReturn(endereco);
         when(fornecedorRepository.save(any(Fornecedor.class))).thenReturn(fornecedor);
 
         // Execução

@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +69,7 @@ class ClienteServiceImplTest {
         when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(false);
         when(clienteRepository.existsClienteByEmail(clienteDTO.getEmail())).thenReturn(false);
         when(mapper.map(clienteDTO, Cliente.class)).thenReturn(cliente);
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(endereco));
+        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(endereco);
         when(clienteRepository.save(cliente)).thenReturn(cliente);
 
         Cliente clienteSalvo = clienteService.salvarCliente(clienteDTO);
@@ -138,12 +137,11 @@ class ClienteServiceImplTest {
         when(clienteRepository.existsClienteByCpf(cpfCliente)).thenReturn(true);
         when(clienteRepository.findClienteByCpf(cpfCliente)).thenReturn(Optional.of(cliente));
 
-        Optional<Cliente> clienteOptional = clienteService.buscarClientePorCPF(cpfCliente);
+        Cliente clienteBuscado = clienteService.buscarClientePorCPF(cpfCliente);
 
-        assertNotNull(clienteOptional);
-        assertEquals(true, clienteOptional.isPresent());
-        assertEquals(cliente, clienteOptional.get());
-        assertEquals(Optional.class, clienteOptional.getClass());
+        assertNotNull(clienteBuscado);
+        assertEquals(cliente, clienteBuscado);
+        assertEquals(Cliente.class, clienteBuscado.getClass());
     }
 
     @Test
@@ -159,8 +157,7 @@ class ClienteServiceImplTest {
                 .build();
         Cliente novoCliente;
 
-        when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(true);
-        when(clienteService.buscarClientePorCPF(clienteDTO.getCpf())).thenReturn(Optional.of(clienteAntigo));
+        when(clienteRepository.findClienteByCpf(clienteDTO.getCpf())).thenReturn(Optional.of(clienteAntigo));
 
         when(mapper.map(clienteDTO, Cliente.class)).thenReturn(
                 novoCliente = Cliente.builder()
@@ -173,7 +170,7 @@ class ClienteServiceImplTest {
                         .build()
         );
 
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(Optional.of(endereco));
+        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(endereco);
         when(clienteRepository.save(novoCliente)).thenReturn(novoCliente);
 
         Cliente clienteAtualizado = clienteService.atualizarCliente(clienteDTO);
@@ -205,11 +202,8 @@ class ClienteServiceImplTest {
     @DisplayName("Deve lancar erro ao tentar atualizar cliente com email ja utilizado por outro cliente")
     void erroAtualizarClienteEmailJaUtilizado() {
     	when(mapper.map(any(), any())).thenReturn(cliente);
-        when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(true);
-        when(clienteService.buscarClientePorCPF(clienteDTO.getCpf())).thenReturn(Optional.of(getCliente()));
-        when(clienteRepository.findByCpfNot(clienteDTO.getCpf())).thenReturn(
-                Arrays.asList(getCliente(), getCliente())
-        );
+    	when(clienteRepository.findClienteByCpf(clienteDTO.getCpf())).thenReturn(Optional.of(getCliente()));
+        when(clienteRepository.findByCpfNot(clienteDTO.getCpf())).thenReturn(List.of(getCliente(), getCliente()));
 
         RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () -> {
             clienteService.atualizarCliente(clienteDTO);

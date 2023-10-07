@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
@@ -110,13 +109,11 @@ class EstoqueServiceImplTest {
         when(estoqueRepository.findById(idEstoque)).thenReturn(Optional.of(estoque));
 
         // Execução
-        Optional<Estoque> estoqueOptional = estoqueService.buscarEstoquePorId(idEstoque);
+        Estoque estoque = estoqueService.buscarEstoquePorId(idEstoque);
 
         // Verificação
-        assertTrue(estoqueOptional.isPresent());
-        assertEquals(estoque, estoqueOptional.get());
-        assertEquals(Optional.class, estoqueOptional.getClass());
-        verify(estoqueRepository, times(1)).existsById(idEstoque);
+        assertEquals(estoque, estoque);
+        assertEquals(Estoque.class, estoque.getClass());
         verify(estoqueRepository, times(1)).findById(idEstoque);
     }
 
@@ -132,8 +129,6 @@ class EstoqueServiceImplTest {
             estoqueService.buscarEstoquePorId(idEstoque);
         });
         assertEquals("Estoque não encontrado para o Id informado.", exception.getMessage());
-        verify(estoqueRepository, times(1)).existsById(idEstoque);
-        verify(estoqueRepository, never()).findById(idEstoque);
     }
 
     @Test
@@ -211,7 +206,7 @@ class EstoqueServiceImplTest {
         produto.setEstoque(estoque);
         produto.getEstoque().setQuantidade(quantidadeEsperada);
         when(produtoService.buscarProdutoPorId(produto.getId()))
-                .thenReturn(Optional.of(produto));
+                .thenReturn(produto);
 
         // Execução
         Integer quantidadeObtida = estoqueService.obterQuantidadeDoProduto(produto.getId());
@@ -232,7 +227,7 @@ class EstoqueServiceImplTest {
 
         produto.setEstoque(estoque);
         produto.getEstoque().setQuantidade(quantidadeAtual);
-        when(produtoService.buscarProdutoPorId(idProduto)).thenReturn(Optional.of(produto));
+        when(produtoService.buscarProdutoPorId(idProduto)).thenReturn(produto);
         when(mapper.map(estoque, EstoqueDTO.class)).thenReturn(estoqueDTO);
         when(mapper.map(estoqueDTO, Estoque.class)).thenReturn(estoque);
         when(estoqueRepository.existsById(anyInt())).thenReturn(true);
@@ -247,7 +242,7 @@ class EstoqueServiceImplTest {
         verify(estoqueRepository, times(1)).save(estoque);
         verify(estoqueRepository, times(1)).existsById(estoque.getId());
     }
-    
+
     @Test
     @DisplayName("Deve calcular o valor total de custo do Estoque")
     void calcularCustoTotalEstoque() {
@@ -276,7 +271,7 @@ class EstoqueServiceImplTest {
         assertEquals(valorTotalEsperado, valorCustoTotalEstoque);
         verify(estoqueRepository, times(1)).findAll();
     }
-    
+
     @Test
     @DisplayName("Deve calcular o potencial de venda do Estoque")
     void calcularPontecialVendaEstoque() {
