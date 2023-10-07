@@ -70,5 +70,5 @@ public class Produto {
     private Fornecedor fornecedor;
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
-    private List<ProdutoPedido> produtosPedido;
+    private List<ProdutoVenda> produtosVenda;
 }

@@ -9,9 +9,9 @@ import com.jbmotos.model.entity.Servico;
 
 public interface ServicoRepository extends JpaRepository<Servico, Integer> {
 
-    Optional<Servico> findServicoByPedidoId(Integer idPedido);
+    Optional<Servico> findServicoByVendaId(Integer idVenda);
 
-    boolean existsServicoByPedidoId(Integer idPedido);
+    boolean existsServicoByVendaId(Integer idVenda);
 
     List<Servico> findServicoByFuncionarioCpf(String cpfFuncionario);
 }

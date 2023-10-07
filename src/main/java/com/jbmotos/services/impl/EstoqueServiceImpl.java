@@ -2,7 +2,6 @@ package com.jbmotos.services.impl;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,8 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 
 @Service
 public class EstoqueServiceImpl implements EstoqueService {
+
+	private final String ESTOQUE_NAO_ENCONTRADO = "Estoque não encontrado para o Id informado.";
 
     @Autowired
     private EstoqueRepository estoqueRepository;
@@ -49,9 +50,9 @@ public class EstoqueServiceImpl implements EstoqueService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Estoque> buscarEstoquePorId(Integer id) {
-        validarEstoque(id);
-        return estoqueRepository.findById(id);
+    public Estoque buscarEstoquePorId(Integer id) {
+        return estoqueRepository.findById(id)
+        		.orElseThrow(() -> new ObjetoNaoEncontradoException(ESTOQUE_NAO_ENCONTRADO));
     }
 
     @Override
@@ -73,21 +74,19 @@ public class EstoqueServiceImpl implements EstoqueService {
 
 	@Override
 	public Integer obterQuantidadeDoProduto(Integer idProduto) {
-		Optional<Produto> produtoOptional = produtoService.buscarProdutoPorId(idProduto);
-		return produtoOptional.map(produto -> produto.getEstoque().getQuantidade()).orElse(null);
+		Produto produto = produtoService.buscarProdutoPorId(idProduto);
+		return produto.getEstoque().getQuantidade();
 	}
 
 	@Override
 	@Transactional
 	public void adicionarQuantidadeAoEstoque(Integer idProduto, Integer quantidade) {
-		Optional<Produto> produtoOptional = produtoService.buscarProdutoPorId(idProduto);
-		if (produtoOptional.isPresent()) {
-			Estoque estoque = produtoOptional.get().getEstoque();
-			estoque.setQuantidade(estoque.getQuantidade() + quantidade);
-			atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
-		}
+		Produto produto = produtoService.buscarProdutoPorId(idProduto);
+		Estoque estoque = produto.getEstoque();
+		estoque.setQuantidade(estoque.getQuantidade() + quantidade);
+		atualizarEstoque(mapper.map(estoque, EstoqueDTO.class));
 	}
-	
+
 	@Override
     @Transactional(readOnly = true)
     public BigDecimal calcularCustoTotalEstoque() {
@@ -111,7 +110,7 @@ public class EstoqueServiceImpl implements EstoqueService {
     @Override
     public void validarEstoque(Integer id) {
         if (!estoqueRepository.existsById(id)) {
-            throw new ObjetoNaoEncontradoException("Estoque não encontrado para o Id informado.");
+            throw new ObjetoNaoEncontradoException(ESTOQUE_NAO_ENCONTRADO);
         }
     }
 

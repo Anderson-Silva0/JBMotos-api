@@ -1,7 +1,6 @@
 package com.jbmotos.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.FornecedorDTO;
 import com.jbmotos.model.entity.Fornecedor;
@@ -13,7 +12,7 @@ public interface FornecedorService {
 
     List<Fornecedor> buscarTodosFornecedores();
 
-    Optional<Fornecedor> buscarFornecedorPorCNPJ(String cnpj);
+    Fornecedor buscarFornecedorPorCNPJ(String cnpj);
 
     List<Fornecedor> filtrarFornecedor(FornecedorDTO fornecedorDTO);
 
@@ -26,8 +25,6 @@ public interface FornecedorService {
     void validarCnpjFornecedorParaSalvar(String cnpj);
 
     List<Fornecedor> filtrarFornecedoresPorCnpjDiferente(FornecedorDTO fornecedorDTO);
-
-    void checarCnpjFornecedorExistente(String cnpj);
 
     boolean existeFornecedorPorIdEndereco(Integer idEndereco);
 }

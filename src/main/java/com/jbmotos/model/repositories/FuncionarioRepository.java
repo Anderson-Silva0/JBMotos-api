@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.jbmotos.model.entity.Funcionario;
 
 public interface FuncionarioRepository extends JpaRepository<Funcionario, String> {
-	
+
     Optional<Funcionario> findFuncionarioByCpf(String cpf);
 
     boolean existsFuncionarioByCpf(String cpf);

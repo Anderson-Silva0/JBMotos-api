@@ -23,13 +23,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "pedido", schema = "jbmotos")
+@Table(name = "venda", schema = "jbmotos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class Pedido {
+public class Venda {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -53,9 +54,9 @@ public class Pedido {
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime dataHoraCadastro;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
-    private List<ProdutoPedido> produtosPedido;
+    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
+    private List<ProdutoVenda> produtosVenda;
 
-    @OneToOne(mappedBy = "pedido")
+    @OneToOne(mappedBy = "venda")
     private Servico servico;
 }

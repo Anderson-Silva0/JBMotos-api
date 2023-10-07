@@ -2,7 +2,6 @@ package com.jbmotos.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,9 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 @Service
 public class MotoServiceImpl implements MotoService {
 
+	private final String MOTO_NAO_ENCONTRADA_ID = "Moto não encontrada para o Id informado.";
+	private final String MOTO_NAO_ENCONTRADA_PLACA = "Moto não encontrada para a Placa informada.";
+
     @Autowired
     private MotoRepository motoRepository;
 
@@ -42,10 +44,8 @@ public class MotoServiceImpl implements MotoService {
         validarPlacaMotoParaSalvar(motoDTO.getPlaca());
         moto.setStatusMoto(Situacao.ATIVO);
 
-        Optional<Cliente> clienteOptional = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
-        if (clienteOptional.isPresent()) {
-        	moto.setCliente(clienteOptional.get());
-		}
+        Cliente cliente = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
+        moto.setCliente(cliente);
 
         return motoRepository.save(moto);
     }
@@ -64,20 +64,20 @@ public class MotoServiceImpl implements MotoService {
         return motoRepository.findMotosByClienteCpf(cpfCliente);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Moto> buscarMotoPorId(Integer idMoto) {
-        validarExistenciaMotoPorId(idMoto);
-        return motoRepository.findById(idMoto);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Moto buscarMotoPorId(Integer idMoto) {
+		return motoRepository.findById(idMoto)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(MOTO_NAO_ENCONTRADA_ID));
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Moto> buscarMotoPorPlaca(String placa) {
-        String placaMaiuscula = placa.toUpperCase();
-        validarExistenciaMotoPorPlaca(placaMaiuscula);
-        return motoRepository.findMotoByPlaca(placaMaiuscula);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Moto buscarMotoPorPlaca(String placa) {
+		String placaMaiuscula = placa.toUpperCase();
+		return motoRepository.findMotoByPlaca(placaMaiuscula)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(MOTO_NAO_ENCONTRADA_PLACA));
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -92,39 +92,31 @@ public class MotoServiceImpl implements MotoService {
 	@Override
 	@Transactional
 	public Situacao alternarStatusMoto(Integer idMoto) {
-		Optional<Moto> motoOptional = buscarMotoPorId(idMoto);
-		if (motoOptional.isPresent()) {
-			if (motoOptional.get().getStatusMoto().equals(Situacao.ATIVO)) {
-				motoOptional.get().setStatusMoto(Situacao.INATIVO);
-			} else if (motoOptional.get().getStatusMoto().equals(Situacao.INATIVO)) {
-				motoOptional.get().setStatusMoto(Situacao.ATIVO);
-			}
-			motoRepository.save(motoOptional.get());
-			return motoOptional.get().getStatusMoto();
+		Moto moto = buscarMotoPorId(idMoto);
+		if (moto.getStatusMoto().equals(Situacao.ATIVO)) {
+			moto.setStatusMoto(Situacao.INATIVO);
+		} else if (moto.getStatusMoto().equals(Situacao.INATIVO)) {
+			moto.setStatusMoto(Situacao.ATIVO);
 		}
-		return null;
+		motoRepository.save(moto);
+		return moto.getStatusMoto();
 	}
 
 	@Override
 	@Transactional
 	public Moto atualizarMoto(MotoDTO motoDTO) {
-		Optional<Moto> motoOptional = buscarMotoPorId(motoDTO.getId());
-		if (motoOptional.isPresent()) {
-			LocalDateTime dateTime = motoOptional.get().getDataHoraCadastro();
-			motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
-			validarExistenciaMotoPorId(motoDTO.getId());
-			validarPlacaMotoParaAtualizar(motoDTO);
-			Moto moto = mapper.map(motoDTO, Moto.class);
+		Moto moto = mapper.map(motoDTO, Moto.class);
 
-			Optional<Cliente> clienteOptional = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
-			if (clienteOptional.isPresent()) {
-				moto.setCliente(clienteOptional.get());
-			}
+		LocalDateTime dateTime = buscarMotoPorId(motoDTO.getId()).getDataHoraCadastro();
+		moto.setDataHoraCadastro(dateTime);
 
-			moto.setDataHoraCadastro(dateTime);
-			return motoRepository.save(moto);
-		}
-		return null;
+		validarPlacaMotoParaAtualizar(motoDTO);
+		motoDTO.setPlaca(motoDTO.getPlaca().toUpperCase());
+
+		Cliente cliente = clienteService.buscarClientePorCPF(motoDTO.getCpfCliente());
+		moto.setCliente(cliente);
+
+		return motoRepository.save(moto);
 	}
 
     @Override
@@ -165,14 +157,14 @@ public class MotoServiceImpl implements MotoService {
     @Override
     public void validarExistenciaMotoPorId(Integer idMoto) {
         if (!motoRepository.existsById(idMoto)) {
-            throw new ObjetoNaoEncontradoException("Moto não encontrada para o Id informado.");
+            throw new ObjetoNaoEncontradoException(MOTO_NAO_ENCONTRADA_ID);
         }
     }
 
     @Override
     public void validarExistenciaMotoPorPlaca(String placa) {
         if (!motoRepository.existsMotoByPlaca(placa)) {
-            throw new ObjetoNaoEncontradoException("Moto não encontrada para a Placa informada.");
+            throw new ObjetoNaoEncontradoException(MOTO_NAO_ENCONTRADA_PLACA);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.jbmotos.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.MotoDTO;
 import com.jbmotos.model.entity.Moto;
@@ -15,9 +14,9 @@ public interface MotoService {
 
     List<Moto> buscarMotosPorCpfCliente(String cpfCliente);
 
-    Optional<Moto> buscarMotoPorId(Integer idMoto);
+    Moto buscarMotoPorId(Integer idMoto);
 
-    Optional<Moto> buscarMotoPorPlaca(String placa);
+    Moto buscarMotoPorPlaca(String placa);
 
     List<Moto> filtrarMoto(MotoDTO motoDTO);
 

@@ -2,7 +2,6 @@ package com.jbmotos.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jbmotos.api.dto.ServicoDTO;
 import com.jbmotos.model.entity.Funcionario;
 import com.jbmotos.model.entity.Moto;
-import com.jbmotos.model.entity.Pedido;
 import com.jbmotos.model.entity.Servico;
+import com.jbmotos.model.entity.Venda;
 import com.jbmotos.model.repositories.ServicoRepository;
 import com.jbmotos.services.FuncionarioService;
 import com.jbmotos.services.MotoService;
-import com.jbmotos.services.PedidoService;
 import com.jbmotos.services.ServicoService;
+import com.jbmotos.services.VendaService;
 import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.jbmotos.services.exception.RegraDeNegocioException;
 
@@ -35,7 +34,7 @@ public class ServicoServiceImpl implements ServicoService {
     private MotoService motoService;
 
     @Autowired
-    private PedidoService pedidoService;
+    private VendaService vendaService;
 
     @Autowired
     private ModelMapper mapper;
@@ -44,24 +43,17 @@ public class ServicoServiceImpl implements ServicoService {
 	@Transactional
 	public Servico salvarServico(ServicoDTO servicoDTO) {
 		servicoDTO.setDataHoraCadastro(LocalDateTime.now());
-		validarPedidoParaSalvarServico(servicoDTO.getIdPedido());
+		validarVendaParaSalvarServico(servicoDTO.getIdVenda());
 		Servico servico = mapper.map(servicoDTO, Servico.class);
 
-		Optional<Funcionario> funcionarioOptional = funcionarioService
-				.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
-		if (funcionarioOptional.isPresent()) {
-			servico.setFuncionario(funcionarioOptional.get());
-		}
+		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
+		servico.setFuncionario(funcionario);
 
-		Optional<Moto> motoOptional = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
-		if (motoOptional.isPresent()) {
-			servico.setMoto(motoOptional.get());
-		}
+		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+		servico.setMoto(moto);
 
-		Optional<Pedido> pedidoOptional = pedidoService.buscarPedidoPorId(servicoDTO.getIdPedido());
-		if (pedidoOptional.isPresent()) {
-			servico.setPedido(pedidoOptional.get());
-		}
+		Venda venda = vendaService.buscarVendaPorId(servicoDTO.getIdVenda());
+		servico.setVenda(venda);
 
 		return servicoRepository.save(servico);
 	}
@@ -72,20 +64,20 @@ public class ServicoServiceImpl implements ServicoService {
         return servicoRepository.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Servico> buscarServicoPorId(Integer idServico) {
-        validarServico(idServico);
-        return servicoRepository.findById(idServico);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Servico buscarServicoPorId(Integer idServico) {
+		return servicoRepository.findById(idServico)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException("Serviço não encontrado para o Id informado."));
+	}
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Servico> buscarServicoPorIdPedido(Integer idPedido) {
-        pedidoService.validarPedido(idPedido);
-        verificarSePedidoPertenceAoServico(idPedido);
-        return servicoRepository.findServicoByPedidoId(idPedido);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Servico buscarServicoPorIdVenda(Integer idVenda) {
+		vendaService.validarVenda(idVenda);
+		return servicoRepository.findServicoByVendaId(idVenda)
+				.orElseThrow(() -> new RegraDeNegocioException("A Venda informada não pertence a um Serviço."));
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -97,28 +89,22 @@ public class ServicoServiceImpl implements ServicoService {
 	@Override
 	@Transactional
 	public Servico atualizarServico(ServicoDTO servicoDTO) {
-		Optional<Servico> servicoOptional = buscarServicoPorId(servicoDTO.getId());
-		if (servicoOptional.isPresent()) {
-			Servico servicoAntigo = servicoOptional.get();
-			Servico servicoNovo = mapper.map(servicoDTO, Servico.class);
-			servicoNovo.setDataHoraCadastro(servicoAntigo.getDataHoraCadastro());
-			validarPedidoParaAtualizarServico(servicoAntigo, servicoDTO);
+		Servico servicoNovo = mapper.map(servicoDTO, Servico.class);
 
-			Optional<Funcionario> funcionarioOptional = funcionarioService
-					.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
-			if (funcionarioOptional.isPresent()) {
-				servicoNovo.setFuncionario(funcionarioOptional.get());
-			}
+		Servico servicoAntigo = buscarServicoPorId(servicoDTO.getId());
+		servicoNovo.setDataHoraCadastro(servicoAntigo.getDataHoraCadastro());
 
-			Optional<Moto> motoOptional = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
-			if (motoOptional.isPresent()) {
-				servicoNovo.setMoto(motoOptional.get());
-			}
+		validarVendaParaAtualizarServico(servicoAntigo, servicoDTO);
 
-			servicoNovo.setPedido(servicoAntigo.getPedido());
-			return servicoRepository.save(servicoNovo);
-		}
-		return null;
+		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
+		servicoNovo.setFuncionario(funcionario);
+
+		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+		servicoNovo.setMoto(moto);
+
+		servicoNovo.setVenda(servicoAntigo.getVenda());
+
+		return servicoRepository.save(servicoNovo);
 	}
 
     @Override
@@ -128,23 +114,23 @@ public class ServicoServiceImpl implements ServicoService {
         servicoRepository.deleteById(idServico);
     }
 
-    private void validarPedidoParaSalvarServico(Integer idPedido) {
-        if (servicoRepository.existsServicoByPedidoId(idPedido)) {
-            throw new RegraDeNegocioException("Erro ao tentar salvar o Serviço, o pedido pertence a outro Serviço.");
+    private void validarVendaParaSalvarServico(Integer idPedido) {
+        if (servicoRepository.existsServicoByVendaId(idPedido)) {
+            throw new RegraDeNegocioException("Erro ao tentar salvar o Serviço, a Venda pertence a outro Serviço.");
         }
     }
 
-    private void validarPedidoParaAtualizarServico(Servico servicoAntigo, ServicoDTO servicoDTO) {
-        if (servicoAntigo.getPedido().getId() != servicoDTO.getIdPedido()) {
-            throw new RegraDeNegocioException("Erro ao tentar atualizar Serviço, o Pedido não pode ser alterado.");
-        }
-    }
+	private void validarVendaParaAtualizarServico(Servico servicoAntigo, ServicoDTO servicoDTO) {
+		if (!servicoAntigo.getVenda().getId().equals(servicoDTO.getIdVenda())) {
+			throw new RegraDeNegocioException("Erro ao tentar atualizar Serviço, a Venda não pode ser alterada.");
+		}
+	}
 
 	@Override
-	public void verificarSePedidoPertenceAoServico(Integer idPedido) {
-		Optional<Pedido> pedidoOptional = pedidoService.buscarPedidoPorId(idPedido);
-		if (pedidoOptional.isPresent() && (pedidoOptional.get().getServico() == null)) {
-			throw new RegraDeNegocioException("O Pedido informado não pertence a um Serviço.");
+	public void verificarSeVendaPertenceAoServico(Integer idVenda) {
+		Venda venda = vendaService.buscarVendaPorId(idVenda);
+		if (venda.getServico() == null) {
+			throw new RegraDeNegocioException("A Venda informada não pertence a um Serviço.");
 		}
 	}
 

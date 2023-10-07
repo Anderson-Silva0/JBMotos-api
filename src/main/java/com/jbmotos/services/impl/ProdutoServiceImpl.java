@@ -3,7 +3,6 @@ package com.jbmotos.services.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -28,6 +27,8 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 @Service
 public class ProdutoServiceImpl implements ProdutoService {
 
+	private final String PRODUTO_NAO_ENCONTRADO = "Produto não encontrado para o Id informado.";
+
 	@Autowired
 	private ProdutoRepository produtoRepository;
 
@@ -48,16 +49,11 @@ public class ProdutoServiceImpl implements ProdutoService {
 		produto.setStatusProduto(Situacao.ATIVO);
 		produto.setDataHoraCadastro(LocalDateTime.now());
 
-		Optional<Estoque> estoqueOptional = estoqueService.buscarEstoquePorId(produtoDTO.getIdEstoque());
-		if (estoqueOptional.isPresent()) {
-			produto.setEstoque(estoqueOptional.get());
-		}
+		Estoque estoque = estoqueService.buscarEstoquePorId(produtoDTO.getIdEstoque());
+		produto.setEstoque(estoque);
 
-		Optional<Fornecedor> fornecedorOptional = fornecedorService
-				.buscarFornecedorPorCNPJ(produtoDTO.getCnpjFornecedor());
-		if (fornecedorOptional.isPresent()) {
-			produto.setFornecedor(fornecedorOptional.get());
-		}
+		Fornecedor fornecedor = fornecedorService.buscarFornecedorPorCNPJ(produtoDTO.getCnpjFornecedor());
+		produto.setFornecedor(fornecedor);
 
 		return produtoRepository.save(produto);
 	}
@@ -70,9 +66,9 @@ public class ProdutoServiceImpl implements ProdutoService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<Produto> buscarProdutoPorId(Integer id) {
-		verificaSeProdutoExiste(id);
-		return produtoRepository.findById(id);
+	public Produto buscarProdutoPorId(Integer id) {
+		return produtoRepository.findById(id)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(PRODUTO_NAO_ENCONTRADO));
 	}
 
 	@Override
@@ -85,36 +81,30 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	@Transactional
 	public Situacao alternarStatusProduto(Integer idProduto) {
-		Optional<Produto> produtoOptional = buscarProdutoPorId(idProduto);
-		if (produtoOptional.isPresent()) {
-			if (produtoOptional.get().getStatusProduto().equals(Situacao.ATIVO)) {
-				produtoOptional.get().setStatusProduto(Situacao.INATIVO);
-			} else if (produtoOptional.get().getStatusProduto().equals(Situacao.INATIVO)) {
-				produtoOptional.get().setStatusProduto(Situacao.ATIVO);
-			}
-			produtoRepository.save(produtoOptional.get());
-			return produtoOptional.get().getStatusProduto();
+		Produto produto = buscarProdutoPorId(idProduto);
+		if (produto.getStatusProduto().equals(Situacao.ATIVO)) {
+			produto.setStatusProduto(Situacao.INATIVO);
+		} else if (produto.getStatusProduto().equals(Situacao.INATIVO)) {
+			produto.setStatusProduto(Situacao.ATIVO);
 		}
-		return null;
+		produtoRepository.save(produto);
+		return produto.getStatusProduto();
 	}
 
 	@Override
 	@Transactional
 	public Produto atualizarProduto(ProdutoDTO produtoDTO) {
-		verificaSeProdutoExiste(produtoDTO.getId());
-		validarEstoqueParaAtualizar(produtoDTO);
 		Produto produto = mapper.map(produtoDTO, Produto.class);
+		validarEstoqueParaAtualizar(produtoDTO);
 
-		Optional<Estoque> estoqueOptional = estoqueService.buscarEstoquePorId(produtoDTO.getIdEstoque());
-		if (estoqueOptional.isPresent()) {
-			produto.setEstoque(estoqueOptional.get());
-		}
+		LocalDateTime dateTime = buscarProdutoPorId(produtoDTO.getId()).getDataHoraCadastro();
+		produto.setDataHoraCadastro(dateTime);
 
-		Optional<Fornecedor> fornecedorOptional = fornecedorService
-				.buscarFornecedorPorCNPJ(produtoDTO.getCnpjFornecedor());
-		if (fornecedorOptional.isPresent()) {
-			produto.setFornecedor(fornecedorOptional.get());
-		}
+		Estoque estoque = estoqueService.buscarEstoquePorId(produtoDTO.getIdEstoque());
+		produto.setEstoque(estoque);
+
+		Fornecedor fornecedor = fornecedorService.buscarFornecedorPorCNPJ(produtoDTO.getCnpjFornecedor());
+		produto.setFornecedor(fornecedor);
 
 		return produtoRepository.save(produto);
 	}
@@ -129,12 +119,8 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	@Transactional
 	public BigDecimal calcularLucroProduto(Integer idProduto) {
-		Optional<Produto> produtoOptional = buscarProdutoPorId(idProduto);
-		if (produtoOptional.isPresent()) {
-			Produto produto = produtoOptional.get();
-			return produto.getPrecoVenda().subtract(produto.getPrecoCusto());
-		}
-		return null;
+		Produto produto = buscarProdutoPorId(idProduto);
+		return produto.getPrecoVenda().subtract(produto.getPrecoCusto());
 	}
 
 	public void validarEstoqueParaAtualizar(ProdutoDTO produtoDTO) {
@@ -153,7 +139,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 	@Override
 	public void verificaSeProdutoExiste(Integer id) {
 		if (!produtoRepository.existsById(id)) {
-			throw new ObjetoNaoEncontradoException("Produto não encontrado para o Id informado.");
+			throw new ObjetoNaoEncontradoException(PRODUTO_NAO_ENCONTRADO);
 		}
 	}
 

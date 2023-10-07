@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProdutoPedidoDTO {
+public class ProdutoVendaDTO {
 
     private Integer id;
 
-    @NotNull(message = "O Id do Pedido não pode ser nulo.")
-    private Integer idPedido;
+    @NotNull(message = "O Id da Venda não pode ser nulo.")
+    private Integer idVenda;
 
     @NotNull(message = "O Id do Produto não pode ser nulo.")
     private Integer idProduto;

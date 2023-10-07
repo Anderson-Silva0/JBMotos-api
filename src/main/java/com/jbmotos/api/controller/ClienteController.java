@@ -55,7 +55,7 @@ public class ClienteController {
     @GetMapping("/buscar/{cpf}")
     public ResponseEntity<ClienteDTO> buscarPorCpf(@PathVariable("cpf") String cpf) {
         return ResponseEntity.ok().body(
-                mapper.map(clienteService.buscarClientePorCPF(cpf).get(), ClienteDTO.class));
+                mapper.map(clienteService.buscarClientePorCPF(cpf), ClienteDTO.class));
     }
 
     @GetMapping("/filtrar")

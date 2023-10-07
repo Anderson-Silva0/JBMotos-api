@@ -1,7 +1,6 @@
 package com.jbmotos.services.impl;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,8 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 
 @Service
 public class EnderecoServiceImpl implements EnderecoService {
+
+	private final String ENDERECO_NAO_ENCONTRADO = "Endereço não encontrado para o Id informado.";
 
     private final String ERRO_DELETAR_ENDERECO = "Erro ao tentar deletar, o Endereço pertence a um";
 
@@ -54,44 +55,44 @@ public class EnderecoServiceImpl implements EnderecoService {
         return enderecoRepository.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Endereco> buscarEnderecoPorId(Integer id) {
-        validarEndereco(id);
-        return enderecoRepository.findById(id);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Endereco buscarEnderecoPorId(Integer id) {
+		return enderecoRepository.findById(id)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(ENDERECO_NAO_ENCONTRADO));
+	}
 
-    @Override
-    @Transactional
-    public Endereco atualizarEndereco(EnderecoDTO enderecoDTO) {
-        validarEndereco(enderecoDTO.getId());
-        return enderecoRepository.save(mapper.map(enderecoDTO, Endereco.class));
-    }
+	@Override
+	@Transactional
+	public Endereco atualizarEndereco(EnderecoDTO enderecoDTO) {
+		validarEndereco(enderecoDTO.getId());
+		return enderecoRepository.save(mapper.map(enderecoDTO, Endereco.class));
+	}
 
-    @Override
-    @Transactional
-    public void deletarEnderecoPorId(Integer id) {
-        validarEndereco(id);
-        verificarUsoEndereco(id);
-        enderecoRepository.deleteById(id);
-    }
+	@Override
+	@Transactional
+	public void deletarEnderecoPorId(Integer id) {
+		validarEndereco(id);
+		verificarUsoEndereco(id);
+		enderecoRepository.deleteById(id);
+	}
 
-    @Override
-    public void validarEndereco(Integer id) {
-        if(!enderecoRepository.existsById(id)) {
-            throw new ObjetoNaoEncontradoException("Endereço não encontrado para o Id informado.");
-        }
-    }
+	@Override
+	public void validarEndereco(Integer id) {
+		if (!enderecoRepository.existsById(id)) {
+			throw new ObjetoNaoEncontradoException(ENDERECO_NAO_ENCONTRADO);
+		}
+	}
 
-    private void verificarUsoEndereco(Integer idEndereco) {
-        if (clienteService.existeClientePorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO+" Cliente.");
-        }
-        if (funcionarioService.existeFuncionarioPorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO+" Funcionário.");
-        }
-        if (fornecedorService.existeFornecedorPorIdEndereco(idEndereco)) {
-            throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO+" Fornecedor.");
-        }
-    }
+	private void verificarUsoEndereco(Integer idEndereco) {
+		if (clienteService.existeClientePorIdEndereco(idEndereco)) {
+			throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO + " Cliente.");
+		}
+		if (funcionarioService.existeFuncionarioPorIdEndereco(idEndereco)) {
+			throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO + " Funcionário.");
+		}
+		if (fornecedorService.existeFornecedorPorIdEndereco(idEndereco)) {
+			throw new RegraDeNegocioException(ERRO_DELETAR_ENDERECO + " Fornecedor.");
+		}
+	}
 }

@@ -58,7 +58,7 @@ public class Cliente {
     private Endereco endereco;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
-    private List<Pedido> pedidos;
+    private List<Venda> vendas;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Moto> motos;

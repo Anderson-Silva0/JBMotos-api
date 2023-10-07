@@ -1,7 +1,6 @@
 package com.jbmotos.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.FuncionarioDTO;
 import com.jbmotos.model.entity.Funcionario;
@@ -13,7 +12,7 @@ public interface FuncionarioService {
 
     List<Funcionario> buscarTodosFuncionarios();
 
-    Optional<Funcionario> buscarFuncionarioPorCPF(String cpf);
+    Funcionario buscarFuncionarioPorCPF(String cpf);
 
     List<Funcionario> filtrarFuncionario(FuncionarioDTO funcionarioDTO);
 
@@ -27,7 +26,7 @@ public interface FuncionarioService {
 
     List<Funcionario> filtrarFuncionariosPorCpfDiferente(FuncionarioDTO funcionarioDTO);
 
-    void checarCpfFuncionarioExistente(String cpf);
-
     boolean existeFuncionarioPorIdEndereco(Integer idEndereco);
+
+    void checarCpfFuncionarioExistente(String cpfFuncionario);
 }

@@ -1,7 +1,6 @@
 package com.jbmotos.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.ServicoDTO;
 import com.jbmotos.model.entity.Servico;
@@ -12,9 +11,9 @@ public interface ServicoService {
 
     List<Servico> buscarTodosServicos();
 
-    Optional<Servico> buscarServicoPorId(Integer idServico);
+    Servico buscarServicoPorId(Integer idServico);
 
-    Optional<Servico> buscarServicoPorIdPedido(Integer idPedido);
+    Servico buscarServicoPorIdVenda(Integer idVenda);
 
     List<Servico> buscarServicosPorCpfFuncionario(String cpfFuncionario);
 
@@ -22,7 +21,7 @@ public interface ServicoService {
 
     void deletarServico(Integer idServico);
 
-    void verificarSePedidoPertenceAoServico(Integer idPedido);
+    void verificarSeVendaPertenceAoServico(Integer idVenda);
 
     void validarServico(Integer idServico);
 }

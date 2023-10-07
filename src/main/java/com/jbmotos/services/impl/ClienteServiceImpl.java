@@ -2,7 +2,6 @@ package com.jbmotos.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 @Service
 public class ClienteServiceImpl implements ClienteService {
 
+	private final String CLIENTE_NAO_ENCONTRADO = "Cliente não encrontrado para o CPF informado.";
+
     private final String ERRO_SALVAR_CLIENTE = "Erro ao tentar salvar Cliente";
 
     private final String ERRO_ATUALIZAR_CLIENTE = "Erro ao tentar atualizar Cliente";
@@ -37,22 +38,20 @@ public class ClienteServiceImpl implements ClienteService {
     @Autowired
     private ModelMapper mapper;
 
-    @Override
-    @Transactional
-    public Cliente salvarCliente(ClienteDTO clienteDTO) {
-        validarCpfClienteParaSalvar(clienteDTO.getCpf());
-        validarEmailParaSalvar(clienteDTO.getEmail());
-        Cliente cliente = mapper.map(clienteDTO, Cliente.class);
-        cliente.setDataHoraCadastro(LocalDateTime.now());
-        cliente.setStatusCliente(Situacao.ATIVO);
+	@Override
+	@Transactional
+	public Cliente salvarCliente(ClienteDTO clienteDTO) {
+		validarCpfClienteParaSalvar(clienteDTO.getCpf());
+		validarEmailParaSalvar(clienteDTO.getEmail());
+		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
+		cliente.setDataHoraCadastro(LocalDateTime.now());
+		cliente.setStatusCliente(Situacao.ATIVO);
 
-        Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
-        if (enderecoOptional.isPresent()) {
-            cliente.setEndereco(enderecoOptional.get());
-		}
+		Endereco endereco = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
+		cliente.setEndereco(endereco);
 
-        return clienteRepository.save(cliente);
-    }
+		return clienteRepository.save(cliente);
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -60,12 +59,12 @@ public class ClienteServiceImpl implements ClienteService {
         return clienteRepository.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Cliente> buscarClientePorCPF(String cpf) {
-        checarCpfClienteExistente(cpf);
-        return clienteRepository.findClienteByCpf(cpf);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Cliente buscarClientePorCPF(String cpf) {
+		return clienteRepository.findClienteByCpf(cpf)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(CLIENTE_NAO_ENCONTRADO));
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -80,46 +79,45 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@Transactional
 	public Situacao alternarStatusCliente(String cpf) {
-		Optional<Cliente> clienteOptional = buscarClientePorCPF(cpf);
-		if (clienteOptional.isPresent()) {
-			if (clienteOptional.get().getStatusCliente().equals(Situacao.ATIVO)) {
-				clienteOptional.get().setStatusCliente(Situacao.INATIVO);
-			} else if (clienteOptional.get().getStatusCliente().equals(Situacao.INATIVO)) {
-				clienteOptional.get().setStatusCliente(Situacao.ATIVO);
-			}
-			clienteRepository.save(clienteOptional.get());
-			return clienteOptional.get().getStatusCliente();
+		Cliente cliente = buscarClientePorCPF(cpf);
+		if (cliente.getStatusCliente().equals(Situacao.ATIVO)) {
+			cliente.setStatusCliente(Situacao.INATIVO);
+		} else if (cliente.getStatusCliente().equals(Situacao.INATIVO)) {
+			cliente.setStatusCliente(Situacao.ATIVO);
 		}
-		return null;
+		clienteRepository.save(cliente);
+		return cliente.getStatusCliente();
 	}
 
-    @Override
-    @Transactional
+	@Override
+	@Transactional
 	public Cliente atualizarCliente(ClienteDTO clienteDTO) {
 		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
 
-		Optional<Cliente> clienteOptional = buscarClientePorCPF(clienteDTO.getCpf());
-		if (clienteOptional.isPresent()) {
-			LocalDateTime dateTime = clienteOptional.get().getDataHoraCadastro();
-			cliente.setDataHoraCadastro(dateTime);
-		}
+		LocalDateTime dateTime = buscarClientePorCPF(clienteDTO.getCpf()).getDataHoraCadastro();
+		cliente.setDataHoraCadastro(dateTime);
 
 		validarEmailParaAtualizar(clienteDTO);
 
-		Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
-		if (enderecoOptional.isPresent()) {
-			cliente.setEndereco(enderecoOptional.get());
-		}
+		Endereco endereco = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
+		cliente.setEndereco(endereco);
 
 		return clienteRepository.save(cliente);
 	}
 
-    @Override
-    @Transactional
-    public void deletarCliente(String cpf) {
-        checarCpfClienteExistente(cpf);
-        clienteRepository.deleteClienteByCpf(cpf);
-    }
+	@Override
+	@Transactional
+	public void deletarCliente(String cpf) {
+		checarCpfClienteExistente(cpf);
+		clienteRepository.deleteClienteByCpf(cpf);
+	}
+
+	@Override
+	public void checarCpfClienteExistente(String cpf) {
+		if (!clienteRepository.existsClienteByCpf(cpf)) {
+			throw new ObjetoNaoEncontradoException(CLIENTE_NAO_ENCONTRADO);
+		}
+	}
 
     @Override
     public void validarEmailParaSalvar(String email) {
@@ -146,13 +144,6 @@ public class ClienteServiceImpl implements ClienteService {
 
     private List<Cliente> filtrarClientesPorCpfDiferente(ClienteDTO clienteDTO) {
         return clienteRepository.findByCpfNot(clienteDTO.getCpf());
-    }
-
-    @Override
-    public void checarCpfClienteExistente(String cpf){
-        if (!clienteRepository.existsClienteByCpf(cpf)) {
-            throw new ObjetoNaoEncontradoException("Cliente não encrontrado para o CPF informado.");
-        }
     }
 
     @Override

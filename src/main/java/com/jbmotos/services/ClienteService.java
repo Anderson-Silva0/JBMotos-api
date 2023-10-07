@@ -1,7 +1,6 @@
 package com.jbmotos.services;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.ClienteDTO;
 import com.jbmotos.model.entity.Cliente;
@@ -13,7 +12,7 @@ public interface ClienteService {
 
     List<Cliente> buscarTodosClientes();
 
-    Optional<Cliente> buscarClientePorCPF(String cpf);
+    Cliente buscarClientePorCPF(String cpf);
 
     List<Cliente> filtrarCliente(ClienteDTO clienteDTO);
 
@@ -29,7 +28,7 @@ public interface ClienteService {
 
     void validarEmailParaAtualizar(ClienteDTO clienteDTO);
 
-    void checarCpfClienteExistente(String cpf);
-
     boolean existeClientePorIdEndereco(Integer idEndereco);
+
+	void checarCpfClienteExistente(String cpf);
 }

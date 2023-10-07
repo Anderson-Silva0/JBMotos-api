@@ -16,21 +16,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "produto_pedido", schema = "jbmotos")
+@Table(name = "produto_venda", schema = "jbmotos")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-public class ProdutoPedido {
+public class ProdutoVenda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_pedido")
-    private Pedido pedido;
+    @JoinColumn(name = "id_venda")
+    private Venda venda;
 
     @ManyToOne
     @JoinColumn(name = "id_produto")

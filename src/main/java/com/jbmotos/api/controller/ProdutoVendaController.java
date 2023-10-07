@@ -22,70 +22,70 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.jbmotos.api.dto.ProdutoPedidoDTO;
-import com.jbmotos.model.entity.ProdutoPedido;
-import com.jbmotos.services.ProdutoPedidoService;
+import com.jbmotos.api.dto.ProdutoVendaDTO;
+import com.jbmotos.model.entity.ProdutoVenda;
+import com.jbmotos.services.ProdutoVendaService;
 
 @RestController
-@RequestMapping("/api/produtopedido")
+@RequestMapping("/api/produtovenda")
 @Validated
-public class ProdutoPedidoController {
+public class ProdutoVendaController {
 
     @Autowired
-    private ProdutoPedidoService produtoPedidoService;
+    private ProdutoVendaService produtoVendaService;
 
     @Autowired
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<ProdutoPedidoDTO> salvar(@Valid @RequestBody ProdutoPedidoDTO produtoPedidoDTO){
-        ProdutoPedido produtoPedido = produtoPedidoService.salvarProdutoPedido(produtoPedidoDTO);
+    public ResponseEntity<ProdutoVendaDTO> salvar(@Valid @RequestBody ProdutoVendaDTO produtoVendaDTO){
+        ProdutoVenda produtoVenda = produtoVendaService.salvarProdutoVenda(produtoVendaDTO);
         URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequest().buildAndExpand(produtoPedido).toUri();
-        return ResponseEntity.created(uri).body(mapper.map(produtoPedido, ProdutoPedidoDTO.class));
+                .fromCurrentRequest().buildAndExpand(produtoVenda).toUri();
+        return ResponseEntity.created(uri).body(mapper.map(produtoVenda, ProdutoVendaDTO.class));
     }
 
     @GetMapping("/buscar-todos")
-    public ResponseEntity<List<ProdutoPedidoDTO>> buscarTodos(){
+    public ResponseEntity<List<ProdutoVendaDTO>> buscarTodos(){
         return ResponseEntity.ok().body(
-                produtoPedidoService.buscarTodosProdutoPedido().stream().map(produtoPedido ->
-                        mapper.map(produtoPedido, ProdutoPedidoDTO.class)
+                produtoVendaService.buscarTodosProdutoVenda().stream().map(produtoVenda ->
+                        mapper.map(produtoVenda, ProdutoVendaDTO.class)
                 ).collect(Collectors.toList()));
     }
 
     @GetMapping("/buscar/{id}")
-    public ResponseEntity<ProdutoPedidoDTO> buscarPorId(@PathVariable("id") Integer id){
-        return ResponseEntity.ok().body(mapper.map(produtoPedidoService.
-                buscarProdutoPedidoPorId(id), ProdutoPedidoDTO.class));
+    public ResponseEntity<ProdutoVendaDTO> buscarPorId(@PathVariable("id") Integer id){
+        return ResponseEntity.ok().body(mapper.map(produtoVendaService.
+                buscarProdutoVendaPorId(id), ProdutoVendaDTO.class));
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<ProdutoPedidoDTO> atualizar(@PathVariable("id") Integer id,
-                                                      @RequestParam Integer idPedido,
+    public ResponseEntity<ProdutoVendaDTO> atualizar(@PathVariable("id") Integer id,
+                                                      @RequestParam Integer idVenda,
                                                                     Integer idProduto,
         @Positive(message = "A quantidade deve ser maior que zero") Integer quantidade) {
-        ProdutoPedidoDTO produtoPedidoDTO = ProdutoPedidoDTO.builder()
+        ProdutoVendaDTO produtoVendaDTO = ProdutoVendaDTO.builder()
                 .id(id)
-                .idPedido(idPedido)
+                .idVenda(idVenda)
                 .idProduto(idProduto)
                 .quantidade(quantidade)
                 .build();
         return ResponseEntity.ok().body(
-                mapper.map(produtoPedidoService.atualizarProdutoPedido(produtoPedidoDTO), ProdutoPedidoDTO.class)
+                mapper.map(produtoVendaService.atualizarProdutoVenda(produtoVendaDTO), ProdutoVendaDTO.class)
         );
     }
 
     @DeleteMapping("/deletar/{id}")
     public ResponseEntity<?> deletar(@PathVariable("id") Integer id){
-        produtoPedidoService.deletarProdutoPedidoPorId(id);
+        produtoVendaService.deletarProdutoVendaPorId(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/produtos-pedido/{idPedido}")
-    public ResponseEntity<List<ProdutoPedidoDTO>> buscarTodosPorIdPedido(@PathVariable("idPedido") Integer idPedido){
+    @GetMapping("/produtos-venda/{idVenda}")
+    public ResponseEntity<List<ProdutoVendaDTO>> buscarTodosPorIdVenda(@PathVariable("idVenda") Integer idVenda){
         return ResponseEntity.ok().body(
-                produtoPedidoService.buscarProdutoPedidoPorIdPedido(idPedido).stream().map(pedido ->
-                        mapper.map(pedido, ProdutoPedidoDTO.class)
+                produtoVendaService.buscarProdutoVendaPorIdVenda(idVenda).stream().map(venda ->
+                        mapper.map(venda, ProdutoVendaDTO.class)
                 ).collect(Collectors.toList()));
     }
 }

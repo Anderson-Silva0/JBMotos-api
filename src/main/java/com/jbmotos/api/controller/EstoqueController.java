@@ -77,7 +77,7 @@ public class EstoqueController {
         return ResponseEntity.ok().body("A quantidade de "+quantidade+" foi adicionada ao estoque. O estoque atual " +
                 "é de "+qtdProdutoEstoque);
     }
-    
+
     @GetMapping("/valorTotalCusto")
     public ResponseEntity<BigDecimal> valorTotalCustoEstoque() {
         return ResponseEntity.ok().body(estoqueService.calcularCustoTotalEstoque());

@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jbmotos.model.entity.ProdutoPedido;
+import com.jbmotos.model.entity.ProdutoVenda;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PedidoDTO {
+public class VendaDTO {
 
     private Integer id;
 
@@ -46,5 +46,5 @@ public class PedidoDTO {
     private LocalDateTime dataHoraCadastro;
 
     @JsonIgnore
-    private List<ProdutoPedido> produtosPedidos;
+    private List<ProdutoVenda> produtosVendas;
 }

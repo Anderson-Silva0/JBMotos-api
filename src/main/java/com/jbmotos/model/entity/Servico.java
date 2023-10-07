@@ -44,8 +44,8 @@ public class Servico {
     private Moto moto;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_pedido", referencedColumnName = "id")
-    private Pedido pedido;
+    @JoinColumn(name = "id_venda", referencedColumnName = "id")
+    private Venda venda;
 
     @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)

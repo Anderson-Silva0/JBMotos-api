@@ -2,7 +2,6 @@ package com.jbmotos.services.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import com.jbmotos.services.exception.RegraDeNegocioException;
 @Service
 public class FuncionarioServiceImpl implements FuncionarioService {
 
+	private final String FUNCIONARIO_NAO_ENCONTRADO = "Funcionário não encrontrado para o CPF informado.";
+
     private final String ERRO_SALVAR_FUNCIONARIO = "Erro ao tentar salvar Funcionário";
 
     @Autowired
@@ -43,10 +44,9 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 		funcionario.setStatusFuncionario(Situacao.ATIVO);
 		funcionario.setDataHoraCadastro(LocalDateTime.now());
 
-		Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
-		if (enderecoOptional.isPresent()) {
-			funcionario.setEndereco(enderecoOptional.get());
-		}
+		Endereco endereco = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
+		funcionario.setEndereco(endereco);
+
 		return funcionarioRepository.save(funcionario);
 	}
 
@@ -56,12 +56,12 @@ public class FuncionarioServiceImpl implements FuncionarioService {
         return funcionarioRepository.findAll();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Funcionario> buscarFuncionarioPorCPF(String cpf) {
-        checarCpfFuncionarioExistente(cpf);
-        return funcionarioRepository.findFuncionarioByCpf(cpf);
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public Funcionario buscarFuncionarioPorCPF(String cpf) {
+		return funcionarioRepository.findFuncionarioByCpf(cpf)
+				.orElseThrow(() -> new ObjetoNaoEncontradoException(FUNCIONARIO_NAO_ENCONTRADO));
+	}
 
     @Override
     @Transactional(readOnly = true)
@@ -76,43 +76,43 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 	@Override
 	@Transactional
 	public Situacao alternarStatusFuncionario(String cpf) {
-		Optional<Funcionario> funcionarioOptional = buscarFuncionarioPorCPF(cpf);
-		if (funcionarioOptional.isPresent()) {
-			if (funcionarioOptional.get().getStatusFuncionario().equals(Situacao.ATIVO)) {
-				funcionarioOptional.get().setStatusFuncionario(Situacao.INATIVO);
-			} else if (funcionarioOptional.get().getStatusFuncionario().equals(Situacao.INATIVO)) {
-				funcionarioOptional.get().setStatusFuncionario(Situacao.ATIVO);
-			}
-			funcionarioRepository.save(funcionarioOptional.get());
-			return funcionarioOptional.get().getStatusFuncionario();
+		Funcionario funcionario = buscarFuncionarioPorCPF(cpf);
+		if (funcionario.getStatusFuncionario().equals(Situacao.ATIVO)) {
+			funcionario.setStatusFuncionario(Situacao.INATIVO);
+		} else if (funcionario.getStatusFuncionario().equals(Situacao.INATIVO)) {
+			funcionario.setStatusFuncionario(Situacao.ATIVO);
 		}
-		return null;
+		funcionarioRepository.save(funcionario);
+		return funcionario.getStatusFuncionario();
 	}
 
 	@Override
 	@Transactional
 	public Funcionario atualizarFuncionario(FuncionarioDTO funcionarioDTO) {
-		Optional<Funcionario> funcionarioOptional = buscarFuncionarioPorCPF(funcionarioDTO.getCpf());
-		if (funcionarioOptional.isPresent()) {
-			LocalDateTime dateTime = funcionarioOptional.get().getDataHoraCadastro();
-			Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
-			funcionario.setDataHoraCadastro(dateTime);
+		Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
 
-			Optional<Endereco> enderecoOptional = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
-			if (enderecoOptional.isPresent()) {
-				funcionario.setEndereco(enderecoOptional.get());
-			}
-			return funcionarioRepository.save(funcionario);
-		}
-		return null;
+		LocalDateTime dateTime = buscarFuncionarioPorCPF(funcionarioDTO.getCpf()).getDataHoraCadastro();
+		funcionario.setDataHoraCadastro(dateTime);
+
+		Endereco endereco = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
+		funcionario.setEndereco(endereco);
+
+		return funcionarioRepository.save(funcionario);
 	}
 
-    @Override
-    @Transactional
-    public void deletarFuncionario(String cpf) {
-        checarCpfFuncionarioExistente(cpf);
-        funcionarioRepository.deleteFuncionarioByCpf(cpf);
-    }
+	@Override
+	@Transactional
+	public void deletarFuncionario(String cpf) {
+		checarCpfFuncionarioExistente(cpf);
+		funcionarioRepository.deleteFuncionarioByCpf(cpf);
+	}
+
+	@Override
+	public void checarCpfFuncionarioExistente(String cpf) {
+		if (!funcionarioRepository.existsFuncionarioByCpf(cpf)) {
+			throw new ObjetoNaoEncontradoException(FUNCIONARIO_NAO_ENCONTRADO);
+		}
+	}
 
     @Override
     public void validarCpfFuncionarioParaSalvar(String cpf) {
@@ -124,13 +124,6 @@ public class FuncionarioServiceImpl implements FuncionarioService {
     @Override
     public List<Funcionario> filtrarFuncionariosPorCpfDiferente(FuncionarioDTO funcionarioDTO) {
         return funcionarioRepository.findByCpfNot(funcionarioDTO.getCpf());
-    }
-
-    @Override
-    public void checarCpfFuncionarioExistente(String cpf) {
-        if (!funcionarioRepository.existsFuncionarioByCpf(cpf)) {
-            throw new ObjetoNaoEncontradoException("Funcionário não encrontrado para o CPF informado.");
-        }
     }
 
     @Override

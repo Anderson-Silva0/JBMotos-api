@@ -55,7 +55,7 @@ public class Funcionario {
     private Endereco endereco;
 
     @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
-    private List<Pedido> pedidos;
+    private List<Venda> vendas;
 
     @OneToMany(mappedBy = "funcionario", cascade = CascadeType.ALL)
     private List<Servico> servicos;

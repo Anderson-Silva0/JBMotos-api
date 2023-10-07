@@ -53,9 +53,9 @@ public class ServicoController {
         return ResponseEntity.ok().body(mapper.map(servicoService.buscarServicoPorId(idServico), ServicoDTO.class));
     }
 
-    @GetMapping("/buscar-por-pedido/{idPedido}")
-    public ResponseEntity<ServicoDTO> buscarPorIdPedido(@PathVariable("idPedido") Integer idPedido) {
-        return ResponseEntity.ok(mapper.map(servicoService.buscarServicoPorIdPedido(idPedido), ServicoDTO.class));
+    @GetMapping("/buscar-por-venda/{idVenda}")
+    public ResponseEntity<ServicoDTO> buscarPorIdVenda(@PathVariable("idVenda") Integer idVenda) {
+        return ResponseEntity.ok(mapper.map(servicoService.buscarServicoPorIdVenda(idVenda), ServicoDTO.class));
     }
 
     @GetMapping("/buscar-por-cpfFuncionario/{cpfFuncionario}")

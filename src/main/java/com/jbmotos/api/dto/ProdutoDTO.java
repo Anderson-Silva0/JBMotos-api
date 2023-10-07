@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jbmotos.model.entity.ProdutoPedido;
+import com.jbmotos.model.entity.ProdutoVenda;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,5 +55,5 @@ public class ProdutoDTO {
     private LocalDateTime dataHoraCadastro;
 
     @JsonIgnore
-    private List<ProdutoPedido> produtosPedido;
+    private List<ProdutoVenda> produtosPedido;
 }

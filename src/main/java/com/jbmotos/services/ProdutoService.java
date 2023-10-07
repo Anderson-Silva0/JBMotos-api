@@ -2,7 +2,6 @@ package com.jbmotos.services;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import com.jbmotos.api.dto.ProdutoDTO;
 import com.jbmotos.model.entity.Produto;
@@ -14,7 +13,7 @@ public interface ProdutoService {
 
     List<Produto> buscarTodosProdutos();
 
-    Optional<Produto> buscarProdutoPorId(Integer id);
+    Produto buscarProdutoPorId(Integer id);
 
     List<Produto> filtrarProduto(ProdutoDTO produtoDTO);
 

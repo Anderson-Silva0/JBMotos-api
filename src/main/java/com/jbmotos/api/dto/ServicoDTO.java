@@ -32,8 +32,8 @@ public class ServicoDTO {
     @NotNull(message = "O Id da Moto não pode ser nulo.")
     private Integer idMoto;
 
-    @NotNull(message = "O Id do Pedido não pode ser nulo.")
-    private Integer idPedido;
+    @NotNull(message = "O Id da Venda não pode ser nulo.")
+    private Integer idVenda;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
