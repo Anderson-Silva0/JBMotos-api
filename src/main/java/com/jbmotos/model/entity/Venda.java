@@ -45,4 +45,7 @@ public class Venda {
 
     @OneToOne(mappedBy = "venda")
     private Servico servico;
+
+    @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
+    private PagamentoCartao pagamentoCartao;
 }
