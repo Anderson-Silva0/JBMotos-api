@@ -1,44 +1,35 @@
 package com.jbmotos.model.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Entity
 @Table(name = "endereco", schema = "jbmotos")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
-@Entity
 public class Endereco {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "rua", length = 100)
+    @Column(length = 100)
     private String rua;
 
-    @Column(name = "cep", length = 9)
+    @Column(length = 9)
     private String cep;
 
-    @Column(name = "numero")
     private Integer numero;
 
-    @Column(name = "bairro", length = 50)
+    @Column(length = 50)
     private String bairro;
 
-    @Column(name = "cidade", length = 50)
+    @Column(length = 50)
     private String cidade;
 
     @OneToOne(mappedBy = "endereco")

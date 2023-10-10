@@ -3,50 +3,37 @@ package com.jbmotos.model.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
+
+import lombok.*;
 
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import com.jbmotos.model.enums.Situacao;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+@Entity
 @Table(name = "fornecedor", schema = "jbmotos")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
-@Entity
 public class Fornecedor {
 
     @Id
-    @Column(name = "cnpj", length = 18)
+    @Column(length = 18, unique = true)
     private String cnpj;
 
-    @Column(name = "nome", length = 50)
+    @Column(length = 50)
     private String nome;
 
-    @Column(name = "telefone", length = 15)
+    @Column(length = 15)
     private String telefone;
 
-    @Column(name = "statusFornecedor")
     @Enumerated(EnumType.STRING)
     private Situacao statusFornecedor;
 
-    @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime dataHoraCadastro;
 

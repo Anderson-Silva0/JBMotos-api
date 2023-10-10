@@ -2,26 +2,18 @@ package com.jbmotos.model.entity;
 
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Entity
 @Table(name = "produto_venda", schema = "jbmotos")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
-@Entity
 public class ProdutoVenda {
 
     @Id
@@ -36,12 +28,9 @@ public class ProdutoVenda {
     @JoinColumn(name = "id_produto")
     private Produto produto;
 
-    @Column(name = "quantidade")
     private Integer quantidade;
 
-    @Column(name = "valor_unidade")
     private BigDecimal valorUnidade;
 
-    @Column(name = "valor_total")
     private BigDecimal valorTotal;
 }

@@ -3,37 +3,24 @@ package com.jbmotos.model.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.*;
+
+import lombok.*;
 
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+@Entity
 @Table(name = "venda", schema = "jbmotos")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 @Builder
-@Entity
 public class Venda {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Integer id;
 
     @ManyToOne
@@ -44,13 +31,12 @@ public class Venda {
     @JoinColumn(name = "cpf_funcionario")
     private Funcionario funcionario;
 
-    @Column(name = "observacao", length = 100)
+    @Column(length = 100)
     private String observacao;
 
-    @Column(name = "forma_de_pagamento", length = 50)
+    @Column(length = 50)
     private String formaDePagamento;
 
-    @Column(name = "data_hora_cadastro")
     @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime dataHoraCadastro;
 
