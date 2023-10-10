@@ -1,19 +1,10 @@
 package com.jbmotos.config;
 
+import com.jbmotos.api.dto.*;
+import com.jbmotos.model.entity.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.jbmotos.api.dto.ClienteDTO;
-import com.jbmotos.api.dto.FornecedorDTO;
-import com.jbmotos.api.dto.FuncionarioDTO;
-import com.jbmotos.api.dto.ProdutoVendaDTO;
-import com.jbmotos.api.dto.VendaDTO;
-import com.jbmotos.model.entity.Cliente;
-import com.jbmotos.model.entity.Fornecedor;
-import com.jbmotos.model.entity.Funcionario;
-import com.jbmotos.model.entity.ProdutoVenda;
-import com.jbmotos.model.entity.Venda;
 
 @Configuration
 public class ModelMapperConfig {
@@ -38,6 +29,10 @@ public class ModelMapperConfig {
         modelMapper.createTypeMap(ProdutoVenda.class, ProdutoVendaDTO.class)
                 .<Integer>addMapping(src -> src.getProduto().getId(), ProdutoVendaDTO::setIdProduto)
                 .<Integer>addMapping(src -> src.getVenda().getId(), ProdutoVendaDTO::setIdVenda);
+
+        modelMapper.createTypeMap(PagamentoCartao.class, PagamentoCartaoDTO.class)
+                .<Integer>addMapping(src -> src.getVenda().getId(), PagamentoCartaoDTO::setIdVenda)
+                .<Integer>addMapping(src -> src.getVenda().getId(), PagamentoCartaoDTO::setIdVenda);
 
         return modelMapper;
     }
