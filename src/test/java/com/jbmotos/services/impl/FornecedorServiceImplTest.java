@@ -23,7 +23,6 @@ import com.jbmotos.model.repositories.FornecedorRepository;
 import com.jbmotos.services.EnderecoService;
 
 @SpringBootTest
-@ActiveProfiles("test")
 class FornecedorServiceImplTest {
 
     @Autowired

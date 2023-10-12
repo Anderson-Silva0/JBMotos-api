@@ -37,7 +37,6 @@ import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.jbmotos.services.exception.RegraDeNegocioException;
 
 @SpringBootTest
-@ActiveProfiles("test")
 class ClienteServiceImplTest {
 
     @Autowired

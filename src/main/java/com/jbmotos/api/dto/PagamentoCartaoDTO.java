@@ -1,6 +1,7 @@
 package com.jbmotos.api.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.*;
@@ -18,10 +19,10 @@ public class PagamentoCartaoDTO {
 
     private Integer id;
 
-    @NotNull(message = "Informe a Quantidade de Parcelas.")
+    @NotBlank(message = "Informe a Quantidade de Parcelas.")
     private String parcela;
 
-    @NotNull(message = "Informe a Bandeira do Cartão.")
+    @NotBlank(message = "Informe a Bandeira do Cartão.")
     private String bandeira;
 
     @NotNull(message = "Informe o Total de Taxas.")
