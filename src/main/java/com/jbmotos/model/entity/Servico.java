@@ -1,13 +1,11 @@
 package com.jbmotos.model.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
-import jakarta.persistence.*;
-
-import lombok.*;
-
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 @Entity
 @Table(name = "servico", schema = "jbmotos")
@@ -35,7 +33,7 @@ public class Servico {
     @JoinColumn(name = "id_venda", referencedColumnName = "id")
     private Venda venda;
 
-    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
     @Column(length = 300)

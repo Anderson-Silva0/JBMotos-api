@@ -44,7 +44,6 @@ public class ClienteServiceImpl implements ClienteService {
 		validarCpfClienteParaSalvar(clienteDTO.getCpf());
 		validarEmailParaSalvar(clienteDTO.getEmail());
 		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
-		cliente.setDataHoraCadastro(LocalDateTime.now());
 		cliente.setStatusCliente(Situacao.ATIVO);
 
 		Endereco endereco = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());

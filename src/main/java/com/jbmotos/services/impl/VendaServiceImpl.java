@@ -52,7 +52,6 @@ public class VendaServiceImpl implements VendaService {
 	@Override
 	@Transactional
 	public Venda salvarVenda(VendaDTO vendaDTO) {
-		vendaDTO.setDataHoraCadastro(LocalDateTime.now());
 		Venda venda = mapper.map(vendaDTO, Venda.class);
 
 		Cliente cliente = clienteService.buscarClientePorCPF(vendaDTO.getCpfCliente());

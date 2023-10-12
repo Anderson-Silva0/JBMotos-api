@@ -42,7 +42,6 @@ public class ServicoServiceImpl implements ServicoService {
 	@Override
 	@Transactional
 	public Servico salvarServico(ServicoDTO servicoDTO) {
-		servicoDTO.setDataHoraCadastro(LocalDateTime.now());
 		validarVendaParaSalvarServico(servicoDTO.getIdVenda());
 		Servico servico = mapper.map(servicoDTO, Servico.class);
 

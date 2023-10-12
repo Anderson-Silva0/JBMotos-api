@@ -42,7 +42,6 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 		validarCpfFuncionarioParaSalvar(funcionarioDTO.getCpf());
 		Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
 		funcionario.setStatusFuncionario(Situacao.ATIVO);
-		funcionario.setDataHoraCadastro(LocalDateTime.now());
 
 		Endereco endereco = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
 		funcionario.setEndereco(endereco);

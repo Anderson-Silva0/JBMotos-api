@@ -42,7 +42,6 @@ public class FornecedorServiceImpl implements FornecedorService {
 		validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
 		Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
 		fornecedor.setStatusFornecedor(Situacao.ATIVO);
-		fornecedor.setDataHoraCadastro(LocalDateTime.now());
 
 		Endereco endereco = enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco());
 		fornecedor.setEndereco(endereco);

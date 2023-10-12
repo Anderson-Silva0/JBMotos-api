@@ -1,16 +1,13 @@
 package com.jbmotos.model.entity;
 
+import com.jbmotos.model.enums.Situacao;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.persistence.*;
-
-import lombok.*;
-
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
-
-import com.jbmotos.model.enums.Situacao;
 
 @Entity
 @Table(name = "produto", schema = "jbmotos")
@@ -39,7 +36,7 @@ public class Produto {
     @Enumerated(EnumType.STRING)
     private Situacao statusProduto;
 
-    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
     @OneToOne(cascade = CascadeType.ALL)

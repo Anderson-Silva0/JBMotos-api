@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.hibernate.annotations.CreationTimestamp;
 
 import com.jbmotos.model.enums.Situacao;
 
@@ -37,7 +37,7 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private Situacao statusCliente;
 
-    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
     @OneToOne(cascade = CascadeType.ALL)

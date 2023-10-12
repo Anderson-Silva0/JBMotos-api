@@ -47,7 +47,6 @@ public class ProdutoServiceImpl implements ProdutoService {
 		estoqueService.verificarUsoEstoque(produtoDTO.getIdEstoque());
 		Produto produto = mapper.map(produtoDTO, Produto.class);
 		produto.setStatusProduto(Situacao.ATIVO);
-		produto.setDataHoraCadastro(LocalDateTime.now());
 
 		Estoque estoque = estoqueService.buscarEstoquePorId(produtoDTO.getIdEstoque());
 		produto.setEstoque(estoque);

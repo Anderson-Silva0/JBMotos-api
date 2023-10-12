@@ -39,7 +39,6 @@ public class MotoServiceImpl implements MotoService {
     @Transactional
     public Moto salvarMoto(MotoDTO motoDTO) {
         Moto moto = mapper.map(motoDTO, Moto.class);
-        moto.setDataHoraCadastro(LocalDateTime.now());
         moto.setPlaca(motoDTO.getPlaca().toUpperCase());
         validarPlacaMotoParaSalvar(motoDTO.getPlaca());
         moto.setStatusMoto(Situacao.ATIVO);

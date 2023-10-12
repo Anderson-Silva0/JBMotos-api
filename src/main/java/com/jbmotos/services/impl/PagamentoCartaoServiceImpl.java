@@ -34,7 +34,6 @@ public class PagamentoCartaoServiceImpl implements PagamentoCartaoService {
     @Transactional
     @Override
     public PagamentoCartao salvarPagamentoCartao(PagamentoCartaoDTO pagamentoCartaoDTO) {
-        //Teste aqui...
         if (repository.existsByVendaId(pagamentoCartaoDTO.getIdVenda())) {
             throw new RegraDeNegocioException("Essa Venda já possui um Pagamento em Cartão de Crédito.");
         }
