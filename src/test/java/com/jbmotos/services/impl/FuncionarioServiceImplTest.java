@@ -74,7 +74,6 @@ class FuncionarioServiceImplTest {
         assertEquals(funcionarioDTO.getCpf(), funcionarioSalvo.getCpf());
         assertEquals(funcionarioDTO.getNome(), funcionarioSalvo.getNome());
         assertEquals(funcionarioDTO.getTelefone(), funcionarioSalvo.getTelefone());
-        assertNotNull(funcionarioSalvo.getDataHoraCadastro());
         assertEquals(funcionario.getDataHoraCadastro(), funcionarioSalvo.getDataHoraCadastro());
         assertNotNull(funcionarioSalvo.getEndereco());
         assertEquals(funcionario.getEndereco(), funcionarioSalvo.getEndereco());

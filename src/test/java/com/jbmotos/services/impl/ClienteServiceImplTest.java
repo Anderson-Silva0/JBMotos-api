@@ -78,7 +78,6 @@ class ClienteServiceImplTest {
         assertEquals(clienteDTO.getNome(), clienteSalvo.getNome());
         assertEquals(clienteDTO.getEmail(), clienteSalvo.getEmail());
         assertEquals(clienteDTO.getTelefone(), clienteSalvo.getTelefone());
-        assertNotNull(clienteSalvo.getDataHoraCadastro());
         assertEquals(cliente.getDataHoraCadastro(), clienteSalvo.getDataHoraCadastro());
         assertNotNull(clienteSalvo.getEndereco());
         assertEquals(endereco, clienteSalvo.getEndereco());

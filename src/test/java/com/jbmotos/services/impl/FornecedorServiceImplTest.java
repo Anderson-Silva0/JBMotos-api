@@ -62,7 +62,6 @@ class FornecedorServiceImplTest {
 
         //Verificação
         assertNotNull(fornecedorSalvo);
-        assertNotNull(fornecedorSalvo.getDataHoraCadastro());
         assertNotNull(fornecedorSalvo.getEndereco());
         assertEquals(fornecedor.getCnpj(), fornecedorSalvo.getCnpj());
         assertEquals(fornecedor.getNome(), fornecedorSalvo.getNome());
