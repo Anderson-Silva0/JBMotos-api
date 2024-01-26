@@ -47,6 +47,13 @@ public class PagamentoCartaoController {
         );
     }
 
+    @GetMapping("/buscar-por-idVenda/{idVenda}")
+    public ResponseEntity<PagamentoCartaoDTO> buscarPorIdVenda(@PathVariable("idVenda") Integer idVenda) {
+        return ResponseEntity.ok().body(
+               mapper.map(service.buscarPagamentoCartaoPorIdVenda(idVenda), PagamentoCartaoDTO.class)
+        );
+    }
+
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<PagamentoCartaoDTO> atualizar(@PathVariable("id") Integer id,
                                                         @Valid @RequestBody PagamentoCartaoDTO pagamentoCartaoDTO) {
