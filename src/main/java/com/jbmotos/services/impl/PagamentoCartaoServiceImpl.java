@@ -57,6 +57,15 @@ public class PagamentoCartaoServiceImpl implements PagamentoCartaoService {
                 .orElseThrow(() -> new ObjetoNaoEncontradoException(PAGAMENTO_CARTAO_NAO_ENCONTRADO));
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public PagamentoCartao buscarPagamentoCartaoPorIdVenda(Integer idVenda) {
+        vendaService.validarVenda(idVenda);
+        return repository.findByVendaId(idVenda)
+                .orElseThrow(() -> new ObjetoNaoEncontradoException("Essa venda não possui registro de pagamento" +
+                        " com cartão de crédito"));
+    }
+
     @Transactional
     @Override
     public PagamentoCartao atualizarPagamentoCartao(PagamentoCartaoDTO pagamentoCartaoDTO) {
