@@ -25,13 +25,9 @@ public class VendaDTO {
     private Integer id;
 
     @NotBlank(message = "O campo CPF do Cliente é obrigatório.")
-    @Length(min = 14, max = 14, message = "O campo CPF do Cliente deve ter 14 caracteres.")
-    @CPF(message = "CPF do Cliente inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfCliente;
 
     @NotBlank(message = "O campo CPF do Funcionário é obrigatório.")
-    @Length(min = 14, max = 14, message = "O campo CPF do Funcionário deve ter 14 caracteres.")
-    @CPF(message = "CPF do Fucionário inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpfFuncionario;
 
     @Length(max = 100, message = "O campo Observação tem no máximo 100 caracteres.")

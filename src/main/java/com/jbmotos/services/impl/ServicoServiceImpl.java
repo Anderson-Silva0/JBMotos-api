@@ -1,6 +1,5 @@
 package com.jbmotos.services.impl;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -42,7 +41,6 @@ public class ServicoServiceImpl implements ServicoService {
 	@Override
 	@Transactional
 	public Servico salvarServico(ServicoDTO servicoDTO) {
-		validarVendaParaSalvarServico(servicoDTO.getIdVenda());
 		Servico servico = mapper.map(servicoDTO, Servico.class);
 
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
@@ -51,8 +49,11 @@ public class ServicoServiceImpl implements ServicoService {
 		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
 		servico.setMoto(moto);
 
-		Venda venda = vendaService.buscarVendaPorId(servicoDTO.getIdVenda());
-		servico.setVenda(venda);
+		if (servicoDTO.getIdVenda() != null) {
+			validarVendaParaSalvarServico(servicoDTO.getIdVenda());
+			Venda venda = vendaService.buscarVendaPorId(servicoDTO.getIdVenda());
+			servico.setVenda(venda);
+		}
 
 		return servicoRepository.save(servico);
 	}
