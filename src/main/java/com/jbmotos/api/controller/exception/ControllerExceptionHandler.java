@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -17,6 +14,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.jbmotos.services.exception.RegraDeNegocioException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -56,6 +56,10 @@ public class ControllerExceptionHandler {
                 .forEach(erro -> {
                     String nomeCampo = ((FieldError) erro).getField();
                     String mensagemErro = erro.getDefaultMessage();
+                    int posicaoPrimeiroPonto = nomeCampo.indexOf(".");
+                    if (posicaoPrimeiroPonto != -1) {
+                        nomeCampo = nomeCampo.substring(posicaoPrimeiroPonto + 1);
+                    }
                     erros.put(nomeCampo, mensagemErro);
                 });
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);

@@ -39,12 +39,13 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 	@Override
 	@Transactional
 	public Funcionario salvarFuncionario(FuncionarioDTO funcionarioDTO) {
+		Endereco enderecoSalvo = enderecoService.salvarEndereco(funcionarioDTO.getEndereco());
+		
 		validarCpfFuncionarioParaSalvar(funcionarioDTO.getCpf());
 		Funcionario funcionario = mapper.map(funcionarioDTO, Funcionario.class);
 		funcionario.setStatusFuncionario(Situacao.ATIVO);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
-		funcionario.setEndereco(endereco);
+		funcionario.setEndereco(enderecoSalvo);
 
 		return funcionarioRepository.save(funcionario);
 	}
@@ -93,7 +94,7 @@ public class FuncionarioServiceImpl implements FuncionarioService {
 		LocalDateTime dateTime = buscarFuncionarioPorCPF(funcionarioDTO.getCpf()).getDataHoraCadastro();
 		funcionario.setDataHoraCadastro(dateTime);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco());
+		Endereco endereco = mapper.map(funcionarioDTO.getEndereco(), Endereco.class);
 		funcionario.setEndereco(endereco);
 
 		return funcionarioRepository.save(funcionario);

@@ -39,12 +39,13 @@ public class FornecedorServiceImpl implements FornecedorService {
 	@Override
 	@Transactional
 	public Fornecedor salvarFornecedor(FornecedorDTO fornecedorDTO) {
+		Endereco enderecoSalvo = enderecoService.salvarEndereco(fornecedorDTO.getEndereco());
+		
 		validarCnpjFornecedorParaSalvar(fornecedorDTO.getCnpj());
 		Fornecedor fornecedor = mapper.map(fornecedorDTO, Fornecedor.class);
 		fornecedor.setStatusFornecedor(Situacao.ATIVO);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco());
-		fornecedor.setEndereco(endereco);
+		fornecedor.setEndereco(enderecoSalvo);
 
 		return fornecedorRepository.save(fornecedor);
 	}
@@ -93,7 +94,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 		LocalDateTime dateTime = buscarFornecedorPorCNPJ(fornecedorDTO.getCnpj()).getDataHoraCadastro();
 		fornecedor.setDataHoraCadastro(dateTime);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco());
+		Endereco endereco = mapper.map(fornecedorDTO.getEndereco(), Endereco.class);
 		fornecedor.setEndereco(endereco);
 
 		return fornecedorRepository.save(fornecedor);

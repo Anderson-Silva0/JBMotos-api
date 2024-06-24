@@ -41,13 +41,14 @@ public class ClienteServiceImpl implements ClienteService {
 	@Override
 	@Transactional
 	public Cliente salvarCliente(ClienteDTO clienteDTO) {
+		Endereco enderecoSalvo = enderecoService.salvarEndereco(clienteDTO.getEndereco());
+		
 		validarCpfClienteParaSalvar(clienteDTO.getCpf());
 		validarEmailParaSalvar(clienteDTO.getEmail());
 		Cliente cliente = mapper.map(clienteDTO, Cliente.class);
 		cliente.setStatusCliente(Situacao.ATIVO);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
-		cliente.setEndereco(endereco);
+		cliente.setEndereco(enderecoSalvo);
 
 		return clienteRepository.save(cliente);
 	}
@@ -98,7 +99,7 @@ public class ClienteServiceImpl implements ClienteService {
 
 		validarEmailParaAtualizar(clienteDTO);
 
-		Endereco endereco = enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco());
+		Endereco endereco = mapper.map(clienteDTO.getEndereco(), Endereco.class);
 		cliente.setEndereco(endereco);
 
 		return clienteRepository.save(cliente);

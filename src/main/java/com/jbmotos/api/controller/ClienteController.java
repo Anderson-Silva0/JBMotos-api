@@ -4,8 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.validation.Valid;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,8 @@ import com.jbmotos.api.dto.ClienteDTO;
 import com.jbmotos.model.entity.Cliente;
 import com.jbmotos.model.enums.Situacao;
 import com.jbmotos.services.ClienteService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/cliente")

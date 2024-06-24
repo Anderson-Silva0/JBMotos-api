@@ -4,8 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.validation.Valid;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +20,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.jbmotos.api.dto.EnderecoDTO;
 import com.jbmotos.model.entity.Endereco;
 import com.jbmotos.services.EnderecoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/endereco")
@@ -40,6 +40,7 @@ public class EnderecoController {
                 .fromCurrentRequest().buildAndExpand( endereco ).toUri();
         return ResponseEntity.created(uri).body(mapper.map(endereco, EnderecoDTO.class));
     }
+    
     @GetMapping("/buscar-todos")
     public ResponseEntity<List<EnderecoDTO>> buscarTodos() {
         return ResponseEntity.ok().body(
@@ -47,6 +48,7 @@ public class EnderecoController {
                         mapper.map(endereco, EnderecoDTO.class)
                 ).collect(Collectors.toList()));
     }
+    
     @GetMapping("/buscar/{id}")
     public ResponseEntity<EnderecoDTO> buscarPorId(@PathVariable("id") Integer id) {
         return ResponseEntity.ok().body(mapper.map(enderecoService.buscarEnderecoPorId(id), EnderecoDTO.class));

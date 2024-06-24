@@ -2,14 +2,19 @@ package com.jbmotos.api.dto;
 
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.*;
-
-import lombok.*;
-
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -36,6 +41,6 @@ public class FuncionarioDTO {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
 
-    @NotNull(message = "O campo Endereço é obrigatório.")
-    private Integer endereco;
+    @Valid
+    private EnderecoDTO endereco;
 }
