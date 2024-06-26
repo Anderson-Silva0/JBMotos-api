@@ -2,16 +2,20 @@ package com.jbmotos.services.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jbmotos.api.dto.PagamentoCartaoDTO;
+import com.jbmotos.api.dto.ProdutoVendaDTO;
 import com.jbmotos.api.dto.VendaDTO;
 import com.jbmotos.model.entity.Cliente;
 import com.jbmotos.model.entity.Funcionario;
@@ -21,6 +25,7 @@ import com.jbmotos.model.entity.Venda;
 import com.jbmotos.model.repositories.VendaRepository;
 import com.jbmotos.services.ClienteService;
 import com.jbmotos.services.FuncionarioService;
+import com.jbmotos.services.PagamentoCartaoService;
 import com.jbmotos.services.ProdutoService;
 import com.jbmotos.services.ProdutoVendaService;
 import com.jbmotos.services.VendaService;
@@ -45,6 +50,10 @@ public class VendaServiceImpl implements VendaService {
 
 	@Autowired
 	private FuncionarioService funcionarioService;
+	
+	@Lazy
+	@Autowired
+	private PagamentoCartaoService pagamentoCartaoService;
 
 	@Autowired
 	private ModelMapper mapper;
@@ -53,14 +62,34 @@ public class VendaServiceImpl implements VendaService {
 	@Transactional
 	public Venda salvarVenda(VendaDTO vendaDTO) {
 		Venda venda = mapper.map(vendaDTO, Venda.class);
-
+		
 		Cliente cliente = clienteService.buscarClientePorCPF(vendaDTO.getCpfCliente());
 		venda.setCliente(cliente);
-
+		
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(vendaDTO.getCpfFuncionario());
 		venda.setFuncionario(funcionario);
+		
+		List<ProdutoVendaDTO> produtosVenda = vendaDTO.getProdutosVenda();
+		
+		venda.setProdutosVenda(new ArrayList<>());
+		venda.setPagamentoCartao(null);
+		Venda vendaSalva = vendaRepository.save(venda);
+		
+		if (produtosVenda != null) {
+			for (ProdutoVendaDTO produtoVenda : produtosVenda) {
+				produtoVenda.setIdVenda(vendaSalva.getId());
+				produtoVendaService.salvarProdutoVenda(produtoVenda);
+			}
+		}
+		
+		if (vendaDTO.getFormaDePagamento().equals("Cartão de Crédito")) {
+			PagamentoCartaoDTO pagamentoCartaoDTO = vendaDTO.getPagamentoCartao();
+			pagamentoCartaoDTO.setIdVenda(vendaSalva.getId());
+			
+			pagamentoCartaoService.salvarPagamentoCartao(pagamentoCartaoDTO);
+		}
 
-		return vendaRepository.save(venda);
+		return venda;
 	}
 
 	@Override

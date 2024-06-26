@@ -1,5 +1,12 @@
 package com.jbmotos.services.impl;
 
+import java.util.List;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.jbmotos.api.dto.PagamentoCartaoDTO;
 import com.jbmotos.model.entity.PagamentoCartao;
 import com.jbmotos.model.repositories.PagamentoCartaoRepository;
@@ -7,15 +14,7 @@ import com.jbmotos.services.PagamentoCartaoService;
 import com.jbmotos.services.VendaService;
 import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.jbmotos.services.exception.RegraDeNegocioException;
-import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-@Log4j2
 @Service
 public class PagamentoCartaoServiceImpl implements PagamentoCartaoService {
 

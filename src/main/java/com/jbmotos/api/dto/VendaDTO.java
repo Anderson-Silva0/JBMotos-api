@@ -6,9 +6,8 @@ import java.util.List;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jbmotos.model.entity.ProdutoVenda;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,10 +38,12 @@ public class VendaDTO {
     @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
     @Length(max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String formaDePagamento;
+    
+    @Valid
+    private PagamentoCartaoDTO pagamentoCartao;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
 
-    @JsonIgnore
-    private List<ProdutoVenda> produtosVendas;
+    private List<ProdutoVendaDTO> produtosVenda;
 }
