@@ -89,7 +89,7 @@ public class VendaServiceImpl implements VendaService {
 			pagamentoCartaoService.salvarPagamentoCartao(pagamentoCartaoDTO);
 		}
 
-		return venda;
+		return vendaSalva;
 	}
 
 	@Override

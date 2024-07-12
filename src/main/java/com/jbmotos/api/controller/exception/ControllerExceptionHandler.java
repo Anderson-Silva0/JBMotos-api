@@ -56,7 +56,7 @@ public class ControllerExceptionHandler {
                 .forEach(erro -> {
                     String nomeCampo = ((FieldError) erro).getField();
                     String mensagemErro = erro.getDefaultMessage();
-                    int posicaoPrimeiroPonto = nomeCampo.indexOf(".");
+                    int posicaoPrimeiroPonto = nomeCampo.lastIndexOf(".");
                     if (posicaoPrimeiroPonto != -1) {
                         nomeCampo = nomeCampo.substring(posicaoPrimeiroPonto + 1);
                     }
@@ -73,7 +73,7 @@ public class ControllerExceptionHandler {
                 .stream()
                 .forEach(erro -> {
                     String nomeMetodoComNomeCampo = erro.getPropertyPath().toString();
-                    int posicaoPrimeiroPonto = nomeMetodoComNomeCampo.indexOf(".");
+                    int posicaoPrimeiroPonto = nomeMetodoComNomeCampo.lastIndexOf(".");
                     String somenteNomeCampo = nomeMetodoComNomeCampo.substring(posicaoPrimeiroPonto + 1);
                     String mensagemErro = erro.getMessage();
                     erros.put(somenteNomeCampo, mensagemErro);

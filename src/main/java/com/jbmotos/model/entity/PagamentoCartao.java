@@ -16,17 +16,17 @@ import java.math.BigDecimal;
 @Builder
 public class PagamentoCartao {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-    private String parcela;
+	private String parcela;
 
-    private String bandeira;
+	private String bandeira;
 
-    private BigDecimal totalTaxas;
+	private BigDecimal totalTaxas;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_venda", referencedColumnName = "id")
-    private Venda venda;
+	@OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
+	@JoinColumn(name = "id_venda", referencedColumnName = "id")
+	private Venda venda;
 }

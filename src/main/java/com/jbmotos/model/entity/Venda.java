@@ -38,12 +38,12 @@ public class Venda {
     @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
-    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "venda", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
     private List<ProdutoVenda> produtosVenda;
 
     @OneToOne(mappedBy = "venda")
     private Servico servico;
 
-    @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "venda", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
     private PagamentoCartao pagamentoCartao;
 }

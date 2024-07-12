@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jbmotos.api.dto.ServicoDTO;
+import com.jbmotos.api.dto.VendaDTO;
 import com.jbmotos.model.entity.Funcionario;
 import com.jbmotos.model.entity.Moto;
 import com.jbmotos.model.entity.Servico;
@@ -34,7 +35,7 @@ public class ServicoServiceImpl implements ServicoService {
 
     @Autowired
     private VendaService vendaService;
-
+    
     @Autowired
     private ModelMapper mapper;
 
@@ -42,6 +43,12 @@ public class ServicoServiceImpl implements ServicoService {
 	@Transactional
 	public Servico salvarServico(ServicoDTO servicoDTO) {
 		Servico servico = mapper.map(servicoDTO, Servico.class);
+		Venda vendaSalva = null;
+		VendaDTO vendaDTO = servicoDTO.getVenda();
+		
+		if (vendaDTO != null) {
+			vendaSalva = vendaService.salvarVenda(vendaDTO);
+		}
 
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
 		servico.setFuncionario(funcionario);
@@ -49,11 +56,7 @@ public class ServicoServiceImpl implements ServicoService {
 		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
 		servico.setMoto(moto);
 
-		if (servicoDTO.getIdVenda() != null) {
-			validarVendaParaSalvarServico(servicoDTO.getIdVenda());
-			Venda venda = vendaService.buscarVendaPorId(servicoDTO.getIdVenda());
-			servico.setVenda(venda);
-		}
+		servico.setVenda(vendaSalva);
 
 		return servicoRepository.save(servico);
 	}
@@ -94,8 +97,6 @@ public class ServicoServiceImpl implements ServicoService {
 		Servico servicoAntigo = buscarServicoPorId(servicoDTO.getId());
 		servicoNovo.setDataHoraCadastro(servicoAntigo.getDataHoraCadastro());
 
-		validarVendaParaAtualizarServico(servicoAntigo, servicoDTO);
-
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
 		servicoNovo.setFuncionario(funcionario);
 
@@ -113,18 +114,6 @@ public class ServicoServiceImpl implements ServicoService {
         validarServico(idServico);
         servicoRepository.deleteById(idServico);
     }
-
-    private void validarVendaParaSalvarServico(Integer idPedido) {
-        if (servicoRepository.existsServicoByVendaId(idPedido)) {
-            throw new RegraDeNegocioException("Erro ao tentar salvar o Serviço, a Venda pertence a outro Serviço.");
-        }
-    }
-
-	private void validarVendaParaAtualizarServico(Servico servicoAntigo, ServicoDTO servicoDTO) {
-		if (!servicoAntigo.getVenda().getId().equals(servicoDTO.getIdVenda())) {
-			throw new RegraDeNegocioException("Erro ao tentar atualizar Serviço, a Venda não pode ser alterada.");
-		}
-	}
 
 	@Override
 	public void verificarSeVendaPertenceAoServico(Integer idVenda) {
