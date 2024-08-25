@@ -12,6 +12,8 @@ public interface ServicoService {
     List<Servico> buscarTodosServicos();
 
     Servico buscarServicoPorId(Integer idServico);
+    
+    List<Servico> filtrarServico(ServicoDTO servicoDTO);
 
     Servico buscarServicoPorIdVenda(Integer idVenda);
 

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +55,7 @@ public class ServicoServiceImpl implements ServicoService {
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
 		servico.setFuncionario(funcionario);
 
-		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+		Moto moto = motoService.buscarMotoPorId(servicoDTO.getMoto().getId());
 		servico.setMoto(moto);
 
 		servico.setVenda(vendaSalva);
@@ -74,6 +76,14 @@ public class ServicoServiceImpl implements ServicoService {
 				.orElseThrow(() -> new ObjetoNaoEncontradoException("Serviço não encontrado para o Id informado."));
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<Servico> filtrarServico(ServicoDTO servicoDTO) {
+		Example<Servico> example = Example.of(mapper.map(servicoDTO, Servico.class),
+				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
+		return servicoRepository.findAll(example);
+	}
+	
 	@Override
 	@Transactional(readOnly = true)
 	public Servico buscarServicoPorIdVenda(Integer idVenda) {
@@ -100,7 +110,7 @@ public class ServicoServiceImpl implements ServicoService {
 		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(servicoDTO.getCpfFuncionario());
 		servicoNovo.setFuncionario(funcionario);
 
-		Moto moto = motoService.buscarMotoPorId(servicoDTO.getIdMoto());
+		Moto moto = motoService.buscarMotoPorId(servicoDTO.getMoto().getId());
 		servicoNovo.setMoto(moto);
 
 		servicoNovo.setVenda(servicoAntigo.getVenda());

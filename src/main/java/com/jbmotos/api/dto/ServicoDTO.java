@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,8 +30,7 @@ public class ServicoDTO {
     @NotBlank(message = "O campo CPF do Funcionário é obrigatório.")
     private String cpfFuncionario;
 
-    @Min(value = 1, message = "Selecione alguma moto")
-    private Integer idMoto;
+    private MotoDTO moto;
 
     @Valid
     private VendaDTO venda;

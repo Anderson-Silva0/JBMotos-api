@@ -4,8 +4,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import jakarta.validation.Valid;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +14,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.jbmotos.api.dto.MotoDTO;
 import com.jbmotos.api.dto.ServicoDTO;
 import com.jbmotos.model.entity.Servico;
 import com.jbmotos.services.ServicoService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/servico")
@@ -51,6 +53,24 @@ public class ServicoController {
     @GetMapping("/buscar/{idServico}")
     public ResponseEntity<ServicoDTO> buscarPorId(@PathVariable("idServico") Integer idServico) {
         return ResponseEntity.ok().body(mapper.map(servicoService.buscarServicoPorId(idServico), ServicoDTO.class));
+    }
+    
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<ServicoDTO>> filtrar(
+            @RequestParam(value = "cpfCliente", required = false) String cpfCliente,
+            @RequestParam(value = "cpfFuncionario", required = false) String cpfFuncionario,
+            @RequestParam(value = "placa", required = false) String placa,
+            @RequestParam(value = "servicosRealizados", required = false) String servicosRealizados
+    ) {
+        ServicoDTO servicoDTO = ServicoDTO.builder()
+        		.moto(MotoDTO.builder().cpfCliente(cpfCliente).placa(placa).build())
+        		.servicosRealizados(servicosRealizados)
+                .cpfFuncionario(cpfFuncionario)
+                .build();
+        return ResponseEntity.ok().body(
+                servicoService.filtrarServico(servicoDTO).stream().map(servico ->
+                        mapper.map(servico, ServicoDTO.class)
+                ).collect(Collectors.toList()));
     }
 
     @GetMapping("/buscar-por-venda/{idVenda}")
