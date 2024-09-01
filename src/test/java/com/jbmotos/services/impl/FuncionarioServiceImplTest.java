@@ -1,30 +1,6 @@
 package com.jbmotos.services.impl;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
-
+import com.jbmotos.api.dto.EnderecoDTO;
 import com.jbmotos.api.dto.FuncionarioDTO;
 import com.jbmotos.model.entity.Endereco;
 import com.jbmotos.model.entity.Funcionario;
@@ -32,6 +8,21 @@ import com.jbmotos.model.repositories.FuncionarioRepository;
 import com.jbmotos.services.EnderecoService;
 import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
 import com.jbmotos.services.exception.RegraDeNegocioException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class FuncionarioServiceImplTest {
@@ -66,7 +57,7 @@ class FuncionarioServiceImplTest {
         when(funcionarioRepository.existsFuncionarioByCpf(funcionarioDTO.getCpf())).thenReturn(false);
         when(mapper.map(funcionarioDTO, Funcionario.class)).thenReturn(funcionario);
         when(funcionarioRepository.save(funcionario)).thenReturn(funcionario);
-        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(endereco);
+        when(enderecoService.salvarEndereco(EnderecoServiceImplTest.getEnderecoDTO())).thenReturn(endereco);
 
         Funcionario funcionarioSalvo = funcionarioService.salvarFuncionario(funcionarioDTO);
 
@@ -79,7 +70,6 @@ class FuncionarioServiceImplTest {
         assertEquals(funcionario.getEndereco(), funcionarioSalvo.getEndereco());
 
         verify(funcionarioRepository, times(1)).existsFuncionarioByCpf(funcionarioDTO.getCpf());
-        verify(enderecoService, times(1)).buscarEnderecoPorId(funcionarioDTO.getEndereco());
         verify(funcionarioRepository, times(1)).save(funcionario);
     }
 
@@ -159,11 +149,11 @@ class FuncionarioServiceImplTest {
                 .nome(funcionarioDTO.getNome())
                 .telefone(funcionarioDTO.getTelefone())
                 .dataHoraCadastro(null)
-                .endereco(null)
+                .endereco(endereco)
                 .build()
         );
 
-        when(enderecoService.buscarEnderecoPorId(funcionarioDTO.getEndereco())).thenReturn(endereco);
+        when(mapper.map(funcionarioDTO.getEndereco(), Endereco.class)).thenReturn(endereco);
         when(funcionarioRepository.save(novoFuncionario)).thenReturn(novoFuncionario);
 
         Funcionario funcionarioAtualizado = funcionarioService.atualizarFuncionario(funcionarioDTO);
@@ -321,7 +311,7 @@ class FuncionarioServiceImplTest {
                 .nome("Jabison Batista")
                 .telefone("(81) 91234-5678")
                 .dataHoraCadastro(null)
-                .endereco(1)
+                .endereco(EnderecoServiceImplTest.getEnderecoDTO())
                 .build();
     }
 }

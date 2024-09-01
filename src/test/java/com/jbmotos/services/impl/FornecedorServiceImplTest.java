@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.jbmotos.api.dto.EnderecoDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,9 @@ class FornecedorServiceImplTest {
         // Cenário
         when(fornecedorRepository.existsFornecedorByCnpj(fornecedorDTO.getCnpj())).thenReturn(false);
         when(mapper.map(fornecedorDTO, Fornecedor.class)).thenReturn(fornecedor);
-        when(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco())).thenReturn(endereco);
+        when(enderecoService.buscarEnderecoPorId(fornecedorDTO.getEndereco().getId())).thenReturn(endereco);
         when(fornecedorRepository.save(any(Fornecedor.class))).thenReturn(fornecedor);
+        when(enderecoService.salvarEndereco(fornecedorDTO.getEndereco())).thenReturn(endereco);
 
         // Execução
         Fornecedor fornecedorSalvo = fornecedorService.salvarFornecedor(fornecedorDTO);
@@ -117,7 +119,7 @@ class FornecedorServiceImplTest {
                 .nome("Maringá")
                 .telefone("(81) 98311-0568")
                 .dataHoraCadastro(null)
-                .endereco(null)
+                .endereco(EnderecoDTO.builder().id(1).build())
                 .build();
     }
 }

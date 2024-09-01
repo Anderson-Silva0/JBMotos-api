@@ -1,24 +1,13 @@
 package com.jbmotos.services.impl;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+import com.jbmotos.api.dto.ClienteDTO;
+import com.jbmotos.api.dto.EnderecoDTO;
+import com.jbmotos.model.entity.Cliente;
+import com.jbmotos.model.entity.Endereco;
+import com.jbmotos.model.repositories.ClienteRepository;
+import com.jbmotos.services.EnderecoService;
+import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
+import com.jbmotos.services.exception.RegraDeNegocioException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,15 +15,15 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.jbmotos.api.dto.ClienteDTO;
-import com.jbmotos.model.entity.Cliente;
-import com.jbmotos.model.entity.Endereco;
-import com.jbmotos.model.repositories.ClienteRepository;
-import com.jbmotos.services.EnderecoService;
-import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.jbmotos.services.exception.RegraDeNegocioException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class ClienteServiceImplTest {
@@ -68,8 +57,8 @@ class ClienteServiceImplTest {
         when(clienteRepository.existsClienteByCpf(clienteDTO.getCpf())).thenReturn(false);
         when(clienteRepository.existsClienteByEmail(clienteDTO.getEmail())).thenReturn(false);
         when(mapper.map(clienteDTO, Cliente.class)).thenReturn(cliente);
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(endereco);
         when(clienteRepository.save(cliente)).thenReturn(cliente);
+        when(enderecoService.salvarEndereco(clienteDTO.getEndereco())).thenReturn(endereco);
 
         Cliente clienteSalvo = clienteService.salvarCliente(clienteDTO);
 
@@ -84,7 +73,6 @@ class ClienteServiceImplTest {
 
         verify(clienteRepository, times(1)).existsClienteByCpf(anyString());
         verify(clienteRepository, times(1)).existsClienteByEmail(anyString());
-        verify(enderecoService, times(1)).buscarEnderecoPorId(anyInt());
         verify(clienteRepository, times(1)).save(cliente);
     }
 
@@ -164,11 +152,11 @@ class ClienteServiceImplTest {
                         .email(clienteDTO.getEmail())
                         .telefone(clienteDTO.getTelefone())
                         .dataHoraCadastro(null)
-                        .endereco(null)
+                        .endereco(endereco)
                         .build()
         );
 
-        when(enderecoService.buscarEnderecoPorId(clienteDTO.getEndereco())).thenReturn(endereco);
+        when(mapper.map(clienteDTO.getEndereco(), Endereco.class)).thenReturn(endereco);
         when(clienteRepository.save(novoCliente)).thenReturn(novoCliente);
 
         Cliente clienteAtualizado = clienteService.atualizarCliente(clienteDTO);
@@ -382,7 +370,7 @@ class ClienteServiceImplTest {
                 .email("anderson@gmail.com")
                 .telefone("(81) 992389161")
                 .dataHoraCadastro(null)
-                .endereco(123)
+                .endereco(EnderecoDTO.builder().id(123).build())
                 .build();
     }
 }
