@@ -21,13 +21,14 @@ public class CredenciaisUsuariosDTO {
     private Long id;
 
     @NotBlank(message = "O campo Login é obrigatório.")
-    @Length(min = 5, max = 50, message = "O campo Login deve ter entre 5 e 50 caracteres.")
+    @Length(min = 4, max = 50, message = "O campo Login deve ter entre 5 e 50 caracteres.")
     private String login;
 
     @NotBlank(message = "O campo Senha é obrigatório.")
     @Length(min = 6, max = 15, message = "O campo Senha deve ter entre 6 e 15 caracteres.")
     private String senha;
 
+    @NotBlank(message = "O campo Permissão é obrigatório.")
     private String role;
 
     @Valid

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.jbmotos.services.exception.AutenticacaoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -79,5 +80,13 @@ public class ControllerExceptionHandler {
                     erros.put(somenteNomeCampo, mensagemErro);
                 });
         return ResponseEntity.badRequest().body(erros);
+    }
+
+    @ExceptionHandler(AutenticacaoException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Map<String, String>> handleAutenticacaoException(AutenticacaoException ex) {
+        Map<String, String> erros = new HashMap<>();
+        erros.put("loginError", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(erros);
     }
 }

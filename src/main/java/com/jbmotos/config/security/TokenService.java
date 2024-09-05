@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 
 @Service
 public class TokenService {
@@ -26,6 +25,8 @@ public class TokenService {
                     .withIssuer("jbmotos-api")
                     .withSubject(credenciaisUsuarios.getLogin())
                     .withExpiresAt(this.generateExpirationDate())
+                    .withClaim("userName", credenciaisUsuarios.getFuncionario().getNome())
+                    .withClaim("role", credenciaisUsuarios.getRole().name())
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {
