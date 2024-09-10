@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: jbmotos-api
+    env: docker
+    plan: free
+    dockerfile: Dockerfile
+    port: 8080
