@@ -25,6 +25,7 @@ public class TokenService {
                     .withIssuer("jbmotos-api")
                     .withSubject(credenciaisUsuarios.getLogin())
                     .withExpiresAt(this.generateExpirationDate())
+                    .withClaim("userCpf", credenciaisUsuarios.getFuncionario().getCpf())
                     .withClaim("userName", credenciaisUsuarios.getFuncionario().getNome())
                     .withClaim("role", credenciaisUsuarios.getRole().name())
                     .sign(algorithm);

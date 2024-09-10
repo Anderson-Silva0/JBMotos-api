@@ -31,7 +31,18 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers("/api/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/funcionario/buscar/{cpf}")
+                        .hasAnyRole(Role.ADMIN.name(), Role.OPERADOR.name())
+
+                        .requestMatchers(
+                                "/api/funcionario/**",
+                                "/api/estoque/valorTotalCusto/",
+                                "/api/estoque/valorTotalVenda/",
+                                "/lucro-venda/"
+                        ).hasRole(Role.ADMIN.name())
+
+                        .requestMatchers("/api/**").hasAnyRole(Role.ADMIN.name(), Role.OPERADOR.name())
                         .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())
