@@ -1,15 +1,12 @@
 package com.jbmotos.model.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.jbmotos.model.enums.Situacao;
 import jakarta.persistence.*;
-
 import lombok.*;
 
-import org.hibernate.annotations.CreationTimestamp;
-
-import com.jbmotos.model.enums.Situacao;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 @Entity
 @Table(name = "cliente", schema = "jbmotos")
@@ -37,7 +34,6 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private Situacao statusCliente;
 
-    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -49,4 +45,9 @@ public class Cliente {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Moto> motos;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataHoraCadastro = LocalDateTime.now(ZoneId.of("America/Recife"));
+    }
 }

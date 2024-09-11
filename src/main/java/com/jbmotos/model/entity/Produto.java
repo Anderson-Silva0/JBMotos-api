@@ -3,10 +3,10 @@ package com.jbmotos.model.entity;
 import com.jbmotos.model.enums.Situacao;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Entity
@@ -36,7 +36,6 @@ public class Produto {
     @Enumerated(EnumType.STRING)
     private Situacao statusProduto;
 
-    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -49,4 +48,9 @@ public class Produto {
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
     private List<ProdutoVenda> produtosVenda;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataHoraCadastro = LocalDateTime.now(ZoneId.of("America/Recife"));
+    }
 }

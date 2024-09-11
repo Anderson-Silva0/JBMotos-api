@@ -2,9 +2,9 @@ package com.jbmotos.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Entity
@@ -35,15 +35,19 @@ public class Venda {
     @Column(length = 50)
     private String formaDePagamento;
 
-    @CreationTimestamp
     private LocalDateTime dataHoraCadastro;
 
-    @OneToMany(mappedBy = "venda", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
+    @OneToMany(mappedBy = "venda", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private List<ProdutoVenda> produtosVenda;
 
     @OneToOne(mappedBy = "venda")
     private Servico servico;
 
-    @OneToOne(mappedBy = "venda", cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
+    @OneToOne(mappedBy = "venda", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private PagamentoCartao pagamentoCartao;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataHoraCadastro = LocalDateTime.now(ZoneId.of("America/Recife"));
+    }
 }
