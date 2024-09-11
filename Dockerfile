@@ -1,8 +1,5 @@
 # Etapa de construção
-FROM openjdk:17-oracle AS build
-
-# Instala Maven
-RUN apt-get update && apt-get install -y maven
+FROM maven:3.9.4-openjdk-17 AS build
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -14,7 +11,7 @@ COPY . .
 RUN mvn clean install -DskipTests
 
 # Etapa de execução
-FROM openjdk:17-oracle
+FROM openjdk:17-jdk-slim
 
 # Define o diretório de trabalho
 WORKDIR /app
