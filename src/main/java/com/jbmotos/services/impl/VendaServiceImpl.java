@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,7 +111,10 @@ public class VendaServiceImpl implements VendaService {
 	public List<Venda> filtrarVenda(VendaDTO vendaDTO) {
 		Example<Venda> example = Example.of(mapper.map(vendaDTO, Venda.class),
 				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
-		return vendaRepository.findAll(example);
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "dataHoraCadastro");
+
+		return vendaRepository.findAll(example, sort);
 	}
 
 	@Override

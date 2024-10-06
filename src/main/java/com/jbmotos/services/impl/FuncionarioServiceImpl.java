@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +71,10 @@ public class FuncionarioServiceImpl implements FuncionarioService {
                 ExampleMatcher.matching()
                         .withIgnoreCase()
                         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
-        return funcionarioRepository.findAll(example);
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "dataHoraCadastro");
+
+        return funcionarioRepository.findAll(example, sort);
     }
 
 	@Override

@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +74,10 @@ public class ClienteServiceImpl implements ClienteService {
                 ExampleMatcher.matching()
                         .withIgnoreCase()
                         .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
-        return clienteRepository.findAll(example);
+
+		Sort sort = Sort.by(Sort.Direction.DESC, "dataHoraCadastro");
+
+        return clienteRepository.findAll(example, sort);
     }
 
 	@Override
