@@ -1,13 +1,5 @@
 package com.jbmotos.api.controller;
 
-import com.jbmotos.api.dto.AuthenticationDTO;
-import com.jbmotos.api.dto.CredenciaisUsuariosDTO;
-import com.jbmotos.api.dto.LoginResponseDTO;
-import com.jbmotos.config.security.TokenService;
-import com.jbmotos.model.entity.CredenciaisUsuarios;
-import com.jbmotos.services.CredenciaisUsuariosService;
-import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +7,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jbmotos.api.dto.AuthenticationDTO;
+import com.jbmotos.api.dto.CredenciaisUsuariosDTO;
+import com.jbmotos.api.dto.LoginResponseDTO;
+import com.jbmotos.config.security.TokenService;
+import com.jbmotos.model.entity.CredenciaisUsuarios;
+import com.jbmotos.services.CredenciaisUsuariosService;
+
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
-
-    @Autowired
-    private ModelMapper mapper;
 
     @Autowired
     private CredenciaisUsuariosService service;
