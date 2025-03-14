@@ -3,6 +3,7 @@ package com.jbmotos.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -45,6 +46,8 @@ public class Venda {
 
     @OneToOne(mappedBy = "venda", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE})
     private PagamentoCartao pagamentoCartao;
+
+    private BigDecimal valorTotalVenda;
 
     @PrePersist
     public void prePersist() {

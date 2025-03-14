@@ -1,5 +1,6 @@
 package com.jbmotos.api.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,11 +27,9 @@ public class VendaDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O campo CPF do Cliente é obrigatório.")
-    private String cpfCliente;
+    private ClienteDTO cliente;
 
-    @NotBlank(message = "O campo CPF do Funcionário é obrigatório.")
-    private String cpfFuncionario;
+    private FuncionarioDTO funcionario;
 
     @Length(max = 100, message = "O campo Observação tem no máximo 100 caracteres.")
     private String observacao;
@@ -44,6 +43,8 @@ public class VendaDTO {
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dataHoraCadastro;
+
+    private BigDecimal valorTotalVenda;
 
     private List<ProdutoVendaDTO> produtosVenda;
 }

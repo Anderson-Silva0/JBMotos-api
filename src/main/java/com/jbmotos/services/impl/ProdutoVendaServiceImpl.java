@@ -3,6 +3,7 @@ package com.jbmotos.services.impl;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.jbmotos.api.dto.ProdutoDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -29,13 +30,13 @@ public class ProdutoVendaServiceImpl implements ProdutoVendaService {
 
 	private final String PRODUTO_VENDA_NAO_ENCONTRADO = "Produto da Venda não encontrado para o Id informado.";
 
-	private final String MSG_ERRO_SALVAR_PRODUTO_VENDA = "Não é possível realizar a Venda pois a "
+	private static final String MSG_ERRO_SALVAR_PRODUTO_VENDA = "Não é possível realizar a Venda pois a "
 			+ "quantidade solicitada do produto é maior do que a quantidade disponível em estoque.";
 
-	private final String MSG_ERRO_ATUALIZAR_PRODUTO_VENDA = "Não é possível Atualizar a Venda pois a "
+	private static final String MSG_ERRO_ATUALIZAR_PRODUTO_VENDA = "Não é possível Atualizar a Venda pois a "
 			+ "quantidade solicitada do Produto é maior do que a quantidade disponível em estoque.";
 
-	private final String MSG_ERRO_ATUALIZAR_NOVO_PRODUTO = "Não é possível Atualizar a Venda pois a quantidade "
+	private static final String MSG_ERRO_ATUALIZAR_NOVO_PRODUTO = "Não é possível Atualizar a Venda pois a quantidade "
 			+ "solicitada do novo Produto é maior do que a quantidade disponível em estoque.";
 
 	@Autowired
@@ -110,7 +111,8 @@ public class ProdutoVendaServiceImpl implements ProdutoVendaService {
 		Venda venda = vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda());
 		produtoVenda.setVenda(venda);
 
-		Produto produto = produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto());
+		ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		Produto produto = produtoService.buscarProdutoPorId(produtoDTO.getId());
 		produtoVenda.setProduto(produto);
 
 		verificarSeProdutoJaExisteNaVendaParaSalvar(produtoVenda);
@@ -131,13 +133,16 @@ public class ProdutoVendaServiceImpl implements ProdutoVendaService {
 
 		verificarSeProdutoJaExisteNaVendaParaAtualizar(produtoVenda, produtoVendaDTO);
 
-		if (!produtoVendaDTO.getIdProduto().equals(produtoVenda.getProduto().getId())) {
+		ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		Integer produtoDtoId = produtoDTO.getId();
+
+		if (!produtoDtoId.equals(produtoVenda.getProduto().getId())) {
 			atualizarVendaComNovoProduto(produtoVenda, produtoVendaDTO);
 		} else {
 			Venda venda = vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda());
 			produtoVenda.setVenda(venda);
 
-			Produto produto = produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto());
+			Produto produto = produtoService.buscarProdutoPorId(produtoDtoId);
 			produtoVenda.setProduto(produto);
 
 			Estoque estoque = produtoVenda.getProduto().getEstoque();
@@ -162,8 +167,10 @@ public class ProdutoVendaServiceImpl implements ProdutoVendaService {
 		estoqueProdutoAntigo.setQuantidade(qtdProdutoVendaAntigo + qtdEstoqueAntigo);
 		estoqueService.atualizarEstoque(mapper.map(estoqueProdutoAntigo, EstoqueDTO.class));
 
+		ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+
 		// Abater a quantidade de estoque do novo produto.
-		Produto novoProduto = produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto());
+		Produto novoProduto = produtoService.buscarProdutoPorId(produtoDTO.getId());
 
 		Estoque estoqueNovoProduto = novoProduto.getEstoque();
 
@@ -233,8 +240,9 @@ public class ProdutoVendaServiceImpl implements ProdutoVendaService {
 	}
 
 	private void verificarSeProdutoJaExisteNaVendaParaAtualizar(ProdutoVenda produtoVenda, ProdutoVendaDTO dto) {
-		filtrarProdutoVendaPorIdDiferente(produtoVenda).stream().forEach(produtoVendaFiltrado -> {
-			if (dto.getIdProduto().equals(produtoVendaFiltrado.getProduto().getId())
+		filtrarProdutoVendaPorIdDiferente(produtoVenda).forEach(produtoVendaFiltrado -> {
+			ProdutoDTO produtoDTO = dto.getProduto();
+			if (produtoDTO.getId().equals(produtoVendaFiltrado.getProduto().getId())
 					&& dto.getIdVenda().equals(produtoVendaFiltrado.getVenda().getId())) {
 				throw new RegraDeNegocioException("Erro ao tentar Atualizar, Produto já adicionado à Venda.");
 			}

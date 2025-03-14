@@ -18,12 +18,7 @@ public class ModelMapperConfig {
     ModelMapper ModelMapper() {
         var modelMapper = new ModelMapper();
 
-        modelMapper.createTypeMap(Venda.class, VendaDTO.class)
-                .<String>addMapping(src -> src.getCliente().getCpf(), VendaDTO::setCpfCliente)
-                .<String>addMapping(src -> src.getFuncionario().getCpf(), VendaDTO::setCpfFuncionario);
-
         modelMapper.createTypeMap(ProdutoVenda.class, ProdutoVendaDTO.class)
-                .<Integer>addMapping(src -> src.getProduto().getId(), ProdutoVendaDTO::setIdProduto)
                 .<Integer>addMapping(src -> src.getVenda().getId(), ProdutoVendaDTO::setIdVenda);
 
         modelMapper.createTypeMap(PagamentoCartao.class, PagamentoCartaoDTO.class)

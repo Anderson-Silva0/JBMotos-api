@@ -5,6 +5,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jbmotos.api.dto.ClienteDTO;
+import com.jbmotos.api.dto.FuncionarioDTO;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -62,9 +64,12 @@ public class VendaController {
             @RequestParam(value = "cpfCliente", required = false) String cpfCliente,
             @RequestParam(value = "cpfFuncionario", required = false) String cpfFuncionario
     ) {
+        ClienteDTO clienteDTO = ClienteDTO.builder().cpf(cpfCliente).build();
+        FuncionarioDTO funcionarioDTO = FuncionarioDTO.builder().cpf(cpfFuncionario).build();
+
         VendaDTO vendaDTO = VendaDTO.builder()
-                .cpfCliente(cpfCliente)
-                .cpfFuncionario(cpfFuncionario)
+                .cliente(clienteDTO)
+                .funcionario(funcionarioDTO)
                 .build();
         return ResponseEntity.ok().body(
                 vendaService.filtrarVenda(vendaDTO).stream().map(venda ->
@@ -88,11 +93,6 @@ public class VendaController {
     @GetMapping("/lucro-venda/{idVenda}")
     public ResponseEntity<BigDecimal> lucroDaVenda(@PathVariable("idVenda") Integer idVenda) {
         return ResponseEntity.ok().body(vendaService.calcularLucroDaVenda(idVenda));
-    }
-
-    @GetMapping("/valor-total-venda/{id}")
-    public ResponseEntity<BigDecimal> valorTotalDaVenda(@PathVariable("id") Integer idVenda) {
-        return ResponseEntity.ok().body(vendaService.valorTotalDaVenda(idVenda));
     }
 
     @GetMapping("/produtos-do-venda/{idVenda}")

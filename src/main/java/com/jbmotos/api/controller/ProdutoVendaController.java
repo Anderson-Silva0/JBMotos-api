@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jbmotos.api.dto.ProdutoDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -64,10 +65,13 @@ public class ProdutoVendaController {
                                                       @RequestParam Integer idVenda,
                                                                     Integer idProduto,
         @Positive(message = "A quantidade deve ser maior que zero") Integer quantidade) {
+
+        ProdutoDTO produtoDTO = ProdutoDTO.builder().id(idProduto).build();
+
         ProdutoVendaDTO produtoVendaDTO = ProdutoVendaDTO.builder()
                 .id(id)
                 .idVenda(idVenda)
-                .idProduto(idProduto)
+                .produto(produtoDTO)
                 .quantidade(quantidade)
                 .build();
         return ResponseEntity.ok().body(

@@ -43,6 +43,11 @@ public class SecurityConfigurations {
                         ).hasRole(Role.ADMIN.name())
 
                         .requestMatchers("/api/**").hasAnyRole(Role.ADMIN.name(), Role.OPERADOR.name())
+
+                        .requestMatchers("/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .cors(Customizer.withDefaults())

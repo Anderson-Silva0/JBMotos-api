@@ -4,8 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.jbmotos.api.dto.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,9 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jbmotos.api.dto.PagamentoCartaoDTO;
-import com.jbmotos.api.dto.ProdutoVendaDTO;
-import com.jbmotos.api.dto.VendaDTO;
 import com.jbmotos.model.entity.Cliente;
 import com.jbmotos.model.entity.Funcionario;
 import com.jbmotos.model.entity.Produto;
@@ -63,11 +63,13 @@ public class VendaServiceImpl implements VendaService {
 	@Transactional
 	public Venda salvarVenda(VendaDTO vendaDTO) {
 		Venda venda = mapper.map(vendaDTO, Venda.class);
-		
-		Cliente cliente = clienteService.buscarClientePorCPF(vendaDTO.getCpfCliente());
+
+		ClienteDTO clienteDTO = vendaDTO.getCliente();
+		Cliente cliente = clienteService.buscarClientePorCPF(clienteDTO.getCpf());
 		venda.setCliente(cliente);
-		
-		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(vendaDTO.getCpfFuncionario());
+
+		FuncionarioDTO funcionarioDTO = vendaDTO.getFuncionario();
+		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(funcionarioDTO.getCpf());
 		venda.setFuncionario(funcionario);
 		
 		List<ProdutoVendaDTO> produtosVenda = vendaDTO.getProdutosVenda();
@@ -77,10 +79,15 @@ public class VendaServiceImpl implements VendaService {
 		Venda vendaSalva = vendaRepository.save(venda);
 		
 		if (produtosVenda != null) {
+			BigDecimal valorTotalVenda = new BigDecimal(0);
+
 			for (ProdutoVendaDTO produtoVenda : produtosVenda) {
 				produtoVenda.setIdVenda(vendaSalva.getId());
 				produtoVendaService.salvarProdutoVenda(produtoVenda);
+				valorTotalVenda = valorTotalVenda.add(produtoVenda.getValorTotal());
 			}
+
+			vendaSalva.setValorTotalVenda(valorTotalVenda);
 		}
 		
 		if (vendaDTO.getFormaDePagamento().equals("Cartão de Crédito")) {
@@ -109,7 +116,9 @@ public class VendaServiceImpl implements VendaService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<Venda> filtrarVenda(VendaDTO vendaDTO) {
-		Example<Venda> example = Example.of(mapper.map(vendaDTO, Venda.class),
+		Venda venda = mapper.map(vendaDTO, Venda.class);
+
+		Example<Venda> example = Example.of(venda,
 				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
 
 		Sort sort = Sort.by(Sort.Direction.DESC, "dataHoraCadastro");
@@ -125,11 +134,25 @@ public class VendaServiceImpl implements VendaService {
 		LocalDateTime dateTime = buscarVendaPorId(vendaDTO.getId()).getDataHoraCadastro();
 		venda.setDataHoraCadastro(dateTime);
 
-		Cliente cliente = clienteService.buscarClientePorCPF(vendaDTO.getCpfCliente());
+		ClienteDTO clienteDTO = vendaDTO.getCliente();
+		Cliente cliente = clienteService.buscarClientePorCPF(clienteDTO.getCpf());
 		venda.setCliente(cliente);
 
-		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(vendaDTO.getCpfFuncionario());
+		FuncionarioDTO funcionarioDTO = vendaDTO.getFuncionario();
+		Funcionario funcionario = funcionarioService.buscarFuncionarioPorCPF(funcionarioDTO.getCpf());
 		venda.setFuncionario(funcionario);
+
+		List<ProdutoVendaDTO> produtosVenda = vendaDTO.getProdutosVenda();
+
+		if (produtosVenda != null) {
+			BigDecimal valorTotalVenda = new BigDecimal(0);
+
+			for (ProdutoVendaDTO produtoVenda : produtosVenda) {
+				valorTotalVenda = valorTotalVenda.add(produtoVenda.getValorTotal());
+			}
+
+			venda.setValorTotalVenda(valorTotalVenda);
+		}
 
 		return vendaRepository.save(venda);
 	}
@@ -141,7 +164,7 @@ public class VendaServiceImpl implements VendaService {
 
 		Venda venda = buscarVendaPorId(id);
 
-		venda.getProdutosVenda().stream().forEach(produto -> {
+		venda.getProdutosVenda().forEach(produto -> {
 			produtoVendaService.atualizarQtdEstoqueParaDeletar(produto.getId());
 		});
 
@@ -164,14 +187,6 @@ public class VendaServiceImpl implements VendaService {
 		if (!vendaRepository.existsById(id)) {
 			throw new ObjetoNaoEncontradoException(VENDA_NAO_ENCONTRADA);
 		}
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public BigDecimal valorTotalDaVenda(Integer idVenda) {
-		validarVenda(idVenda);
-		return produtoVendaService.buscarProdutoVendaPorIdVenda(idVenda).stream()
-				.map(ProdutoVenda::getValorTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	@Override

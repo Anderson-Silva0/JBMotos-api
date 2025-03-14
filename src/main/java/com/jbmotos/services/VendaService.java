@@ -25,7 +25,5 @@ public interface VendaService {
 
     void validarVenda(Integer id);
 
-    BigDecimal valorTotalDaVenda(Integer idVenda);
-
     List<Produto> buscarProdutosDaVenda(Integer idVenda);
 }
