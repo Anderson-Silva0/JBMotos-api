@@ -23,8 +23,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 
+import com.jbmotos.api.dto.ProdutoDTO;
 import com.jbmotos.api.dto.ProdutoVendaDTO;
 import com.jbmotos.model.entity.Estoque;
 import com.jbmotos.model.entity.Produto;
@@ -83,7 +83,8 @@ class ProdutoVendaServiceImplTest {
 
         when(mapper.map(produtoVendaDTO, ProdutoVenda.class)).thenReturn(produtoVenda);
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(produto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(produto);
         when(produtoVendaRepository
                 .existsProdutoVendasByVendaIdAndProdutoId(venda.getId(), produto.getId())).thenReturn(false);
         when(produtoVendaRepository.save(produtoVenda)).thenReturn(produtoVenda);
@@ -128,7 +129,8 @@ class ProdutoVendaServiceImplTest {
         //Cenário
         when(mapper.map(produtoVendaDTO, ProdutoVenda.class)).thenReturn(produtoVenda);
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto()))
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId()))
                 .thenThrow(new ObjetoNaoEncontradoException("Produto não encontrado para o Id informado."));
 
         //Execução e verificação
@@ -149,7 +151,8 @@ class ProdutoVendaServiceImplTest {
 
         when(mapper.map(produtoVendaDTO, ProdutoVenda.class)).thenReturn(produtoVenda);
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(produto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(produto);
 
         //Execução e verificação
         RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () -> {
@@ -168,7 +171,8 @@ class ProdutoVendaServiceImplTest {
 
         when(mapper.map(produtoVendaDTO, ProdutoVenda.class)).thenReturn(produtoVenda);
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(produto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(produto);
         when(produtoVendaRepository.existsProdutoVendasByVendaIdAndProdutoId(venda.getId(), produto.getId()))
                 .thenReturn(true);
 
@@ -232,7 +236,8 @@ class ProdutoVendaServiceImplTest {
         when(produtoVendaRepository.findById(produtoVendaDTO.getId()))
                 .thenReturn(Optional.of(produtoVenda));
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(produto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(produto);
         when(produtoVendaRepository.save(produtoVenda)).thenReturn(produtoVenda);
 
         //Execução
@@ -267,7 +272,8 @@ class ProdutoVendaServiceImplTest {
         when(produtoVendaRepository.findById(produtoVendaDTO.getId()))
                 .thenReturn(Optional.of(produtoVenda));
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(produto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(produto);
 
         //Execução e verificação
         RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class, () -> {
@@ -307,7 +313,8 @@ class ProdutoVendaServiceImplTest {
         when(produtoVendaRepository.findById(produtoVendaDTO.getId()))
                 .thenReturn(Optional.of(produtoVenda));
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(novoProduto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(novoProduto);
         when(produtoVendaRepository.save(produtoVenda)).thenReturn(produtoVenda);
 
         //Execução
@@ -358,7 +365,8 @@ class ProdutoVendaServiceImplTest {
         when(produtoVendaRepository.findById(produtoVendaDTO.getId()))
                 .thenReturn(Optional.of(produtoVenda));
         when(vendaService.buscarVendaPorId(produtoVendaDTO.getIdVenda())).thenReturn(venda);
-        when(produtoService.buscarProdutoPorId(produtoVendaDTO.getIdProduto())).thenReturn(novoProduto);
+        ProdutoDTO produtoDTO = produtoVendaDTO.getProduto();
+		when(produtoService.buscarProdutoPorId(produtoDTO.getId())).thenReturn(novoProduto);
         when(produtoVendaRepository.save(produtoVenda)).thenReturn(produtoVenda);
 
         //Execução e verificação
@@ -502,7 +510,7 @@ class ProdutoVendaServiceImplTest {
         return ProdutoVendaDTO.builder()
                 .id(1)
                 .idVenda(1)
-                .idProduto(1)
+                .produto(ProdutoDTO.builder().id(1).build())
                 .quantidade(5)
                 .valorUnidade(null)
                 .valorTotal(null)

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.jbmotos.api.dto.ClienteDTO;
+import com.jbmotos.api.dto.FuncionarioDTO;
 import com.jbmotos.api.dto.VendaDTO;
 import com.jbmotos.model.entity.Venda;
 
@@ -64,8 +66,8 @@ class VendaServiceImplTest {
     public static VendaDTO getVendaDTO() {
         return VendaDTO.builder()
                 .id(1)
-                .cpfCliente("123.456.789-10")
-                .cpfFuncionario("109.876.543-21")
+                .cliente(ClienteDTO.builder().cpf("123.456.789-10").build())
+                .funcionario(FuncionarioDTO.builder().cpf("109.876.543-21").build())
                 .dataHoraCadastro(LocalDateTime.now())
                 .observacao("")
                 .formaDePagamento("PIX")
