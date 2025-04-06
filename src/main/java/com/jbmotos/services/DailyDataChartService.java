@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface DailyDataChartService {
 
-    List<DailyDataChart> getDadosDoGraficoDiario();
+    List<DailyDataChart> getDailyChartData();
 }

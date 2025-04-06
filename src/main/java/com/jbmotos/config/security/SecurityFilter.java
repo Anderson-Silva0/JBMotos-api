@@ -1,6 +1,6 @@
 package com.jbmotos.config.security;
 
-import com.jbmotos.model.repositories.CredenciaisUsuariosRepository;
+import com.jbmotos.model.repositories.UserCredentialsRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,13 +21,13 @@ public class SecurityFilter extends OncePerRequestFilter {
     private TokenService tokenService;
 
     @Autowired
-    private CredenciaisUsuariosRepository repository;
+    private UserCredentialsRepository repository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         var token = this.recoverToken(request);
         if (token != null) {
-            var login = tokenService.validateToken(token);
+            var login = this.tokenService.validateToken(token);
             UserDetails user = this.repository.findByLogin(login);
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

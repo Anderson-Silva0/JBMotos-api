@@ -11,15 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/dailyDataChart")
+@RequestMapping("/api/daily-data-chart")
 public class DailyDataChartController {
 
     @Autowired
     private DailyDataChartService service;
 
     @GetMapping
-    public ResponseEntity<List<DailyDataChart>> buscarDadosDoGrafico() {
-        return ResponseEntity.ok().body(
-                service.getDadosDoGraficoDiario());
+    public ResponseEntity<List<DailyDataChart>> getChartData() {
+        return ResponseEntity.ok().body(this.service.getDailyChartData());
     }
 }

@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.jbmotos.model.entity.CredenciaisUsuarios;
+import com.jbmotos.model.entity.UserCredentials;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +18,16 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
-    public String generateToken(CredenciaisUsuarios credenciaisUsuarios) {
+    public String generateToken(UserCredentials userCredentials) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                     .withIssuer("jbmotos-api")
-                    .withSubject(credenciaisUsuarios.getLogin())
+                    .withSubject(userCredentials.getLogin())
                     .withExpiresAt(this.generateExpirationDate())
-                    .withClaim("userCpf", credenciaisUsuarios.getFuncionario().getCpf())
-                    .withClaim("userName", credenciaisUsuarios.getFuncionario().getNome())
-                    .withClaim("role", credenciaisUsuarios.getRole().name())
+                    .withClaim("userCpf", userCredentials.getEmployee().getCpf())
+                    .withClaim("userName", userCredentials.getEmployee().getName())
+                    .withClaim("role", userCredentials.getRole().name())
                     .sign(algorithm);
             return token;
         } catch (JWTCreationException exception) {

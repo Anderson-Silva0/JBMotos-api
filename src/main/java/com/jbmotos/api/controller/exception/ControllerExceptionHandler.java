@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.jbmotos.services.exception.AutenticacaoException;
+import com.jbmotos.services.exception.AuthenticationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.jbmotos.services.exception.ObjetoNaoEncontradoException;
-import com.jbmotos.services.exception.RegraDeNegocioException;
+import com.jbmotos.services.exception.ObjectNotFoundException;
+import com.jbmotos.services.exception.BusinessRuleException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
@@ -23,9 +23,9 @@ import jakarta.validation.ConstraintViolationException;
 public class ControllerExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(ObjetoNaoEncontradoException.class)
-    public ResponseEntity<StandardError> ObjetoNaoEncontrado(
-            ObjetoNaoEncontradoException ex, HttpServletRequest request) {
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ResponseEntity<StandardError> objectNotFound(
+            ObjectNotFoundException ex, HttpServletRequest request) {
         StandardError error = StandardError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
@@ -36,9 +36,9 @@ public class ControllerExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(RegraDeNegocioException.class)
-    public ResponseEntity<StandardError> RegraDeNegocio(
-            RegraDeNegocioException ex, HttpServletRequest request) {
+    @ExceptionHandler(BusinessRuleException.class)
+    public ResponseEntity<StandardError> businessRule(
+            BusinessRuleException ex, HttpServletRequest request) {
         StandardError error = StandardError.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
@@ -51,42 +51,40 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> MethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        Map<String, String> erros = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors()
-                .stream()
                 .forEach(erro -> {
-                    String nomeCampo = ((FieldError) erro).getField();
-                    String mensagemErro = erro.getDefaultMessage();
-                    int posicaoPrimeiroPonto = nomeCampo.lastIndexOf(".");
-                    if (posicaoPrimeiroPonto != -1) {
-                        nomeCampo = nomeCampo.substring(posicaoPrimeiroPonto + 1);
+                    String fieldName = ((FieldError) erro).getField();
+                    String errorMessage = erro.getDefaultMessage();
+                    int firstPointIndex = fieldName.lastIndexOf(".");
+                    if (firstPointIndex != -1) {
+                        fieldName = fieldName.substring(firstPointIndex + 1);
                     }
-                    erros.put(nomeCampo, mensagemErro);
+                    errors.put(fieldName, errorMessage);
                 });
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erros);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, String>> handleConstraintViolationException(ConstraintViolationException ex) {
-        Map<String, String> erros = new HashMap<>();
+        Map<String, String> errors = new HashMap<>();
         ex.getConstraintViolations()
-                .stream()
-                .forEach(erro -> {
-                    String nomeMetodoComNomeCampo = erro.getPropertyPath().toString();
-                    int posicaoPrimeiroPonto = nomeMetodoComNomeCampo.lastIndexOf(".");
-                    String somenteNomeCampo = nomeMetodoComNomeCampo.substring(posicaoPrimeiroPonto + 1);
-                    String mensagemErro = erro.getMessage();
-                    erros.put(somenteNomeCampo, mensagemErro);
+                .forEach(error -> {
+                    String methodNameWithFieldName = error.getPropertyPath().toString();
+                    int firstPointIndex = methodNameWithFieldName.lastIndexOf(".");
+                    String fieldNameOnly = methodNameWithFieldName.substring(firstPointIndex + 1);
+                    String errorMessage = error.getMessage();
+                    errors.put(fieldNameOnly, errorMessage);
                 });
-        return ResponseEntity.badRequest().body(erros);
+        return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(AutenticacaoException.class)
+    @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ResponseEntity<Map<String, String>> handleAutenticacaoException(AutenticacaoException ex) {
-        Map<String, String> erros = new HashMap<>();
-        erros.put("loginError", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(erros);
+    public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("loginError", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errors);
     }
 }

@@ -33,7 +33,7 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/funcionario/buscar/{cpf}")
-                        .hasAnyRole(Role.ADMIN.name(), Role.OPERADOR.name())
+                        .hasAnyRole(Role.ADMIN.name(), Role.OPERATOR.name())
 
                         .requestMatchers(
                                 "/api/funcionario/**",
@@ -42,7 +42,7 @@ public class SecurityConfigurations {
                                 "/lucro-venda/"
                         ).hasRole(Role.ADMIN.name())
 
-                        .requestMatchers("/api/**").hasAnyRole(Role.ADMIN.name(), Role.OPERADOR.name())
+                        .requestMatchers("/api/**").hasAnyRole(Role.ADMIN.name(), Role.OPERATOR.name())
 
                         .requestMatchers("/v3/api-docs/**",
                                 "/swagger-ui/**",

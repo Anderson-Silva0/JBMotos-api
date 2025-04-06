@@ -10,6 +10,6 @@ public record AuthenticationDTO(
 
         @NotBlank(message = "A senha não pode estar vazia")
         @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
-        String senha
+        String password
 ) {
 }

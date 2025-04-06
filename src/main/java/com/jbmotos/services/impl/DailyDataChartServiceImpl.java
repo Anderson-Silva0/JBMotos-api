@@ -1,10 +1,10 @@
 package com.jbmotos.services.impl;
 
 import com.jbmotos.api.dto.DailyDataChart;
-import com.jbmotos.model.entity.Servico;
-import com.jbmotos.model.entity.Venda;
-import com.jbmotos.model.repositories.ServicoRepository;
-import com.jbmotos.model.repositories.VendaRepository;
+import com.jbmotos.model.entity.Repair;
+import com.jbmotos.model.entity.Sale;
+import com.jbmotos.model.repositories.RepairRepository;
+import com.jbmotos.model.repositories.SaleRepository;
 import com.jbmotos.services.DailyDataChartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 public class DailyDataChartServiceImpl implements DailyDataChartService {
 
     @Autowired
-    private VendaRepository vendaRepository;
+    private SaleRepository saleRepository;
 
     @Autowired
-    private ServicoRepository servicoRepository;
+    private RepairRepository repairRepository;
 
     @Override
-    public List<DailyDataChart> getDadosDoGraficoDiario() {
+    public List<DailyDataChart> getDailyChartData() {
         List<DailyDataChart> result = new LinkedList<>();
         DailyDataChart dailyDataChart;
 
@@ -35,43 +35,43 @@ public class DailyDataChartServiceImpl implements DailyDataChartService {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        LocalDateTime dataInicio = toLocalDateTime(calendar.getTime());
+        LocalDateTime beginDate = this.toLocalDateTime(calendar.getTime());
 
         calendar.add(Calendar.MONTH, 1);
 
-        LocalDateTime dataFim = toLocalDateTime(calendar.getTime());
+        LocalDateTime endDate = this.toLocalDateTime(calendar.getTime());
 
-        List<Venda> vendasMesAtual = vendaRepository.getVendasDoMesAtual(dataInicio, dataFim);
-        List<Servico> servicosMesAtual = servicoRepository.getServicosDoMesAtual(dataInicio, dataFim);
+        List<Sale> currentMonthSales = this.saleRepository.getSalesCurrentMonth(beginDate, endDate);
+        List<Repair> currentMonthRepairs = this.repairRepository.getRepairsCurrentMonth(beginDate, endDate);
 
-        Map<Integer, Long> diaMesQtdVendaMap = vendasMesAtual.stream()
+        Map<Integer, Long> dayMonthSaleQuantityMap = currentMonthSales.stream()
                 .collect(Collectors.groupingBy(
-                        venda -> venda.getDataHoraCadastro().getDayOfMonth(),
+                        sale -> sale.getCreatedAt().getDayOfMonth(),
                         Collectors.counting()
                 ));
 
-        Map<Integer, Long> diaMesQtdServicoMap = servicosMesAtual.stream()
+        Map<Integer, Long> dayMonthRepairQuantityMap = currentMonthRepairs.stream()
                 .collect(Collectors.groupingBy(
-                        servico -> servico.getDataHoraCadastro().getDayOfMonth(),
+                        repair -> repair.getCreatedAt().getDayOfMonth(),
                         Collectors.counting()
                 ));
 
         calendar.add(Calendar.MONTH, -1);
 
-        long dataInicioMillis = calendar.getTimeInMillis();
-        long dataFimMillis = dataFim.atZone(ZoneId.of("America/Recife")).toInstant().toEpochMilli();
+        long beginDateInMillis = calendar.getTimeInMillis();
+        long endDateInMillis = endDate.atZone(ZoneId.of("America/Recife")).toInstant().toEpochMilli();
 
-        while (dataInicioMillis < dataFimMillis) {
-            int diaDoMes = calendar.get(Calendar.DAY_OF_MONTH);
-            Long qtdVenda = diaMesQtdVendaMap.get(diaDoMes);
-            Long qtdServico = diaMesQtdServicoMap.get(diaDoMes);
+        while (beginDateInMillis < endDateInMillis) {
+            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+            Long saleQuantity = dayMonthSaleQuantityMap.get(dayOfMonth);
+            Long repairQuantity = dayMonthRepairQuantityMap.get(dayOfMonth);
 
-            dailyDataChart = new DailyDataChart(calendar.getTime().getTime(), qtdVenda, qtdServico);
+            dailyDataChart = new DailyDataChart(calendar.getTime().getTime(), saleQuantity, repairQuantity);
 
             result.add(dailyDataChart);
 
             calendar.add(Calendar.DAY_OF_MONTH, 1);
-            dataInicioMillis = calendar.getTimeInMillis();
+            beginDateInMillis = calendar.getTimeInMillis();
         }
 
         return result;

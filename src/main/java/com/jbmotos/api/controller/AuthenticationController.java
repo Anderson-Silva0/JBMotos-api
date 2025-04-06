@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jbmotos.api.dto.AuthenticationDTO;
-import com.jbmotos.api.dto.CredenciaisUsuariosDTO;
+import com.jbmotos.api.dto.UserCredentialsDTO;
 import com.jbmotos.api.dto.LoginResponseDTO;
 import com.jbmotos.config.security.TokenService;
-import com.jbmotos.model.entity.CredenciaisUsuarios;
-import com.jbmotos.services.CredenciaisUsuariosService;
+import com.jbmotos.model.entity.UserCredentials;
+import com.jbmotos.services.UserCredentialsService;
 
 import jakarta.validation.Valid;
 
@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 public class AuthenticationController {
 
     @Autowired
-    private CredenciaisUsuariosService service;
+    private UserCredentialsService service;
 
     @Autowired
     private TokenService tokenService;
@@ -30,14 +30,14 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody @Valid AuthenticationDTO data) {
         var auth = this.service.login(data);
 
-        var token = tokenService.generateToken((CredenciaisUsuarios) auth.getPrincipal());
+        var token = this.tokenService.generateToken((UserCredentials) auth.getPrincipal());
 
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<CredenciaisUsuariosDTO> cadastrar(@RequestBody @Valid CredenciaisUsuariosDTO data) {
-        this.service.cadastrarUsuario(data);
+    public ResponseEntity<UserCredentialsDTO> cadastrar(@RequestBody @Valid UserCredentialsDTO data) {
+        this.service.registerUser(data);
 
         return ResponseEntity.ok().build();
     }
