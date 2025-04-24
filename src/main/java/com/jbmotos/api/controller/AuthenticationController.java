@@ -35,7 +35,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-    @PostMapping("/cadastrar")
+    @PostMapping("/save")
     public ResponseEntity<UserCredentialsDTO> cadastrar(@RequestBody @Valid UserCredentialsDTO data) {
         this.service.registerUser(data);
 

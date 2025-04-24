@@ -48,7 +48,7 @@ public class UserCredentialsServiceImpl implements UserCredentialsService {
                 throw new AuthenticationException("Não é possível fazer login. Usuário inativo.");
             }
         } catch (org.springframework.security.core.AuthenticationException e) {
-            throw new AuthenticationException("Login ou password inválidos");
+            throw new AuthenticationException("Login ou senha inválidos");
         }
     }
 
