@@ -24,7 +24,7 @@ public class CardPayment {
 
 	private String flag;
 
-	private BigDecimal totalFees;
+	private BigDecimal interestRate;
 
 	@OneToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.REMOVE })
 	@JoinColumn(name = "sale_id", referencedColumnName = "id")

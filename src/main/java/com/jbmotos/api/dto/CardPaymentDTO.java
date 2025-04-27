@@ -25,9 +25,9 @@ public class CardPaymentDTO {
     @NotBlank(message = "Informe a Bandeira do Cartão.")
     private String flag;
 
-    @NotNull(message = "Informe o Total de Taxas.")
-    @DecimalMin(value = "0.0", inclusive = false, message = "O Total de Taxas deve ser maior que zero.")
-    private BigDecimal totalFees;
+    @NotNull(message = "Informe a Taxa de Juro.")
+    @DecimalMin(value = "0.0", inclusive = false, message = "A Taxa de Juro deve ser maior que zero.")
+    private BigDecimal interestRate;
 
     @NotNull(message = "O Id da Venda não pode ser nulo.")
     private Integer saleId;
