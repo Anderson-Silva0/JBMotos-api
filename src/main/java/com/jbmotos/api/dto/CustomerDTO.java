@@ -27,7 +27,7 @@ import lombok.Setter;
 public class CustomerDTO {
 
     @CPF(message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
-    @NotBlank(message = "O campo CPF é obrigatório.")
+    @NotBlank(groups = SaleDTO.SaleValidationGroup.class, message = "O campo CPF é obrigatório.")
     @Length(min = 14, max = 14, message = "O campo CPF deve ter 14 caracteres.")
     private String cpf;
 
@@ -51,4 +51,5 @@ public class CustomerDTO {
 
     @Valid
     private AddressDTO address;
+
 }

@@ -27,15 +27,18 @@ public class SaleDTO {
 
     private Integer id;
 
+    @Valid
     private CustomerDTO customer;
 
     private EmployeeDTO employee;
 
-    @Length(max = 100, message = "O campo Observação tem no máximo 100 caracteres.")
+    @Length(groups = SaleDTO.SaleValidationGroup.class, max = 100,
+            message = "O campo Observação tem no máximo 100 caracteres.")
     private String observation;
 
-    @NotBlank(message = "O campo Forma de Pagamento é obrigatório.")
-    @Length(max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
+    @NotBlank(groups = SaleDTO.SaleValidationGroup.class, message = "O campo Forma de Pagamento é obrigatório.")
+    @Length(groups = SaleDTO.SaleValidationGroup.class, max = 50,
+            message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String paymentMethod;
     
     @Valid
@@ -47,4 +50,7 @@ public class SaleDTO {
     private BigDecimal totalSaleValue;
 
     private List<ProductsOfSaleDTO> productsOfSale;
+
+    public interface SaleValidationGroup {}
+
 }

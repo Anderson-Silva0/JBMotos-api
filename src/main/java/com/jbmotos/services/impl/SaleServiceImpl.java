@@ -81,8 +81,8 @@ public class SaleServiceImpl implements SaleService {
 
 			for (ProductsOfSaleDTO productOfSale : productsOfSaleList) {
 				productOfSale.setSaleId(saleSaved.getId());
-				this.productsOfSaleService.saveProductsOfSale(productOfSale);
-				totalSaleValue = totalSaleValue.add(productOfSale.getTotalValue());
+				ProductsOfSale productsOfSaleSaved = this.productsOfSaleService.saveProductsOfSale(productOfSale);
+				totalSaleValue = totalSaleValue.add(productsOfSaleSaved.getTotalValue());
 			}
 
 			saleSaved.setTotalSaleValue(totalSaleValue);

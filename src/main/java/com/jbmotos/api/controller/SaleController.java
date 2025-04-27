@@ -9,9 +9,11 @@ import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.api.dto.EmployeeDTO;
 import jakarta.validation.Valid;
 
+import jakarta.validation.groups.Default;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,7 +41,7 @@ public class SaleController {
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<SaleDTO> save(@Valid @RequestBody SaleDTO saleDTO) {
+    public ResponseEntity<SaleDTO> save(@Validated(SaleDTO.SaleValidationGroup.class) @RequestBody SaleDTO saleDTO) {
         Sale sale = this.saleService.saveSale(saleDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest().buildAndExpand(sale).toUri();
