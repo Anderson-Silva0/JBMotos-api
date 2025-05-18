@@ -74,7 +74,7 @@ public class CardPaymentServiceImpl implements CardPaymentService {
 
         cardPayment.setInstallment(cardPaymentDTO.getInstallment());
         cardPayment.setFlag(cardPaymentDTO.getFlag());
-        cardPayment.setTotalFees(cardPaymentDTO.getTotalFees());
+        cardPayment.setInterestRate(cardPaymentDTO.getInterestRate());
 
         return this.repository.save(cardPayment);
     }
