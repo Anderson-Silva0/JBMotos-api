@@ -1,15 +1,14 @@
 package com.jbmotos.api.dto;
 
-import java.time.LocalDateTime;
-
-import jakarta.validation.constraints.*;
-
-import lombok.*;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CPF;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,6 +18,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Builder
 public class MotorcycleDTO {
 
+
+    @NotNull(groups = { RepairDTO.RepairValidationGroup.class }, message = "O campo Moto é obrigatório.")
+    @DecimalMin(groups = { RepairDTO.RepairValidationGroup.class },
+            value = "0.01", inclusive = false, message = "O campo Id é obrigatório.")
     private Integer id;
 
     @NotBlank(message = "O campo Placa é obrigatório.")
@@ -43,8 +46,7 @@ public class MotorcycleDTO {
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime createdAt;
 
-    @CPF(message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
-    @NotBlank(message = "O campo CPF do Cliente é obrigatório.")
-    @Length(min = 14, max = 14, message = "O campo CPF do Cliente deve ter 14 caracteres.")
-    private String customerCpf;
+    @Valid
+    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
+    private CustomerDTO customer;
 }

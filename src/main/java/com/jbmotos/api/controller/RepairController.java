@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jbmotos.api.dto.CustomerDTO;
+import com.jbmotos.api.dto.EmployeeDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,10 +64,13 @@ public class RepairController {
             @RequestParam(value = "plate", required = false) String plate,
             @RequestParam(value = "repairsPerformed", required = false) String repairsPerformed
     ) {
+        CustomerDTO customerDTO = CustomerDTO.builder().cpf(customerCpf).build();
+        EmployeeDTO employeeDTO = EmployeeDTO.builder().cpf(employeeCpf).build();
+
         RepairDTO repairDTO = RepairDTO.builder()
-        		.motorcycle(MotorcycleDTO.builder().customerCpf(customerCpf).plate(plate).build())
+        		.motorcycle(MotorcycleDTO.builder().customer(customerDTO).plate(plate).build())
         		.repairsPerformed(repairsPerformed)
-                .employeeCpf(employeeCpf)
+                .employee(employeeDTO)
                 .build();
         return ResponseEntity.ok().body(
                 this.repairService.filterRepair(repairDTO).stream().map(repair ->

@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.groups.Default;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,8 @@ import lombok.Setter;
 @Builder
 public class EmployeeDTO {
 
-    @CPF(message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
+    @CPF(groups = { Default.class, RepairDTO.RepairValidationGroup.class },
+            message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
     @Length(min = 14, max = 14, message = "O campo CPF deve ter 14 caracteres.")
     private String cpf;
 

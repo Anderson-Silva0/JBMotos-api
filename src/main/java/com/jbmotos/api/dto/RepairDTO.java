@@ -3,13 +3,14 @@ package com.jbmotos.api.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -27,12 +28,16 @@ public class RepairDTO {
 
     private Integer id;
 
-    @NotBlank(message = "O campo CPF do Funcionário é obrigatório.")
-    private String employeeCpf;
+    @Valid
+    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
+    private EmployeeDTO employee;
 
+    @Valid
+    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
     private MotorcycleDTO motorcycle;
 
     @Valid
+    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
     private SaleDTO sale;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
@@ -46,4 +51,6 @@ public class RepairDTO {
 
     @DecimalMin(value = "0.01", inclusive = false, message = "O campo Preço de Mão de Obra deve ser maior que zero.")
     private BigDecimal laborCost;
+
+    public interface RepairValidationGroup {}
 }

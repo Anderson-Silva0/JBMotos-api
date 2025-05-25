@@ -2,6 +2,7 @@ package com.jbmotos.services.impl;
 
 import java.util.List;
 
+import com.jbmotos.api.dto.EmployeeDTO;
 import com.jbmotos.model.entity.Motorcycle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,8 +54,11 @@ public class RepairServiceImpl implements RepairService {
 			saleSaved = this.saleService.saveSale(saleDTO);
 		}
 
-		Employee employee = this.employeeService.findEmployeeByCpf(repairDTO.getEmployeeCpf());
-		repair.setEmployee(employee);
+		EmployeeDTO employeeDTO = repairDTO.getEmployee();
+		if (employeeDTO != null) {
+			Employee employee = this.employeeService.findEmployeeByCpf(employeeDTO.getCpf());
+			repair.setEmployee(employee);
+		}
 
 		Motorcycle motorcycle = this.motorcycleService.findMotorcycleById(repairDTO.getMotorcycle().getId());
 		repair.setMotorcycle(motorcycle);
@@ -111,8 +115,11 @@ public class RepairServiceImpl implements RepairService {
 		Repair oldRepair = findRepairById(repairDTO.getId());
 		newRepair.setCreatedAt(oldRepair.getCreatedAt());
 
-		Employee employee = this.employeeService.findEmployeeByCpf(repairDTO.getEmployeeCpf());
-		newRepair.setEmployee(employee);
+		EmployeeDTO employeeDTO = repairDTO.getEmployee();
+		if (employeeDTO != null) {
+			Employee employee = this.employeeService.findEmployeeByCpf(employeeDTO.getCpf());
+			newRepair.setEmployee(employee);
+		}
 
 		Motorcycle motorcycle = this.motorcycleService.findMotorcycleById(repairDTO.getMotorcycle().getId());
 		newRepair.setMotorcycle(motorcycle);

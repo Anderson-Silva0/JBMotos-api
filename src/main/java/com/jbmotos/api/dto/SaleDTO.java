@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -28,8 +30,11 @@ public class SaleDTO {
     private Integer id;
 
     @Valid
+    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
     private CustomerDTO customer;
 
+    @Valid
+    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
     private EmployeeDTO employee;
 
     @Length(groups = SaleDTO.SaleValidationGroup.class, max = 100,

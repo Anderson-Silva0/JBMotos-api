@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.jbmotos.api.dto.CustomerDTO;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -82,11 +83,13 @@ public class MotorcycleController {
             @RequestParam(value = "customerCpf", required = false) String customerCpf,
             @RequestParam(value = "motorcycleStatus", required = false) String motorcycleStatus
     ) {
+        CustomerDTO customerDTO = CustomerDTO.builder().cpf(customerCpf).build();
+
         MotorcycleDTO motorcycleDTO = MotorcycleDTO.builder()
                 .plate(plate)
                 .brand(brand)
                 .model(model)
-                .customerCpf(customerCpf)
+                .customer(customerDTO)
                 .motorcycleStatus(motorcycleStatus)
                 .build();
         return ResponseEntity.ok().body(

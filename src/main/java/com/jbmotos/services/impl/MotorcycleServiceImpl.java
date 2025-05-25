@@ -3,6 +3,7 @@ package com.jbmotos.services.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.model.entity.Motorcycle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,11 @@ public class MotorcycleServiceImpl implements MotorcycleService {
         validateMotorcyclePlateToSave(motorcycleDTO.getPlate());
         motorcycle.setMotorcycleStatus(Situation.ACTIVE);
 
-        Customer customer = this.customerService.findCustomerByCpf(motorcycleDTO.getCustomerCpf());
-        motorcycle.setCustomer(customer);
+        CustomerDTO customerDTO = motorcycleDTO.getCustomer();
+        if (customerDTO != null) {
+            Customer customer = this.customerService.findCustomerByCpf(customerDTO.getCpf());
+            motorcycle.setCustomer(customer);
+        }
 
         return this.motorcycleRepository.save(motorcycle);
     }
@@ -116,8 +120,11 @@ public class MotorcycleServiceImpl implements MotorcycleService {
 		this.validateMotorcyclePlateToUpdate(motorcycleDTO);
 		motorcycleDTO.setPlate(motorcycleDTO.getPlate().toUpperCase());
 
-		Customer customer = this.customerService.findCustomerByCpf(motorcycleDTO.getCustomerCpf());
-		motorcycle.setCustomer(customer);
+        CustomerDTO customerDTO = motorcycleDTO.getCustomer();
+        if (customerDTO != null) {
+            Customer customer = this.customerService.findCustomerByCpf(customerDTO.getCpf());
+            motorcycle.setCustomer(customer);
+        }
 
 		return this.motorcycleRepository.save(motorcycle);
 	}
