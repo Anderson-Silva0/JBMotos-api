@@ -1,6 +1,7 @@
 package com.jbmotos.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jbmotos.api.validation.ValidationGroups;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import jakarta.validation.groups.ConvertGroup;
@@ -19,9 +20,9 @@ import java.time.LocalDateTime;
 public class MotorcycleDTO {
 
 
-    @NotNull(groups = { RepairDTO.RepairValidationGroup.class }, message = "O campo Moto é obrigatório.")
-    @DecimalMin(groups = { RepairDTO.RepairValidationGroup.class },
-            value = "0.01", inclusive = false, message = "O campo Id é obrigatório.")
+    @NotNull(groups = { ValidationGroups.RepairValidationGroup.class }, message = "O campo Moto é obrigatório.")
+    @DecimalMin(groups = { ValidationGroups.RepairValidationGroup.class },
+            value = "0.01", inclusive = false, message = "O campo Moto é obrigatório.")
     private Integer id;
 
     @NotBlank(message = "O campo Placa é obrigatório.")
@@ -47,6 +48,8 @@ public class MotorcycleDTO {
     private LocalDateTime createdAt;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.CpfValidationGroup.class)
+    @ConvertGroup(from = ValidationGroups.RepairValidationGroup.class, to = ValidationGroups.CpfValidationGroup.class)
     private CustomerDTO customer;
+
 }

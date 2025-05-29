@@ -1,23 +1,17 @@
 package com.jbmotos.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jbmotos.api.validation.ValidationGroups;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import jakarta.validation.groups.ConvertGroup;
-import jakarta.validation.groups.Default;
-import org.hibernate.validator.constraints.Length;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -30,23 +24,24 @@ public class SaleDTO {
     private Integer id;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.CpfValidationGroup.class)
     private CustomerDTO customer;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairDTO.RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.CpfValidationGroup.class)
     private EmployeeDTO employee;
 
-    @Length(groups = SaleDTO.SaleValidationGroup.class, max = 100,
-            message = "O campo Observação tem no máximo 100 caracteres.")
+    @Length(max = 100, message = "O campo Observação tem no máximo 100 caracteres.")
     private String observation;
 
-    @NotBlank(groups = SaleDTO.SaleValidationGroup.class, message = "O campo Forma de Pagamento é obrigatório.")
-    @Length(groups = SaleDTO.SaleValidationGroup.class, max = 50,
-            message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
+    @NotBlank(groups = { Default.class, ValidationGroups.RepairValidationGroup.class},
+            message = "O campo Forma de Pagamento é obrigatório.")
+    @Length(groups = { Default.class, ValidationGroups.RepairValidationGroup.class},
+            max = 50, message = "O campo Forma de Pagamento tem no máximo 50 caracteres.")
     private String paymentMethod;
     
     @Valid
+    @ConvertGroup(from = Default.class, to = ValidationGroups.RepairValidationGroup.class)
     private CardPaymentDTO cardPayment;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
@@ -55,7 +50,5 @@ public class SaleDTO {
     private BigDecimal totalSaleValue;
 
     private List<ProductsOfSaleDTO> productsOfSale;
-
-    public interface SaleValidationGroup {}
 
 }

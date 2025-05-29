@@ -1,21 +1,15 @@
 package com.jbmotos.api.dto;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.br.CPF;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.jbmotos.api.validation.ValidationGroups;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.br.CPF;
+
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -26,10 +20,12 @@ import lombok.Setter;
 @Builder
 public class CustomerDTO {
 
-    @CPF(message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
-    @NotBlank(groups = {SaleDTO.SaleValidationGroup.class, RepairDTO.RepairValidationGroup.class},
+    @NotBlank(groups = ValidationGroups.CpfValidationGroup.class,
             message = "O campo CPF do Cliente é obrigatório.")
-    @Length(min = 14, max = 14, message = "O campo CPF deve ter 14 caracteres.")
+    @Length(groups = ValidationGroups.CpfValidationGroup.class,
+            min = 14, max = 14, message = "O campo CPF do Cliente deve ter 14 caracteres.")
+    @CPF(groups = ValidationGroups.CpfValidationGroup.class,
+            message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
     private String cpf;
 
     @NotBlank(message = "O campo Nome é obrigatório.")

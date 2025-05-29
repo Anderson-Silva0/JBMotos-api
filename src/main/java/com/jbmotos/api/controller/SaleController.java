@@ -1,34 +1,22 @@
 package com.jbmotos.api.controller;
 
-import java.math.BigDecimal;
-import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.api.dto.EmployeeDTO;
-import jakarta.validation.Valid;
-
-import jakarta.validation.groups.Default;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.jbmotos.api.dto.ProductDTO;
 import com.jbmotos.api.dto.SaleDTO;
 import com.jbmotos.model.entity.Sale;
 import com.jbmotos.services.SaleService;
+import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/sale")
@@ -41,7 +29,7 @@ public class SaleController {
     private ModelMapper mapper;
 
     @PostMapping
-    public ResponseEntity<SaleDTO> save(@Validated(SaleDTO.SaleValidationGroup.class) @RequestBody SaleDTO saleDTO) {
+    public ResponseEntity<SaleDTO> save(@Valid @RequestBody SaleDTO saleDTO) {
         Sale sale = this.saleService.saveSale(saleDTO);
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest().buildAndExpand(sale).toUri();

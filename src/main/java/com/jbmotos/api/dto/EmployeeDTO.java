@@ -1,21 +1,14 @@
 package com.jbmotos.api.dto;
 
-import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.jbmotos.api.validation.ValidationGroups;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.br.CPF;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
-import jakarta.validation.groups.Default;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -25,9 +18,12 @@ import lombok.Setter;
 @Builder
 public class EmployeeDTO {
 
-    @CPF(groups = { Default.class, RepairDTO.RepairValidationGroup.class },
+    @NotBlank(groups = ValidationGroups.CpfValidationGroup.class,
+            message = "O campo CPF do Funcionário é obrigatório.")
+    @Length(groups = ValidationGroups.CpfValidationGroup.class,
+            min = 14, max = 14, message = "O campo CPF do Funcionário deve ter 14 caracteres.")
+    @CPF(groups = ValidationGroups.CpfValidationGroup.class,
             message = "CPF inválido ou não encontrado na base de dados da Receita Federal.")
-    @Length(min = 14, max = 14, message = "O campo CPF deve ter 14 caracteres.")
     private String cpf;
 
     @NotBlank(message = "O campo Nome é obrigatório.")
@@ -45,4 +41,5 @@ public class EmployeeDTO {
 
     @Valid
     private AddressDTO address;
+
 }

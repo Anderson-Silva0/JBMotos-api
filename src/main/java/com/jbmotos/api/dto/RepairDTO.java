@@ -1,22 +1,16 @@
 package com.jbmotos.api.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import jakarta.validation.groups.ConvertGroup;
-import jakarta.validation.groups.Default;
-import org.hibernate.validator.constraints.Length;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import com.jbmotos.api.validation.ValidationGroups;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.groups.ConvertGroup;
+import jakarta.validation.groups.Default;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,15 +23,15 @@ public class RepairDTO {
     private Integer id;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.CpfValidationGroup.class)
     private EmployeeDTO employee;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.RepairValidationGroup.class)
     private MotorcycleDTO motorcycle;
 
     @Valid
-    @ConvertGroup(from = Default.class, to = RepairValidationGroup.class)
+    @ConvertGroup(from = Default.class, to = ValidationGroups.RepairValidationGroup.class)
     private SaleDTO sale;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm")
@@ -52,5 +46,4 @@ public class RepairDTO {
     @DecimalMin(value = "0.01", inclusive = false, message = "O campo Preço de Mão de Obra deve ser maior que zero.")
     private BigDecimal laborCost;
 
-    public interface RepairValidationGroup {}
 }
