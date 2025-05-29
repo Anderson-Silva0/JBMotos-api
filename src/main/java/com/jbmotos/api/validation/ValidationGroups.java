@@ -6,6 +6,4 @@ public interface ValidationGroups {
 
     interface RepairValidationGroup {}
 
-    interface SaleValidationGroup {}
-
 }
