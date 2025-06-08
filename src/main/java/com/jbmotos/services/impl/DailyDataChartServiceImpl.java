@@ -17,11 +17,14 @@ import java.util.stream.Collectors;
 @Service
 public class DailyDataChartServiceImpl implements DailyDataChartService {
 
-    @Autowired
-    private SaleRepository saleRepository;
+    private final SaleRepository saleRepository;
 
-    @Autowired
-    private RepairRepository repairRepository;
+    private final RepairRepository repairRepository;
+
+    public DailyDataChartServiceImpl(SaleRepository saleRepository, RepairRepository repairRepository) {
+        this.saleRepository = saleRepository;
+        this.repairRepository = repairRepository;
+    }
 
     @Override
     public List<DailyDataChart> getDailyChartData() {
@@ -33,6 +36,7 @@ public class DailyDataChartServiceImpl implements DailyDataChartService {
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
         LocalDateTime beginDate = this.toLocalDateTime(calendar.getTime());
