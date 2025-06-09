@@ -6,12 +6,14 @@ import com.jbmotos.model.entity.Sale;
 import com.jbmotos.model.repositories.RepairRepository;
 import com.jbmotos.model.repositories.SaleRepository;
 import com.jbmotos.services.DailyDataChartService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,19 +33,14 @@ public class DailyDataChartServiceImpl implements DailyDataChartService {
         List<DailyDataChart> result = new LinkedList<>();
         DailyDataChart dailyDataChart;
 
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
+        LocalDateTime beginDate = LocalDateTime.now()
+                .withDayOfMonth(1)
+                .withHour(0)
+                .withMinute(0)
+                .withSecond(0)
+                .withNano(0);
 
-        LocalDateTime beginDate = this.toLocalDateTime(calendar.getTime());
-
-        calendar.add(Calendar.MONTH, 1);
-
-        LocalDateTime endDate = this.toLocalDateTime(calendar.getTime());
+        LocalDateTime endDate = beginDate.plusMonths(1);
 
         List<Sale> currentMonthSales = this.saleRepository.getSalesCurrentMonth(beginDate, endDate);
         List<Repair> currentMonthRepairs = this.repairRepository.getRepairsCurrentMonth(beginDate, endDate);
@@ -60,31 +57,22 @@ public class DailyDataChartServiceImpl implements DailyDataChartService {
                         Collectors.counting()
                 ));
 
-        calendar.add(Calendar.MONTH, -1);
+        final ZoneId RECIFE_ZONE = ZoneId.of("America/Recife");
 
-        long beginDateInMillis = calendar.getTimeInMillis();
-        long endDateInMillis = endDate.atZone(ZoneId.of("America/Recife")).toInstant().toEpochMilli();
-
-        while (beginDateInMillis < endDateInMillis) {
-            int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        for (LocalDateTime date = beginDate; date.isBefore(endDate); date = date.plusDays(1)) {
+            int dayOfMonth = date.getDayOfMonth();
             Long saleQuantity = dayMonthSaleQuantityMap.get(dayOfMonth);
             Long repairQuantity = dayMonthRepairQuantityMap.get(dayOfMonth);
 
-            dailyDataChart = new DailyDataChart(calendar.getTime().getTime(), saleQuantity, repairQuantity);
+            Instant instantRecife = date.atZone(RECIFE_ZONE).toInstant();
+            long epochMillisRecife = instantRecife.toEpochMilli();
+
+            dailyDataChart = new DailyDataChart(epochMillisRecife, saleQuantity, repairQuantity);
 
             result.add(dailyDataChart);
-
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-            beginDateInMillis = calendar.getTimeInMillis();
         }
 
         return result;
-    }
-
-    private LocalDateTime toLocalDateTime(Date data) {
-        return data.toInstant()
-                .atZone(ZoneId.of("America/Recife"))
-                .toLocalDateTime();
     }
 
 }

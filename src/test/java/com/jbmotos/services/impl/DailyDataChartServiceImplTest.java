@@ -193,6 +193,7 @@ public class DailyDataChartServiceImplTest {
             assertEquals(0, localDate.getHour());
             assertEquals(0, localDate.getMinute());
             assertEquals(0, localDate.getSecond());
+            assertEquals(0, localDate.getNano());
         });
     }
 
