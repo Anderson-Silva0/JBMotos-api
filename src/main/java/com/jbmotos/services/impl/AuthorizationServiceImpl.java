@@ -1,4 +1,4 @@
-package com.jbmotos.services;
+package com.jbmotos.services.impl;
 
 import com.jbmotos.model.repositories.UserCredentialsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthorizationService implements UserDetailsService {
+public class AuthorizationServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserCredentialsRepository repository;
