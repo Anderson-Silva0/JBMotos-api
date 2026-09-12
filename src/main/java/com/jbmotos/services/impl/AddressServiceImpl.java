@@ -3,7 +3,6 @@ package com.jbmotos.services.impl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,23 +24,23 @@ public class AddressServiceImpl implements AddressService {
 
     private static final String ERROR_DELETE_ADDRESS_MSG = "Erro ao tentar deletar, o Endereço pertence a um";
 
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
+    private final CustomerService customerService;
+    private final EmployeeService employeeService;
+    private final SupplierService supplierService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    @Lazy
-    private CustomerService customerService;
-
-    @Autowired
-    @Lazy
-    private EmployeeService employeeService;
-
-    @Autowired
-    @Lazy
-    private SupplierService supplierService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public AddressServiceImpl(AddressRepository addressRepository,
+                              @Lazy CustomerService customerService,
+                              @Lazy EmployeeService employeeService,
+                              @Lazy SupplierService supplierService,
+                              ModelMapper mapper) {
+        this.addressRepository = addressRepository;
+        this.customerService = customerService;
+        this.employeeService = employeeService;
+        this.supplierService = supplierService;
+        this.mapper = mapper;
+    }
 
     @Override
     @Transactional

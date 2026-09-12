@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.api.dto.EmployeeDTO;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +30,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/repair")
 public class RepairController {
 
-    @Autowired
-    private RepairService repairService;
+    private final RepairService repairService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public RepairController(RepairService repairService, ModelMapper mapper) {
+        this.repairService = repairService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<RepairDTO> save(@Valid @RequestBody RepairDTO repairDTO) {

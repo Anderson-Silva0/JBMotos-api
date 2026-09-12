@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,11 +31,13 @@ import com.jbmotos.services.ProductsOfSaleService;
 @Validated
 public class ProductOfSaleController {
 
-    @Autowired
-    private ProductsOfSaleService productsOfSaleService;
+    private final ProductsOfSaleService productsOfSaleService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public ProductOfSaleController(ProductsOfSaleService productsOfSaleService, ModelMapper mapper) {
+        this.productsOfSaleService = productsOfSaleService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<ProductsOfSaleDTO> save(@Valid @RequestBody ProductsOfSaleDTO productsOfSaleDTO){

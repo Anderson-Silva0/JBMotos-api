@@ -5,7 +5,6 @@ import java.util.List;
 import com.jbmotos.api.dto.EmployeeDTO;
 import com.jbmotos.model.entity.Motorcycle;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -28,20 +27,20 @@ import com.jbmotos.services.exception.BusinessRuleException;
 @Service
 public class RepairServiceImpl implements RepairService {
 
-    @Autowired
-    private RepairRepository repairRepository;
+    private final RepairRepository repairRepository;
+    private final EmployeeService employeeService;
+    private final MotorcycleService motorcycleService;
+    private final SaleService saleService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private MotorcycleService motorcycleService;
-
-    @Autowired
-    private SaleService saleService;
-    
-    @Autowired
-    private ModelMapper mapper;
+    public RepairServiceImpl(RepairRepository repairRepository, EmployeeService employeeService,
+                            MotorcycleService motorcycleService, SaleService saleService, ModelMapper mapper) {
+        this.repairRepository = repairRepository;
+        this.employeeService = employeeService;
+        this.motorcycleService = motorcycleService;
+        this.saleService = saleService;
+        this.mapper = mapper;
+    }
 
 	@Override
 	@Transactional

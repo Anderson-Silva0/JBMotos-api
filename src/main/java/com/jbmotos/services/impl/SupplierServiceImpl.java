@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -28,14 +27,15 @@ public class SupplierServiceImpl implements SupplierService {
 
     private static final String ERROR_SAVE_SUPPLIER_MSG = "Erro ao tentar salvar Fornecedor";
 
-    @Autowired
-    private SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
+    private final AddressService addressService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private AddressService addressService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public SupplierServiceImpl(SupplierRepository supplierRepository, AddressService addressService, ModelMapper mapper) {
+        this.supplierRepository = supplierRepository;
+        this.addressService = addressService;
+        this.mapper = mapper;
+    }
 
 	@Override
 	@Transactional

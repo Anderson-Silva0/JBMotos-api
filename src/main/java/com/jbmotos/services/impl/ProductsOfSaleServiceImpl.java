@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.jbmotos.api.dto.ProductDTO;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,21 +38,20 @@ public class ProductsOfSaleServiceImpl implements ProductsOfSaleService {
 	private static final String ERROR_UPDATE_NEW_PRODUCT_MSG = "Não é possível Atualizar a Venda pois a quantidade "
 			+ "solicitada do novo Produto é maior do que a quantidade disponível em estoque.";
 
-	@Autowired
-	@Lazy
-	private SaleService saleService;
+	private final SaleService saleService;
+	private final ProductService productService;
+	private final StockService stockService;
+	private final ProductsOfSaleRepository productsOfSaleRepository;
+	private final ModelMapper mapper;
 
-	@Autowired
-	private ProductService productService;
-
-	@Autowired
-	private StockService stockService;
-
-	@Autowired
-	private ProductsOfSaleRepository productsOfSaleRepository;
-
-	@Autowired
-	private ModelMapper mapper;
+	public ProductsOfSaleServiceImpl(@Lazy SaleService saleService, ProductService productService,
+			StockService stockService, ProductsOfSaleRepository productsOfSaleRepository, ModelMapper mapper) {
+		this.saleService = saleService;
+		this.productService = productService;
+		this.stockService = stockService;
+		this.productsOfSaleRepository = productsOfSaleRepository;
+		this.mapper = mapper;
+	}
 
 	@Override
 	@Transactional

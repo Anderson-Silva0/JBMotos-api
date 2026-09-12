@@ -8,7 +8,6 @@ import com.jbmotos.model.entity.Sale;
 import com.jbmotos.services.SaleService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,11 +21,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/sale")
 public class SaleController {
 
-    @Autowired
-    private SaleService saleService;
+    private final SaleService saleService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public SaleController(SaleService saleService, ModelMapper mapper) {
+        this.saleService = saleService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<SaleDTO> save(@Valid @RequestBody SaleDTO saleDTO) {

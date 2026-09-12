@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +26,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/address")
 public class AddressController {
 
-    @Autowired
-    private AddressService addressService;
+    private final AddressService addressService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public AddressController(AddressService addressService, ModelMapper mapper) {
+        this.addressService = addressService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<AddressDTO> save(@Valid @RequestBody AddressDTO addressDTO) {

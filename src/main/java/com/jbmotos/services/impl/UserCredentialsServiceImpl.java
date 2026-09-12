@@ -10,7 +10,6 @@ import com.jbmotos.services.UserCredentialsService;
 import com.jbmotos.services.EmployeeService;
 import com.jbmotos.services.exception.AuthenticationException;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,17 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserCredentialsServiceImpl implements UserCredentialsService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final UserCredentialsRepository repository;
+    private final EmployeeService employeeService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private UserCredentialsRepository repository;
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public UserCredentialsServiceImpl(AuthenticationManager authenticationManager,
+                                     UserCredentialsRepository repository,
+                                     EmployeeService employeeService,
+                                     ModelMapper mapper) {
+        this.authenticationManager = authenticationManager;
+        this.repository = repository;
+        this.employeeService = employeeService;
+        this.mapper = mapper;
+    }
 
     @Override
     public Authentication login(AuthenticationDTO dto) {

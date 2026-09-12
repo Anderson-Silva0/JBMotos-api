@@ -6,7 +6,6 @@ import com.jbmotos.services.CardPaymentService;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +17,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/card-payment")
 public class CardPaymentController {
 
-    @Autowired
-    private CardPaymentService cardPaymentService;
+    private final CardPaymentService cardPaymentService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public CardPaymentController(CardPaymentService cardPaymentService, ModelMapper mapper) {
+        this.cardPaymentService = cardPaymentService;
+        this.mapper = mapper;
+    }
 
 
     @PostMapping

@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +30,13 @@ import com.jbmotos.services.ProductService;
 @RequestMapping("/api/product")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public ProductController(ProductService productService, ModelMapper mapper) {
+        this.productService = productService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<ProductDTO> save(@Valid @RequestBody ProductDTO productDTO) {

@@ -9,7 +9,6 @@ import com.jbmotos.model.entity.Stock;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,11 +28,13 @@ import com.jbmotos.services.StockService;
 @RequestMapping("/api/stock")
 public class StockController {
 
-    @Autowired
-    private StockService stockService;
+    private final StockService stockService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public StockController(StockService stockService, ModelMapper mapper) {
+        this.stockService = stockService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<StockDTO> save(@Valid @RequestBody StockDTO stockDTO){

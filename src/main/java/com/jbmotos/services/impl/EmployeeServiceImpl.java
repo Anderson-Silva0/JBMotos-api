@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -28,14 +27,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     private static final String ERROR_SAVE_EMPLOYEE_MSG = "Erro ao tentar salvar Funcionário";
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AddressService addressService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private AddressService addressService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, AddressService addressService, ModelMapper mapper) {
+        this.employeeRepository = employeeRepository;
+        this.addressService = addressService;
+        this.mapper = mapper;
+    }
 
 	@Override
 	@Transactional

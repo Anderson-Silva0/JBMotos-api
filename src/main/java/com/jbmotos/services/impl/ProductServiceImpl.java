@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -30,17 +29,18 @@ public class ProductServiceImpl implements ProductService {
 
 	private static final String PRODUCT_NOT_FOUND_MSG = "Produto não encontrado para o Id informado.";
 
-	@Autowired
-	private ProductRepository productRepository;
+	private final ProductRepository productRepository;
+	private final StockService stockService;
+	private final SupplierService supplierService;
+	private final ModelMapper mapper;
 
-	@Autowired
-	private StockService stockService;
-
-	@Autowired
-	private SupplierService supplierService;
-
-	@Autowired
-	private ModelMapper mapper;
+	public ProductServiceImpl(ProductRepository productRepository, StockService stockService, SupplierService supplierService,
+			ModelMapper mapper) {
+		this.productRepository = productRepository;
+		this.stockService = stockService;
+		this.supplierService = supplierService;
+		this.mapper = mapper;
+	}
 
 	@Override
 	@Transactional

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -30,14 +29,15 @@ public class CustomerServiceImpl implements CustomerService {
 
     private static final String ERROR_UPDATE_CUSTOMER_MSG = "Erro ao tentar atualizar Cliente";
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+    private final AddressService addressService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private AddressService addressService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public CustomerServiceImpl(CustomerRepository customerRepository, AddressService addressService, ModelMapper mapper) {
+        this.customerRepository = customerRepository;
+        this.addressService = addressService;
+        this.mapper = mapper;
+    }
 
 	@Override
 	@Transactional

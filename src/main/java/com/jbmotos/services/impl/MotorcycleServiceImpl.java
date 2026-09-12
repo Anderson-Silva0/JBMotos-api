@@ -6,7 +6,6 @@ import java.util.List;
 import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.model.entity.Motorcycle;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
@@ -28,14 +27,15 @@ public class MotorcycleServiceImpl implements MotorcycleService {
 	private static final String MOTORCYCLE_NOT_FOUND_ID_MSG = "Moto não encontrada para o Id informado.";
 	private static final String MOTORCYCLE_NOT_FOUND_PLATE_MSG = "Moto não encontrada para a Placa informada.";
 
-    @Autowired
-    private MotorcycleRepository motorcycleRepository;
+    private final MotorcycleRepository motorcycleRepository;
+    private final CustomerService customerService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public MotorcycleServiceImpl(MotorcycleRepository motorcycleRepository, CustomerService customerService, ModelMapper mapper) {
+        this.motorcycleRepository = motorcycleRepository;
+        this.customerService = customerService;
+        this.mapper = mapper;
+    }
 
     @Override
     @Transactional

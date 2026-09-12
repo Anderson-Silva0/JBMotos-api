@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,11 +28,13 @@ import com.jbmotos.services.SupplierService;
 @RequestMapping("/api/supplier")
 public class SupplierController {
 
-    @Autowired
-    private SupplierService supplierService;
+    private final SupplierService supplierService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public SupplierController(SupplierService supplierService, ModelMapper mapper) {
+        this.supplierService = supplierService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<SupplierDTO> save(@Valid @RequestBody SupplierDTO supplierDTO) {

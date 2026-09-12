@@ -3,7 +3,6 @@ package com.jbmotos.services.impl;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,14 +19,15 @@ public class CardPaymentServiceImpl implements CardPaymentService {
 
     private static final String PAYMENT_CARD_NOT_FOUND_MSG = "Pagamento em Cartão não encontrado para o Id informado.";
 
-    @Autowired
-    private CardPaymentRepository repository;
+    private final CardPaymentRepository repository;
+    private final SaleService saleService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private SaleService saleService;
-
-    @Autowired
-    private ModelMapper mapper;
+    public CardPaymentServiceImpl(CardPaymentRepository repository, SaleService saleService, ModelMapper mapper) {
+        this.repository = repository;
+        this.saleService = saleService;
+        this.mapper = mapper;
+    }
 
 
     @Transactional

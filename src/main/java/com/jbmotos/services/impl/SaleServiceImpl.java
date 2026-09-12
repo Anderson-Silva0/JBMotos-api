@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.jbmotos.api.dto.*;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -35,27 +34,26 @@ public class SaleServiceImpl implements SaleService {
 
 	private static final String SALE_NOT_FOUND_MSG = "Venda não encontrada para o Id informado.";
 
-	@Autowired
-	private SaleRepository saleRepository;
+	private final SaleRepository saleRepository;
+	private final ProductService productService;
+	private final ProductsOfSaleService productsOfSaleService;
+	private final CustomerService customerService;
+	private final EmployeeService employeeService;
+	private final CardPaymentService cardPaymentService;
+	private final ModelMapper mapper;
 
-	@Autowired
-	private ProductService productService;
-
-	@Autowired
-	private ProductsOfSaleService productsOfSaleService;
-
-	@Autowired
-	private CustomerService customerService;
-
-	@Autowired
-	private EmployeeService employeeService;
-	
-	@Lazy
-	@Autowired
-	private CardPaymentService cardPaymentService;
-
-	@Autowired
-	private ModelMapper mapper;
+	public SaleServiceImpl(SaleRepository saleRepository, ProductService productService,
+			ProductsOfSaleService productsOfSaleService, CustomerService customerService,
+			EmployeeService employeeService, @Lazy CardPaymentService cardPaymentService,
+			ModelMapper mapper) {
+		this.saleRepository = saleRepository;
+		this.productService = productService;
+		this.productsOfSaleService = productsOfSaleService;
+		this.customerService = customerService;
+		this.employeeService = employeeService;
+		this.cardPaymentService = cardPaymentService;
+		this.mapper = mapper;
+	}
 
 	@Override
 	@Transactional

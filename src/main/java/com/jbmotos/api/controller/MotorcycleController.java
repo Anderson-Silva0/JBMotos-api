@@ -8,7 +8,6 @@ import com.jbmotos.api.dto.CustomerDTO;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,11 +30,13 @@ import com.jbmotos.services.MotorcycleService;
 @RequestMapping("/api/motorcycle")
 public class MotorcycleController {
 
-    @Autowired
-    private MotorcycleService motorcycleService;
+    private final MotorcycleService motorcycleService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public MotorcycleController(MotorcycleService motorcycleService, ModelMapper mapper) {
+        this.motorcycleService = motorcycleService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<MotorcycleDTO> save(@Valid @RequestBody MotorcycleDTO motorcycleDTO) {

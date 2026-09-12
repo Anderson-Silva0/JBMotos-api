@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,11 +29,13 @@ import com.jbmotos.services.EmployeeService;
 @RequestMapping("/api/employee")
 public class EmployeeController {
 
-    @Autowired
-    private EmployeeService employeeService;
+    private final EmployeeService employeeService;
+    private final ModelMapper mapper;
 
-    @Autowired
-    private ModelMapper mapper;
+    public EmployeeController(EmployeeService employeeService, ModelMapper mapper) {
+        this.employeeService = employeeService;
+        this.mapper = mapper;
+    }
 
     @PostMapping
     public ResponseEntity<EmployeeDTO> save(@Valid @RequestBody EmployeeDTO employeeDTO) {

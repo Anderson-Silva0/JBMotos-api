@@ -1,6 +1,5 @@
 package com.jbmotos.api.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,11 +19,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/auth")
 public class AuthenticationController {
 
-    @Autowired
-    private UserCredentialsService service;
+    private final UserCredentialsService service;
+    private final TokenService tokenService;
 
-    @Autowired
-    private TokenService tokenService;
+    public AuthenticationController(UserCredentialsService service, TokenService tokenService) {
+        this.service = service;
+        this.tokenService = tokenService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthenticationDTO data) {
