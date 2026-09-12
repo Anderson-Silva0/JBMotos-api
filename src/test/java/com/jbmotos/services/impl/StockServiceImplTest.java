@@ -20,10 +20,11 @@ import com.jbmotos.model.entity.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.jbmotos.api.dto.StockDTO;
 import com.jbmotos.model.entity.Product;
@@ -33,19 +34,19 @@ import com.jbmotos.services.ProductService;
 import com.jbmotos.services.exception.ObjectNotFoundException;
 import com.jbmotos.services.exception.BusinessRuleException;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class StockServiceImplTest {
 
-    @Autowired
+    @InjectMocks
     private StockServiceImpl estoqueService;
 
-    @MockBean
+    @Mock
     private StockRepository stockRepository;
 
-    @MockBean
+    @Mock
     private ProductService productService;
 
-    @MockBean
+    @Mock
     private ModelMapper mapper;
 
     private Stock stock;
@@ -103,7 +104,6 @@ class StockServiceImplTest {
     void findStockById() {
         // Cenário
         Integer idEstoque = 1;
-        when(stockRepository.existsById(idEstoque)).thenReturn(true);
         when(stockRepository.findById(idEstoque)).thenReturn(Optional.of(this.stock));
 
         // Execução
@@ -120,7 +120,7 @@ class StockServiceImplTest {
     void findStockByIdInexistente() {
         // Cenário
         Integer idEstoque = 1;
-        when(stockRepository.existsById(idEstoque)).thenReturn(false);
+        when(stockRepository.findById(idEstoque)).thenReturn(Optional.empty());
 
         // Execução e Verificação
         ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {

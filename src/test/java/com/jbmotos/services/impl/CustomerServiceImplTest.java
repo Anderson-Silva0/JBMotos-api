@@ -1,20 +1,21 @@
 package com.jbmotos.services.impl;
 
-import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.api.dto.AddressDTO;
-import com.jbmotos.model.entity.Customer;
+import com.jbmotos.api.dto.CustomerDTO;
 import com.jbmotos.model.entity.Address;
+import com.jbmotos.model.entity.Customer;
 import com.jbmotos.model.repositories.CustomerRepository;
 import com.jbmotos.services.AddressService;
-import com.jbmotos.services.exception.ObjectNotFoundException;
 import com.jbmotos.services.exception.BusinessRuleException;
+import com.jbmotos.services.exception.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,19 +26,19 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class CustomerServiceImplTest {
 
-    @Autowired
+    @InjectMocks
     private CustomerServiceImpl clienteService;
 
-    @MockBean
+    @Mock
     private CustomerRepository customerRepository;
 
-    @MockBean
+    @Mock
     private AddressService addressService;
 
-    @MockBean
+    @Mock
     private ModelMapper mapper;
 
     private CustomerDTO customerDTO;
@@ -45,7 +46,7 @@ class CustomerServiceImplTest {
     private Address address;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         customerDTO = getClienteDTO();
         customer = getCliente();
         address = AddressServiceImplTest.getEndereco();
@@ -81,9 +82,8 @@ class CustomerServiceImplTest {
     void erroSaveCustomerComCpfJaCadastrado() {
         when(customerRepository.existsCustomerByCpf(customerDTO.getCpf())).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.saveCustomer(customerDTO);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.saveCustomer(customerDTO));
         assertEquals("Erro ao tentar salvar Cliente, CPF já cadastrado.", exception.getMessage());
     }
 
@@ -92,14 +92,13 @@ class CustomerServiceImplTest {
     void erroSaveCustomerComEmailJaCadastrado() {
         when(customerRepository.existsCustomerByEmail(customerDTO.getEmail())).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.saveCustomer(customerDTO);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.saveCustomer(customerDTO));
         assertEquals("Erro ao tentar salvar Cliente, Email já cadastrado.", exception.getMessage());
     }
 
     @Test
-    @DisplayName("Deve retonar uma lista de clientes com sucesso")
+    @DisplayName("Deve retornar uma lista de clientes com sucesso")
     void findAllCustomer() {
         List<Customer> listaCustomers = new ArrayList<>();
         listaCustomers.add(customer);
@@ -120,7 +119,6 @@ class CustomerServiceImplTest {
     void findCustomerByCpf() {
         String cpfCliente = "123.456.789-10";
 
-        when(customerRepository.existsCustomerByCpf(cpfCliente)).thenReturn(true);
         when(customerRepository.findCustomerByCpf(cpfCliente)).thenReturn(Optional.of(customer));
 
         Customer customerBuscado = clienteService.findCustomerByCpf(cpfCliente);
@@ -144,7 +142,6 @@ class CustomerServiceImplTest {
         Customer novoCustomer;
 
         when(customerRepository.findCustomerByCpf(customerDTO.getCpf())).thenReturn(Optional.of(customerAntigo));
-
         when(mapper.map(customerDTO, Customer.class)).thenReturn(
                 novoCustomer = Customer.builder()
                         .cpf(customerDTO.getCpf())
@@ -155,7 +152,6 @@ class CustomerServiceImplTest {
                         .address(address)
                         .build()
         );
-
         when(mapper.map(customerDTO.getAddress(), Address.class)).thenReturn(address);
         when(customerRepository.save(novoCustomer)).thenReturn(novoCustomer);
 
@@ -176,24 +172,22 @@ class CustomerServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar atualizar um cliente que nao existe")
     void erroUpdateCustomerInexistente() {
-        when(customerRepository.existsCustomerByCpf(customerDTO.getCpf())).thenReturn(false);
+        when(customerRepository.findCustomerByCpf(customerDTO.getCpf())).thenReturn(Optional.empty());
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            clienteService.updateCustomer(customerDTO);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                clienteService.updateCustomer(customerDTO));
         assertEquals("Cliente não encrontrado para o CPF informado.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve lancar erro ao tentar atualizar cliente com email ja utilizado por outro cliente")
     void erroUpdateCustomerEmailJaUtilizado() {
-    	when(mapper.map(any(), any())).thenReturn(customer);
-    	when(customerRepository.findCustomerByCpf(customerDTO.getCpf())).thenReturn(Optional.of(getCliente()));
+        when(mapper.map(any(), any())).thenReturn(customer);
+        when(customerRepository.findCustomerByCpf(customerDTO.getCpf())).thenReturn(Optional.of(getCliente()));
         when(customerRepository.findByCpfNot(customerDTO.getCpf())).thenReturn(List.of(getCliente(), getCliente()));
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.updateCustomer(customerDTO);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.updateCustomer(customerDTO));
         assertEquals("Erro ao tentar atualizar Cliente, Email já cadastrado.", exception.getMessage());
     }
 
@@ -218,9 +212,8 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByCpf(cpfCliente)).thenReturn(false);
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            clienteService.deleteCustomer(cpfCliente);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                clienteService.deleteCustomer(cpfCliente));
         assertEquals("Cliente não encrontrado para o CPF informado.", exception.getMessage());
     }
 
@@ -231,9 +224,8 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByEmail(email)).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.validateEmailToSave(email);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.validateEmailToSave(email));
         assertEquals("Erro ao tentar salvar Cliente, Email já cadastrado.", exception.getMessage());
     }
 
@@ -244,9 +236,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByEmail(email)).thenReturn(false);
 
-        assertDoesNotThrow(() -> {
-            clienteService.validateEmailToSave(email);
-        });
+        assertDoesNotThrow(() -> clienteService.validateEmailToSave(email));
     }
 
     @Test
@@ -256,9 +246,8 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByCpf(cpf)).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.validateCustomerCpfToSave(cpf);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.validateCustomerCpfToSave(cpf));
         assertEquals("Erro ao tentar salvar Cliente, CPF já cadastrado.", exception.getMessage());
     }
 
@@ -269,9 +258,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByCpf(cpf)).thenReturn(false);
 
-        assertDoesNotThrow(() -> {
-            clienteService.validateCustomerCpfToSave(cpf);
-        });
+        assertDoesNotThrow(() -> clienteService.validateCustomerCpfToSave(cpf));
     }
 
     @Test
@@ -283,9 +270,8 @@ class CustomerServiceImplTest {
 
         when(customerRepository.findByCpfNot(customerDTO.getCpf())).thenReturn(listaCustomers);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            clienteService.validateEmailToUpdate(customerDTO);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                clienteService.validateEmailToUpdate(customerDTO));
         assertEquals("Erro ao tentar atualizar Cliente, Email já cadastrado.", exception.getMessage());
     }
 
@@ -302,9 +288,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.findByCpfNot(customerDTO.getCpf())).thenReturn(listaCustomers);
 
-        assertDoesNotThrow(() -> {
-            clienteService.validateEmailToUpdate(customerDTO);
-        });
+        assertDoesNotThrow(() -> clienteService.validateEmailToUpdate(customerDTO));
     }
 
     @Test
@@ -314,9 +298,8 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByCpf(cpf)).thenReturn(false);
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            clienteService.checkExistingCustomerCpf(cpf);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                clienteService.checkExistingCustomerCpf(cpf));
         assertEquals("Cliente não encrontrado para o CPF informado.", exception.getMessage());
     }
 
@@ -327,9 +310,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByCpf(cpf)).thenReturn(true);
 
-        assertDoesNotThrow(() -> {
-            clienteService.checkExistingCustomerCpf(cpf);
-        });
+        assertDoesNotThrow(() -> clienteService.checkExistingCustomerCpf(cpf));
     }
 
     @Test
@@ -339,7 +320,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByAddressId(idEndereco)).thenReturn(true);
 
-        assertTrue( clienteService.existsCustomerByAddressId(idEndereco) );
+        assertTrue(clienteService.existsCustomerByAddressId(idEndereco));
     }
 
     @Test
@@ -349,7 +330,7 @@ class CustomerServiceImplTest {
 
         when(customerRepository.existsCustomerByAddressId(idEndereco)).thenReturn(false);
 
-        assertFalse( clienteService.existsCustomerByAddressId(idEndereco) );
+        assertFalse(clienteService.existsCustomerByAddressId(idEndereco));
     }
 
     public static Customer getCliente() {

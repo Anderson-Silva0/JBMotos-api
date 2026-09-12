@@ -17,15 +17,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class DailyDataChartServiceImplTest {
+class DailyDataChartServiceImplTest {
+
+    private static final ZoneId RECIFE_ZONE = ZoneId.of("America/Recife");
 
     @Mock
     private SaleRepository saleRepository;
@@ -34,162 +35,81 @@ public class DailyDataChartServiceImplTest {
     private RepairRepository repairRepository;
 
     @InjectMocks
-    private DailyDataChartServiceImpl dailyDataChartService;
+    private DailyDataChartServiceImpl service;
 
-    private List<Sale> saleList;
-
-    private List<Repair> repairList;
-
-    private final ZoneId recifeZone = ZoneId.of("America/Recife");
+    private List<Sale> sales;
+    private List<Repair> repairs;
 
     @BeforeEach
     void setUp() {
-        this.saleList = this.getSaleList();
-        this.repairList = this.getRepairList();
-    }
-
-    private List<Sale> getSaleList() {
-        return List.of(
-                this.buildSale(1, 12, 30, 30),
-                this.buildSale(1, 11, 40, 28),
-                this.buildSale(3, 16, 37, 32),
-                this.buildSale(3, 19, 49, 51),
-                this.buildSale(20, 13, 31, 45)
-        );
-    }
-
-    private Sale buildSale(int day, int hour, int minute, int second) {
-        return Sale.builder()
-                .createdAt(LocalDateTime.of(2025, 6, day, hour, minute, second))
-                .build();
-    }
-
-    private List<Repair> getRepairList() {
-        return List.of(
-                buildRepair(1, 12, 30, 30),
-                buildRepair(2, 11, 40, 28),
-                buildRepair(4, 16, 37, 32),
-                buildRepair(4, 19, 49, 51),
-                buildRepair(4, 13, 31, 45),
-                buildRepair(6, 9, 15, 10),
-                buildRepair(7, 14, 25, 5),
-                buildRepair(7, 8, 22, 17),
-                buildRepair(10, 10, 33, 44),
-                buildRepair(10, 7, 20, 12)
-        );
-    }
-
-    private Repair buildRepair(int day, int hour, int minute, int second) {
-        return Repair.builder()
-                .createdAt(LocalDateTime.of(2025, 6, day, hour, minute, second))
-                .build();
+        this.sales = this.buildSales();
+        this.repairs = this.buildRepairs();
     }
 
     @Test
-    void getDailyChartDataWithSalesAggregatesByDay() {
-
-        Map<Long, Long> dayMonthSaleQuantityMap = this.saleList.stream()
-                .collect(Collectors.groupingBy(
-                        sale -> {
-                            LocalDateTime createdAt = sale.getCreatedAt()
-                                    .withHour(0)
-                                    .withMinute(0)
-                                    .withSecond(0)
-                                    .withNano(0);
-                            return createdAt.atZone(this.recifeZone).toInstant().toEpochMilli();
-                        },
-                        Collectors.counting()
-                ));
-
-        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(this.saleList);
-
-        List<DailyDataChart> dailyChartData = this.dailyDataChartService.getDailyChartData();
-
-        assertNotNull(dailyChartData);
-
-        assertFalse(dailyChartData.isEmpty());
-
-        LocalDateTime today = LocalDateTime.now();
-        int daysInThisMonth = today.toLocalDate().lengthOfMonth();
-        assertEquals(daysInThisMonth, dailyChartData.size());
-
-        dailyChartData.stream()
-                .filter(chartData -> Objects.nonNull(chartData.saleQuantity()))
-                .forEach(activeChartData -> {
-                    Long expected = dayMonthSaleQuantityMap.get(activeChartData.dataMillis());
-                    assertEquals(expected, activeChartData.saleQuantity());
-                });
-    }
-
-    @Test
-    void getDailyChartDataWithRepairsAggregatesByDay() {
-
-        Map<Long, Long> dayMonthRepairQuantityMap = this.repairList.stream()
-                .collect(Collectors.groupingBy(
-                        repair -> {
-                            LocalDateTime createdAt = repair.getCreatedAt()
-                                    .withHour(0)
-                                    .withMinute(0)
-                                    .withSecond(0)
-                                    .withNano(0);
-                            return createdAt.atZone(this.recifeZone).toInstant().toEpochMilli();
-                        },
-                        Collectors.counting()
-                ));
-
-        when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(this.repairList);
-
-        List<DailyDataChart> dailyChartData = this.dailyDataChartService.getDailyChartData();
-
-        assertNotNull(dailyChartData);
-
-        assertFalse(dailyChartData.isEmpty());
-
-        LocalDateTime today = LocalDateTime.now();
-        int daysInThisMonth = today.toLocalDate().lengthOfMonth();
-        assertEquals(daysInThisMonth, dailyChartData.size());
-
-        dailyChartData.stream()
-                .filter(chartData -> Objects.nonNull(chartData.saleQuantity()))
-                .forEach(activeChartData -> {
-                    Long expected = dayMonthRepairQuantityMap.get(activeChartData.dataMillis());
-                    assertEquals(expected, activeChartData.saleQuantity());
-                });
-    }
-
-    @Test
-    void getDailyChartDataWithEmptySalesAndRepairs() {
-        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(List.of());
+    void getDailyChartData_shouldAggregateSalesByDayOfMonth() {
+        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(this.sales);
         when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(List.of());
 
-        List<DailyDataChart> dailyChartData = this.dailyDataChartService.getDailyChartData();
+        Map<Integer, Long> expectedSalesByDay = this.sales.stream()
+                .collect(Collectors.groupingBy(sale -> sale.getCreatedAt().getDayOfMonth(), Collectors.counting()));
 
-        assertNotNull(dailyChartData);
-        assertFalse(dailyChartData.isEmpty());
+        List<DailyDataChart> result = this.service.getDailyChartData();
 
-        LocalDateTime today = LocalDateTime.now();
-        int daysInThisMonth = today.toLocalDate().lengthOfMonth();
-        assertEquals(daysInThisMonth, dailyChartData.size());
+        assertNotNull(result);
+        assertEquals(this.currentMonthDays(), result.size());
 
-        dailyChartData.forEach(chartData -> {
-            assertNull(chartData.saleQuantity());
-            assertNull(chartData.repairQuantity());
+        result.forEach(chart -> {
+            Long expectedSales = expectedSalesByDay.get(this.extractDayOfMonthFromMillis(chart.dataMillis()));
+            assertEquals(expectedSales, chart.saleQuantity());
+            assertNull(chart.repairQuantity());
         });
     }
 
     @Test
-    void getDailyChartDataShouldHaveDataMillisAtStartOfDay() {
-        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(getSaleList());
-        when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(getRepairList());
+    void getDailyChartData_shouldAggregateRepairsByDayOfMonth() {
+        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(List.of());
+        when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(this.repairs);
 
-        List<DailyDataChart> dailyChartData = dailyDataChartService.getDailyChartData();
+        Map<Integer, Long> expectedRepairsByDay = this.repairs.stream()
+                .collect(Collectors.groupingBy(repair -> repair.getCreatedAt().getDayOfMonth(), Collectors.counting()));
 
-        dailyChartData.forEach(data -> {
-            LocalDateTime localDate = LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(data.dataMillis()),
-                    this.recifeZone
-            );
+        List<DailyDataChart> result = this.service.getDailyChartData();
 
+        assertNotNull(result);
+        assertEquals(this.currentMonthDays(), result.size());
+
+        result.forEach(chart -> {
+            Long expectedRepairs = expectedRepairsByDay.get(this.extractDayOfMonthFromMillis(chart.dataMillis()));
+            assertNull(chart.saleQuantity());
+            assertEquals(expectedRepairs, chart.repairQuantity());
+        });
+    }
+
+    @Test
+    void getDailyChartData_shouldReturnEmptyCountsWhenNoDataExists() {
+        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(List.of());
+        when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(List.of());
+
+        List<DailyDataChart> result = this.service.getDailyChartData();
+
+        assertNotNull(result);
+        assertEquals(this.currentMonthDays(), result.size());
+        result.forEach(chart -> {
+            assertNull(chart.saleQuantity());
+            assertNull(chart.repairQuantity());
+        });
+    }
+
+    @Test
+    void getDailyChartData_shouldUseMidnightTimestampsInRecifeZone() {
+        when(this.saleRepository.getSalesCurrentMonth(any(), any())).thenReturn(this.sales);
+        when(this.repairRepository.getRepairsCurrentMonth(any(), any())).thenReturn(this.repairs);
+
+        List<DailyDataChart> result = this.service.getDailyChartData();
+
+        result.forEach(chart -> {
+            LocalDateTime localDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(chart.dataMillis()), RECIFE_ZONE);
             assertEquals(0, localDate.getHour());
             assertEquals(0, localDate.getMinute());
             assertEquals(0, localDate.getSecond());
@@ -197,5 +117,50 @@ public class DailyDataChartServiceImplTest {
         });
     }
 
+    private List<Sale> buildSales() {
+        return List.of(
+                this.buildSale(1, 12, 30, 0),
+                this.buildSale(1, 14, 10, 5),
+                this.buildSale(3, 9, 15, 5),
+                this.buildSale(3, 20, 0, 0),
+                this.buildSale(10, 13, 31, 45)
+        );
+    }
 
+    private List<Repair> buildRepairs() {
+        return List.of(
+                this.buildRepair(2, 8, 15, 0),
+                this.buildRepair(2, 11, 40, 28),
+                this.buildRepair(4, 16, 37, 32),
+                this.buildRepair(10, 7, 20, 12),
+                this.buildRepair(10, 10, 33, 44),
+                this.buildRepair(15, 9, 10, 10)
+        );
+    }
+
+    private Sale buildSale(int dayOfMonth, int hour, int minute, int second) {
+        return Sale.builder().createdAt(this.currentMonthDate(dayOfMonth, hour, minute, second)).build();
+    }
+
+    private Repair buildRepair(int dayOfMonth, int hour, int minute, int second) {
+        return Repair.builder().createdAt(this.currentMonthDate(dayOfMonth, hour, minute, second)).build();
+    }
+
+    private LocalDateTime currentMonthDate(int dayOfMonth, int hour, int minute, int second) {
+        LocalDateTime now = LocalDateTime.now();
+        int safeDay = Math.min(dayOfMonth, now.toLocalDate().lengthOfMonth());
+        return now.withDayOfMonth(safeDay)
+                .withHour(hour)
+                .withMinute(minute)
+                .withSecond(second)
+                .withNano(0);
+    }
+
+    private int currentMonthDays() {
+        return LocalDateTime.now().toLocalDate().lengthOfMonth();
+    }
+
+    private int extractDayOfMonthFromMillis(long epochMillis) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(epochMillis), RECIFE_ZONE).getDayOfMonth();
+    }
 }

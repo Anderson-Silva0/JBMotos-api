@@ -1,56 +1,50 @@
 package com.jbmotos.services.impl;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.jbmotos.api.dto.AddressDTO;
+import com.jbmotos.model.entity.Address;
+import com.jbmotos.model.repositories.AddressRepository;
+import com.jbmotos.services.CustomerService;
+import com.jbmotos.services.EmployeeService;
+import com.jbmotos.services.SupplierService;
+import com.jbmotos.services.exception.BusinessRuleException;
+import com.jbmotos.services.exception.ObjectNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
-import com.jbmotos.api.dto.AddressDTO;
-import com.jbmotos.model.entity.Address;
-import com.jbmotos.model.repositories.AddressRepository;
-import com.jbmotos.services.CustomerService;
-import com.jbmotos.services.SupplierService;
-import com.jbmotos.services.EmployeeService;
-import com.jbmotos.services.exception.ObjectNotFoundException;
-import com.jbmotos.services.exception.BusinessRuleException;
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class AddressServiceImplTest {
 
-    @Autowired
+    @InjectMocks
     private AddressServiceImpl enderecoService;
 
-    @MockBean
+    @Mock
     private AddressRepository addressRepository;
 
-    @MockBean
+    @Mock
     private CustomerService customerService;
 
-    @MockBean
+    @Mock
     private EmployeeService employeeService;
 
-    @MockBean
+    @Mock
     private SupplierService supplierService;
 
-    @MockBean
+    @Mock
     private ModelMapper mapper;
 
     private Address address;
@@ -63,16 +57,13 @@ class AddressServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve salvar um Endereco sucesso")
+    @DisplayName("Deve salvar um Endereco com sucesso")
     void saveAddress() {
-        //Cenário
         when(mapper.map(any(), any())).thenReturn(address);
         when(addressRepository.save(address)).thenReturn(address);
 
-        //Execução
         Address addressSalvo = enderecoService.saveAddress(addressDTO);
 
-        //Verificação
         assertNotNull(addressSalvo);
         assertEquals(address.getId(), addressSalvo.getId());
         assertEquals(address.getRoad(), addressSalvo.getRoad());
@@ -85,7 +76,6 @@ class AddressServiceImplTest {
     @Test
     @DisplayName("Deve retornar uma lista de Enderecos")
     void findAllAddress() {
-        //Cenário
         List<Address> listaAddresses = new ArrayList<>();
         listaAddresses.add(address);
         listaAddresses.add(address);
@@ -93,10 +83,8 @@ class AddressServiceImplTest {
 
         when(addressRepository.findAll()).thenReturn(listaAddresses);
 
-        //Execução
         List<Address> enderecosRetornados = enderecoService.findAllAddress();
 
-        //Verificação
         assertNotNull(enderecosRetornados);
         assertEquals(3, enderecosRetornados.size());
         assertEquals(listaAddresses, enderecosRetornados);
@@ -105,14 +93,10 @@ class AddressServiceImplTest {
     @Test
     @DisplayName("Deve buscar um Endereco por id com sucesso")
     void findAddressById() {
-        //Cenário
-        when(addressRepository.existsById(address.getId())).thenReturn(true);
         when(addressRepository.findById(address.getId())).thenReturn(Optional.of(address));
 
-        //Execução
         Address addressBuscado = enderecoService.findAddressById(address.getId());
 
-        //Verificação
         assertNotNull(addressBuscado);
         assertEquals(address, addressBuscado);
         assertEquals(Address.class, addressBuscado.getClass());
@@ -121,28 +105,22 @@ class AddressServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar buscar um Endereco por id")
     void erroFindAddressById() {
-        //Cenário
-        when(addressRepository.existsById(address.getId())).thenReturn(false);
+        when(addressRepository.findById(address.getId())).thenReturn(Optional.empty());
 
-        //Execução e verificação
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            enderecoService.findAddressById(address.getId());
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                enderecoService.findAddressById(address.getId()));
         assertEquals("Endereço não encontrado para o Id informado.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve atualizar um Endereco com sucesso")
     void updateAddress() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(true);
         when(mapper.map(any(), any())).thenReturn(address);
         when(addressRepository.save(any())).thenReturn(address);
 
-        //Execução
         Address addressAtualizado = enderecoService.updateAddress(addressDTO);
 
-        //Verificação
         assertNotNull(addressAtualizado);
         assertEquals(address.getId(), addressAtualizado.getId());
         verify(addressRepository, times(1)).existsById(address.getId());
@@ -153,27 +131,21 @@ class AddressServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar atualizar um Endereco")
     void erroUpdateAddress() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(false);
 
-        //Execução e verificação
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            enderecoService.updateAddress(addressDTO);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                enderecoService.updateAddress(addressDTO));
         assertEquals("Endereço não encontrado para o Id informado.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve deletar um Endereco com sucesso")
     void deleteAddressById() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(true);
         doNothing().when(addressRepository).deleteById(address.getId());
 
-        //Execução
         enderecoService.deleteAddressById(address.getId());
 
-        //Verificação
         verify(addressRepository, times(1)).deleteById(address.getId());
         verify(addressRepository, times(1)).existsById(address.getId());
         verify(customerService, times(1)).existsCustomerByAddressId(address.getId());
@@ -184,81 +156,61 @@ class AddressServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar deletar um Endereco que nao existe")
     void erroDeletarEnderecoInexistente() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(false);
 
-        //Execução e verificação
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            enderecoService.deleteAddressById(address.getId());
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                enderecoService.deleteAddressById(address.getId()));
         assertEquals("Endereço não encontrado para o Id informado.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve lancar erro ao tentar deletar um Endereco que está sendo usado por um Cliente")
     void erroDeletarEnderecoEmUsoPorUmCliente() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(true);
         when(customerService.existsCustomerByAddressId(address.getId())).thenReturn(true);
 
-        //Execução e verificação
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            enderecoService.deleteAddressById(address.getId());
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                enderecoService.deleteAddressById(address.getId()));
         assertEquals("Erro ao tentar deletar, o Endereço pertence a um Cliente.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve lancar erro ao tentar deletar um Endereco que está sendo usado por um Funcionario")
     void erroDeletarEnderecoEmUsoPorUmFuncionario() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(true);
         when(employeeService.existsEmployeeByAddressId(address.getId())).thenReturn(true);
 
-        //Execução e verificação
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            enderecoService.deleteAddressById(address.getId());
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                enderecoService.deleteAddressById(address.getId()));
         assertEquals("Erro ao tentar deletar, o Endereço pertence a um Funcionário.", exception.getMessage());
     }
 
     @Test
     @DisplayName("Deve lancar erro ao tentar deletar um Endereco que está sendo usado por um Fornecedor")
     void erroDeletarEnderecoEmUsoPorUmFornecedor() {
-        //Cenário
         when(addressRepository.existsById(address.getId())).thenReturn(true);
         when(supplierService.existsSupplierByAddress(address.getId())).thenReturn(true);
 
-        //Execução e verificação
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            enderecoService.deleteAddressById(address.getId());
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                enderecoService.deleteAddressById(address.getId()));
         assertEquals("Erro ao tentar deletar, o Endereço pertence a um Fornecedor.", exception.getMessage());
     }
 
     @Test
     void validateAddressSemErro() {
-        //Cenário
         when(addressRepository.existsById(anyInt())).thenReturn(true);
 
-        //Execução
         assertDoesNotThrow(() -> enderecoService.validateAddress(1));
-
-        //Verificação
         verify(addressRepository).existsById(1);
     }
 
     @Test
     void validateAddressComErro() {
-        //Cenário
         when(addressRepository.existsById(anyInt())).thenReturn(false);
 
-        //Execução e verificação
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            enderecoService.validateAddress(1);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                enderecoService.validateAddress(1));
         assertEquals("Endereço não encontrado para o Id informado.", exception.getMessage());
-        verify(addressRepository).existsById(1);
     }
 
     public static Address getEndereco() {

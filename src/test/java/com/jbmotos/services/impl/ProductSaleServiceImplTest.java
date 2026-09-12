@@ -20,10 +20,11 @@ import com.jbmotos.model.entity.Stock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.jbmotos.api.dto.ProductDTO;
 import com.jbmotos.api.dto.ProductsOfSaleDTO;
@@ -37,25 +38,25 @@ import com.jbmotos.services.SaleService;
 import com.jbmotos.services.exception.ObjectNotFoundException;
 import com.jbmotos.services.exception.BusinessRuleException;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ProductSaleServiceImplTest {
 
-    @Autowired
+    @InjectMocks
     private ProductsOfSaleServiceImpl produtoVendaService;
 
-    @MockBean
+    @Mock
     private SaleService saleService;
 
-    @MockBean
+    @Mock
     private ProductService productService;
 
-    @MockBean
+    @Mock
     private StockService stockService;
 
-    @MockBean
+    @Mock
     private ProductsOfSaleRepository productsOfSaleRepository;
 
-    @MockBean
+    @Mock
     private ModelMapper mapper;
 
     private ProductsOfSale productsOfSale;
@@ -209,11 +210,10 @@ class ProductSaleServiceImplTest {
     @DisplayName("Deve buscar um ProdutoVenda por id com sucesso")
     void buscarProdutoVendaPorId() {
         //Cenário
-        when(productsOfSaleRepository.existsById(anyInt())).thenReturn(true);
-        when(productsOfSaleRepository.findById(anyInt())).thenReturn(Optional.of(productsOfSale));
+        when(productsOfSaleRepository.findById(productsOfSale.getId())).thenReturn(Optional.of(productsOfSale));
 
         //Execução
-        ProductsOfSale productsOfSaleBuscado = produtoVendaService.findProductsOfSaleById(anyInt());
+        ProductsOfSale productsOfSaleBuscado = produtoVendaService.findProductsOfSaleById(productsOfSale.getId());
 
         //Verificação
         assertNotNull(productsOfSaleBuscado);
@@ -364,10 +364,8 @@ class ProductSaleServiceImplTest {
         when(productsOfSaleRepository.existsById(productsOfSaleDTO.getId())).thenReturn(true);
         when(productsOfSaleRepository.findById(productsOfSaleDTO.getId()))
                 .thenReturn(Optional.of(productsOfSale));
-        when(saleService.findSaleById(productsOfSaleDTO.getSaleId())).thenReturn(sale);
         ProductDTO productDTO = productsOfSaleDTO.getProduct();
 		when(productService.findProductById(productDTO.getId())).thenReturn(novoProduct);
-        when(productsOfSaleRepository.save(productsOfSale)).thenReturn(productsOfSale);
 
         //Execução e verificação
         BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {

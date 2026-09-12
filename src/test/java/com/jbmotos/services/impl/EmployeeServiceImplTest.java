@@ -5,15 +5,16 @@ import com.jbmotos.model.entity.Address;
 import com.jbmotos.model.entity.Employee;
 import com.jbmotos.model.repositories.EmployeeRepository;
 import com.jbmotos.services.AddressService;
-import com.jbmotos.services.exception.ObjectNotFoundException;
 import com.jbmotos.services.exception.BusinessRuleException;
+import com.jbmotos.services.exception.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,25 +24,24 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class EmployeeServiceImplTest {
 
-    @Autowired
+    @InjectMocks
     private EmployeeServiceImpl funcionarioService;
 
-    @MockBean
+    @Mock
     private EmployeeRepository employeeRepository;
 
-    @MockBean
+    @Mock
     private AddressService addressService;
 
-    @MockBean
+    @Mock
     private ModelMapper mapper;
 
     private Employee employee;
     private EmployeeDTO employeeDTO;
     private Address address;
-
 
     @BeforeEach
     void setUp() {
@@ -77,9 +77,8 @@ class EmployeeServiceImplTest {
     void erroSaveEmployeeCpfJaCadastrado() {
         when(employeeRepository.existsEmployeeByCpf(employeeDTO.getCpf())).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            funcionarioService.saveEmployee(employeeDTO);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                funcionarioService.saveEmployee(employeeDTO));
         assertEquals("Erro ao tentar salvar Funcionário, CPF já cadastrado.", exception.getMessage());
     }
 
@@ -105,14 +104,13 @@ class EmployeeServiceImplTest {
     void findEmployeeByCpf() {
         String cpfFuncionario = "123.456.789-10";
 
-        when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(true);
         when(employeeRepository.findEmployeeByCpf(cpfFuncionario)).thenReturn(Optional.of(employee));
 
         Employee employeeBuscado = funcionarioService.findEmployeeByCpf(cpfFuncionario);
 
-        assertNotNull(employee);
+        assertNotNull(employeeBuscado);
         assertEquals(employee, employeeBuscado);
-        assertEquals(Employee.class, employee.getClass());
+        assertEquals(Employee.class, employeeBuscado.getClass());
     }
 
     @Test
@@ -120,11 +118,10 @@ class EmployeeServiceImplTest {
     void erroFindEmployeeByCpf() {
         String cpfFuncionario = "123.456.789-10";
 
-        when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(false);
+        when(employeeRepository.findEmployeeByCpf(cpfFuncionario)).thenReturn(Optional.empty());
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            funcionarioService.findEmployeeByCpf(cpfFuncionario);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                funcionarioService.findEmployeeByCpf(cpfFuncionario));
         assertEquals("Funcionário não encrontrado para o CPF informado.", exception.getMessage());
     }
 
@@ -141,17 +138,15 @@ class EmployeeServiceImplTest {
         Employee novoEmployee;
 
         when(employeeRepository.findEmployeeByCpf(employeeDTO.getCpf())).thenReturn(Optional.of(employeeAntigo));
-
         when(mapper.map(employeeDTO, Employee.class)).thenReturn(
                 novoEmployee = Employee.builder()
-                .cpf(employeeDTO.getCpf())
-                .name(employeeDTO.getName())
-                .phone(employeeDTO.getPhone())
-                .createdAt(null)
-                .address(address)
-                .build()
+                        .cpf(employeeDTO.getCpf())
+                        .name(employeeDTO.getName())
+                        .phone(employeeDTO.getPhone())
+                        .createdAt(null)
+                        .address(address)
+                        .build()
         );
-
         when(mapper.map(employeeDTO.getAddress(), Address.class)).thenReturn(address);
         when(employeeRepository.save(novoEmployee)).thenReturn(novoEmployee);
 
@@ -171,11 +166,10 @@ class EmployeeServiceImplTest {
     @Test
     @DisplayName("Deve lancar erro ao tentar atualizar um funcionario que nao existe")
     void erroUpdateEmployeeInexistente() {
-        when(employeeRepository.existsEmployeeByCpf(employeeDTO.getCpf())).thenReturn(false);
+        when(employeeRepository.findEmployeeByCpf(employeeDTO.getCpf())).thenReturn(Optional.empty());
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            funcionarioService.updateEmployee(employeeDTO);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                funcionarioService.updateEmployee(employeeDTO));
         assertEquals("Funcionário não encrontrado para o CPF informado.", exception.getMessage());
     }
 
@@ -200,9 +194,8 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(false);
 
-        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () -> {
-            funcionarioService.deleteEmployee(cpfFuncionario);
-        });
+        ObjectNotFoundException exception = assertThrows(ObjectNotFoundException.class, () ->
+                funcionarioService.deleteEmployee(cpfFuncionario));
         assertEquals("Funcionário não encrontrado para o CPF informado.", exception.getMessage());
     }
 
@@ -213,9 +206,8 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            funcionarioService.validateEmployeeCpfToSave(cpfFuncionario);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                funcionarioService.validateEmployeeCpfToSave(cpfFuncionario));
         assertEquals("Erro ao tentar salvar Funcionário, CPF já cadastrado.", exception.getMessage());
     }
 
@@ -226,9 +218,7 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(false);
 
-        assertDoesNotThrow(() -> {
-            funcionarioService.validateEmployeeCpfToSave(cpfFuncionario);
-        });
+        assertDoesNotThrow(() -> funcionarioService.validateEmployeeCpfToSave(cpfFuncionario));
     }
 
     @Test
@@ -241,8 +231,7 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.findByCpfNot(employeeDTO.getCpf())).thenReturn(listaEmployees);
 
-        List<Employee> funcionariosFiltrados =
-                funcionarioService.filterEmployeesByDifferentCpf(employeeDTO);
+        List<Employee> funcionariosFiltrados = funcionarioService.filterEmployeesByDifferentCpf(employeeDTO);
 
         assertNotNull(funcionariosFiltrados);
         assertEquals(3, funcionariosFiltrados.size());
@@ -256,9 +245,8 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(true);
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
-            funcionarioService.validateEmployeeCpfToSave(cpfFuncionario);
-        });
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () ->
+                funcionarioService.validateEmployeeCpfToSave(cpfFuncionario));
         assertEquals("Erro ao tentar salvar Funcionário, CPF já cadastrado.", exception.getMessage());
     }
 
@@ -269,9 +257,7 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByCpf(cpfFuncionario)).thenReturn(false);
 
-        assertDoesNotThrow(() -> {
-            funcionarioService.validateEmployeeCpfToSave(cpfFuncionario);
-        });
+        assertDoesNotThrow(() -> funcionarioService.validateEmployeeCpfToSave(cpfFuncionario));
     }
 
     @Test
@@ -281,7 +267,7 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByAddressId(idEndereco)).thenReturn(true);
 
-        assertTrue( funcionarioService.existsEmployeeByAddressId(idEndereco) );
+        assertTrue(funcionarioService.existsEmployeeByAddressId(idEndereco));
     }
 
     @Test
@@ -291,7 +277,7 @@ class EmployeeServiceImplTest {
 
         when(employeeRepository.existsEmployeeByAddressId(idEndereco)).thenReturn(false);
 
-        assertFalse( funcionarioService.existsEmployeeByAddressId(idEndereco) );
+        assertFalse(funcionarioService.existsEmployeeByAddressId(idEndereco));
     }
 
     public static Employee getFuncionario() {
